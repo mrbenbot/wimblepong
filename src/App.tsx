@@ -84,8 +84,8 @@ const App: React.FC = () => {
           />
           <PlayerScore matchState={matchState} player={rightPlayer} />
         </div>
-        {!connected && <button onClick={selectDevice}>select device</button>}
       </div>
+      {!connected && <button onClick={selectDevice}>select device</button>}
       <button onClick={handleFullscreen} className="full-screen-button">
         enter full screen
       </button>

@@ -31,10 +31,8 @@ export default {
 
 ## Notes
 
-- should clearly show score when each point is scored ✅
 - should announce end swaps + serve swaps + general game events
-  - Game wins
-  - aces, return aces, longest rally,
-  - match point, set point, break point
-- rally counter
-- should use delta time for smooth movement if fps drops? ✅
+  - Game Wins
+  - Set Wins
+- speed + increment needs to be a little faster
+- timeout on stats should be longer, with option to quit early?

@@ -219,7 +219,7 @@ describe("Tennis Match Reducer", () => {
       expect(nextState.gameState[Player.Player1]).toBe(Score.Advantage);
     });
 
-    it.only("should work going from advantage to next game", () => {
+    it("should work going from advantage to next game", () => {
       const action: Action = { type: "POINT_SCORED", player: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } };
       const state: MatchState = {
         ...initialState,
