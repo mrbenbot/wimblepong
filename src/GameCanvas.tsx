@@ -181,25 +181,6 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, inputRef, dispatc
     };
   }, [inputRef, gameStateRef, dispatch, servingPlayer, playerPosition, paused, leftPlayer, rightPlayer, deltaTimeRef]);
 
-  // const handleFullscreen = () => {
-  //   if (canvasRef.current !== null) {
-  //     const methods = [
-  //       "requestFullscreen",
-  //       "mozRequestFullScreen", // Firefox
-  //       "webkitRequestFullscreen", // Chrome, Safari, and Opera
-  //       "msRequestFullscreen", // IE/Edge
-  //     ];
-
-  //     for (const method of methods) {
-  //       if (method in canvasRef.current) {
-  //         const func = (canvasRef.current as any)[method] as () => Promise<void>;
-  //         func.call(canvasRef.current);
-  //         break;
-  //       }
-  //     }
-  //   }
-  // };
-
   return (
     <div>
       <canvas ref={canvasRef} width={COURT.width} height={COURT.height} />

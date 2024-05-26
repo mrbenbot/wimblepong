@@ -5,11 +5,48 @@
   text-align: center;
   font-family: "Catamaran", sans-serif;
   font-optical-sizing: auto;
-  /* font-weight: <weight>; */
   font-style: normal;
 }
 
 .main-container {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  z-index: -1;
+  background-color: rgb(0 102 51);
+}
+.second-container {
+  display: flex;
+  justify-content: space-between;
+  position: fixed;
+  top: 500px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  z-index: -1;
+}
+.second-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url(./assets/wimblepong.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 10%;
+  opacity: 0.05;
+  z-index: -1; /* Ensure the pseudo-element stays behind the content */
+}
+
+.full-screen-button {
+  position: fixed;
+  top: 50px;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }

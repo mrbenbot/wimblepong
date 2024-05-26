@@ -44,29 +44,51 @@ const App: React.FC = () => {
   });
   const [matchState, dispatch] = useReducer(reducer, initialState);
   const { leftPlayer, rightPlayer } = getLeftRightPlayer(matchState.playerPositions);
-  // console.log(matchState);
+  const containerDivRef = useRef(null);
+
+  const handleFullscreen = () => {
+    if (containerDivRef.current !== null) {
+      const methods = [
+        "requestFullscreen",
+        "webkitRequestFullscreen", // Chrome, Safari, and Opera
+      ];
+
+      for (const method of methods) {
+        if (method in containerDivRef.current) {
+          const func = containerDivRef.current[method] as () => Promise<void>;
+          func.call(containerDivRef.current);
+          break;
+        }
+      }
+    }
+  };
 
   return (
     <>
-      {matchState.events.map((event, i) => (
-        <EventAnnouncement key={JSON.stringify(event) + i} message={JSON.stringify(event)} />
-      ))}
-      <GameScore leftScore={matchState.gameState[leftPlayer]} rightScore={matchState.gameState[rightPlayer]} pointType={matchState.pointType} />
-      <div className="main-container">
-        {/* <Scoreboard matchState={matchState} /> */}
-        <PlayerScore matchState={matchState} player={leftPlayer} />
-        <GameCanvas
-          gameStateRef={gameStateRef}
-          inputRef={dataRef}
-          dispatch={dispatch}
-          matchState={matchState}
-          paused={!connected}
-          leftPlayer={leftPlayer}
-          rightPlayer={rightPlayer}
-        />
-        <PlayerScore matchState={matchState} player={rightPlayer} />
+      <div ref={containerDivRef} className="main-container">
+        {matchState.events.map((event, i) => (
+          <EventAnnouncement key={JSON.stringify(event) + i} message={JSON.stringify(event)} />
+        ))}
+        <GameScore leftScore={matchState.gameState[leftPlayer]} rightScore={matchState.gameState[rightPlayer]} pointType={matchState.pointType} />
+        <div className="second-container">
+          {/* <Scoreboard matchState={matchState} /> */}
+          <PlayerScore matchState={matchState} player={leftPlayer} />
+          <GameCanvas
+            gameStateRef={gameStateRef}
+            inputRef={dataRef}
+            dispatch={dispatch}
+            matchState={matchState}
+            paused={!connected}
+            leftPlayer={leftPlayer}
+            rightPlayer={rightPlayer}
+          />
+          <PlayerScore matchState={matchState} player={rightPlayer} />
+        </div>
+        {!connected && <button onClick={selectDevice}>select device</button>}
       </div>
-      {!connected && <button onClick={selectDevice}>select device</button>}
+      <button onClick={handleFullscreen} className="full-screen-button">
+        enter full screen
+      </button>
     </>
   );
 };
