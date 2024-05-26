@@ -11,3 +11,4 @@ export const BALL = { radius: 12 };
 export const SERVING_HEIGHT_MULTIPLIER = 2;
 export const SPEED_INCREMENT = 0.25;
 export const INITIAL_SPEED = 8;
+export const DELTA_TIME_DIVISOR = 21;
