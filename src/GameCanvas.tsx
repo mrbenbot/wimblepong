@@ -1,9 +1,19 @@
 import React, { useRef, useEffect } from "react";
 import { GameState } from "./App";
 import { DataRef } from "./ConnectDevices";
-import { Action, MatchState, Player } from "./score";
-import { BALL_COLOUR, COURT, DELTA_TIME_DIVISOR, INITIAL_SPEED, PLAYER_COLOURS, SERVING_HEIGHT_MULTIPLIER, SPEED_INCREMENT } from "./config";
+import { Action } from "./score";
+import {
+  BALL_COLOUR,
+  COURT,
+  DELTA_TIME_DIVISOR,
+  INITIAL_SPEED,
+  PADDLE_SPEED_DEVISOR,
+  PLAYER_COLOURS,
+  SERVING_HEIGHT_MULTIPLIER,
+  SPEED_INCREMENT,
+} from "./config";
 import "./GameCanvas.css";
+import { MatchState, Player } from "./types";
 
 interface GameCanvasProps {
   gameStateRef: React.MutableRefObject<GameState>;
@@ -58,28 +68,34 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, inputRef, dispatc
 
     const update = (deltaTime: number) => {
       // Update ball position
-      const ball = gameStateRef.current.ball;
-      const paddle1 = gameStateRef.current.paddle1;
-      const paddle2 = gameStateRef.current.paddle2;
+      const { ball, paddle1, paddle2, stats } = gameStateRef.current;
       // Update paddle positions based on input
       const { [leftPlayer]: input1, [rightPlayer]: input2 } = inputRef.current;
 
       if (ball.serveMode) {
         if (leftPlayer === servingPlayer) {
-          ball.dy = (paddle1.y + leftHeight / 2 - ball.y) / 15;
+          ball.dy = (paddle1.y + leftHeight / 2 - ball.y) / PADDLE_SPEED_DEVISOR;
           ball.x = paddle1.width + ball.radius;
           if (getButtonPushed(input1.lastData || new Uint8Array())) {
             ball.speed = INITIAL_SPEED;
             ball.dx = INITIAL_SPEED;
             ball.serveMode = false;
+
+            stats.rallyLength += 1;
+            stats.serveSpeed = Math.abs(ball.dy) + Math.abs(ball.dx);
+            stats.server = leftPlayer;
           }
         } else {
-          ball.dy = (paddle2.y + rightHeight / 2 - ball.y) / 15;
+          ball.dy = (paddle2.y + rightHeight / 2 - ball.y) / PADDLE_SPEED_DEVISOR;
           ball.x = canvas.width - paddle2.width - ball.radius;
           if (getButtonPushed(input2.lastData || new Uint8Array())) {
             ball.speed = INITIAL_SPEED;
             ball.dx = -INITIAL_SPEED;
             ball.serveMode = false;
+
+            stats.rallyLength += 1;
+            stats.serveSpeed = Math.abs(ball.dy) + Math.abs(ball.dx);
+            stats.server = rightPlayer;
           }
         }
         ball.y += ball.dy * deltaTime;
@@ -103,20 +119,22 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, inputRef, dispatc
           ball.dy = ball.speed * -Math.sin(bounceAngle);
           ball.x = paddle1.x + paddle1.width + ball.radius; // Adjust ball position to avoid sticking
           ball.speed += SPEED_INCREMENT;
+          stats.rallyLength += 1;
         } else if (ball.x + ball.radius > paddle2.x && ball.y > paddle2.y && ball.y < paddle2.y + rightHeight) {
           const bounceAngle = getBounceAngle(paddle2.y, rightHeight, ball.y);
           ball.dx = -ball.speed * Math.cos(bounceAngle);
           ball.dy = ball.speed * -Math.sin(bounceAngle);
           ball.x = paddle2.x - ball.radius; // Adjust ball position to avoid sticking
           ball.speed += SPEED_INCREMENT;
+          stats.rallyLength += 1;
         }
 
         // Check for scoring
         if (ball.x - ball.radius < 0) {
-          dispatch({ type: "POINT_SCORED", player: rightPlayer });
+          dispatch({ type: "POINT_SCORED", player: rightPlayer, stats: { ...stats } });
           resetBall();
         } else if (ball.x + ball.radius > canvas.width) {
-          dispatch({ type: "POINT_SCORED", player: leftPlayer });
+          dispatch({ type: "POINT_SCORED", player: leftPlayer, stats: { ...stats } });
           resetBall();
         }
       }
@@ -136,9 +154,12 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, inputRef, dispatc
     };
 
     const resetBall = () => {
-      const ball = gameStateRef.current.ball;
+      const { ball, stats } = gameStateRef.current;
+
       ball.speed = INITIAL_SPEED;
       ball.serveMode = true;
+      stats.rallyLength = 0;
+      stats.rallyLength = 0;
     };
 
     let loopId: null | number = null;

@@ -33,8 +33,8 @@ export default {
 
 - should clearly show score when each point is scored ✅
 - should announce end swaps + serve swaps + general game events
-  - basic score
+  - Game wins
   - aces, return aces, longest rally,
-  - match point, set point
+  - match point, set point, break point
 - rally counter
 - should use delta time for smooth movement if fps drops? ✅

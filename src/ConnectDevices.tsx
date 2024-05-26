@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Player } from "./score";
+import { Player } from "./types";
 
 function arraysEqual(a: Uint8Array | null, b: Uint8Array) {
   if (!a || a.length !== b.length) return false;
@@ -32,7 +32,10 @@ const useDJHeroInput = () => {
   const [deviceConnectionStatus, setDeviceConnectionStatus] = useState(DeviceConnectionStatus.NoneConnected);
   const [bothReceiving, setBothReceiving] = useState(false);
   const [devices, setDevices] = useState<HIDDevice[]>([]);
-  const dataRef = useRef<DataRef>({ [Player.Player1]: { lastData: null, lastUpdated: null }, [Player.Player2]: { lastData: null, lastUpdated: null } });
+  const dataRef = useRef<DataRef>({
+    [Player.Player1]: { lastData: null, lastUpdated: null },
+    [Player.Player2]: { lastData: null, lastUpdated: null },
+  });
 
   const selectDevice = async () => {
     console.log("requesting new devices");
@@ -45,7 +48,9 @@ const useDJHeroInput = () => {
     await newDevice.open();
     const newDevices = [...new Set([...devices, newDevice])];
     newDevice.addEventListener("inputreport", handleInputReport(players[newDevices.length === 1 ? 1 : 0]));
-    setDeviceConnectionStatus([DeviceConnectionStatus.NoneConnected, DeviceConnectionStatus.OneConnected, DeviceConnectionStatus.TwoConnected][newDevices.length]);
+    setDeviceConnectionStatus(
+      [DeviceConnectionStatus.NoneConnected, DeviceConnectionStatus.OneConnected, DeviceConnectionStatus.TwoConnected][newDevices.length]
+    );
     setDevices(newDevices);
   };
 
@@ -53,7 +58,9 @@ const useDJHeroInput = () => {
     const handleDisconnect = async (event: HIDConnectionEvent) => {
       console.log(`HID disconnected: ${event.device.productName}`);
       const remainingDevices = await navigator.hid.getDevices();
-      setDeviceConnectionStatus([DeviceConnectionStatus.NoneConnected, DeviceConnectionStatus.OneConnected, DeviceConnectionStatus.TwoConnected][remainingDevices.length]);
+      setDeviceConnectionStatus(
+        [DeviceConnectionStatus.NoneConnected, DeviceConnectionStatus.OneConnected, DeviceConnectionStatus.TwoConnected][remainingDevices.length]
+      );
       setDevices(remainingDevices);
     };
 
@@ -99,7 +106,9 @@ const useDJHeroInput = () => {
           }
         });
 
-        setDeviceConnectionStatus([DeviceConnectionStatus.NoneConnected, DeviceConnectionStatus.OneConnected, DeviceConnectionStatus.TwoConnected][existingDevices.length]);
+        setDeviceConnectionStatus(
+          [DeviceConnectionStatus.NoneConnected, DeviceConnectionStatus.OneConnected, DeviceConnectionStatus.TwoConnected][existingDevices.length]
+        );
 
         setDevices(existingDevices);
       }
@@ -115,7 +124,7 @@ const useDJHeroInput = () => {
       const now = Date.now();
       const diff0 = now - (dataRef.current[Player.Player1].lastUpdated ?? 0);
       const diff1 = now - (dataRef.current[Player.Player2].lastUpdated ?? 0);
-      console.log(dataRef.current);
+      // console.log(dataRef.current);
       setBothReceiving(diff0 < 500 && diff1 < 500);
     }, 1000);
     return () => {

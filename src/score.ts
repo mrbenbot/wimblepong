@@ -1,59 +1,11 @@
-export enum Score {
-  Love = "0",
-  Fifteen = "15",
-  Thirty = "30",
-  Forty = "40",
-  Advantage = "ADVANTAGE",
-  Game = "GAME",
-}
-
-export enum SetResult {
-  Win = "WIN",
-  Loss = "LOSS",
-}
-
-export enum PlayerPositions {
-  Initial = "INITIAL",
-  Reversed = "REVERSED",
-}
-
-export enum Player {
-  Player1 = "Player1",
-  Player2 = "Player2",
-}
-
-export interface GameState {
-  Player1: Score;
-  Player2: Score;
-  AdvantagePlayer?: Player;
-}
-
-export interface MatchState {
-  sets: {
-    [Player.Player1]: number;
-    [Player.Player2]: number;
-  }[];
-  games: {
-    [Player.Player1]: number;
-    [Player.Player2]: number;
-  };
-  tiebreak: {
-    [Player.Player1]: number;
-    [Player.Player2]: number;
-  };
-  matchWinner?: Player;
-  servingPlayer: Player;
-  playerPositions: PlayerPositions;
-  gameState: GameState;
-  matchConfig: {
-    setsToWin: number;
-  };
-}
+import { LONG_RALLY_ANNOUNCEMENT_THRESHOLD } from "./config";
+import { AnnouncementEvent, AnnouncementEventType, MatchState, Player, PlayerPositions, Score } from "./types";
 
 export const initialState: MatchState = {
   sets: [],
   games: { Player1: 0, Player2: 0 },
   tiebreak: { Player1: 0, Player2: 0 },
+  rallies: [],
   servingPlayer: Player.Player1,
   playerPositions: PlayerPositions.Initial,
   gameState: {
@@ -63,9 +15,10 @@ export const initialState: MatchState = {
   matchConfig: {
     setsToWin: 3,
   },
+  events: [],
 };
 
-export type Action = { type: "POINT_SCORED"; player: Player };
+export type Action = { type: "POINT_SCORED"; player: Player; stats: { rallyLength: number; serveSpeed: number; server: Player } };
 
 const scoreOrder: Score[] = [Score.Love, Score.Fifteen, Score.Thirty, Score.Forty, Score.Game];
 
@@ -117,7 +70,7 @@ export function reducer(state: MatchState, action: Action): MatchState {
 
   switch (action.type) {
     case "POINT_SCORED": {
-      const { player } = action;
+      const { player, stats } = action;
       const opponent = player === Player.Player1 ? Player.Player2 : Player.Player1;
 
       if (state.games.Player1 === 6 && state.games.Player2 === 6 && state.sets.length + 1 !== state.matchConfig.setsToWin) {
@@ -126,54 +79,58 @@ export function reducer(state: MatchState, action: Action): MatchState {
           if (Math.abs(state.tiebreak.Player1 - state.tiebreak.Player2) >= 2) {
             const tiebreakWinner = state.tiebreak.Player1 > state.tiebreak.Player2 ? Player.Player1 : Player.Player2;
             const finalSetScore = { ...state.games, [tiebreakWinner]: state.games[tiebreakWinner] + 1 };
-            const newState = {
+            const newState: MatchState = {
               ...state,
               sets: [...state.sets, finalSetScore],
               tiebreak: { Player1: 0, Player2: 0 },
               games: { Player1: 0, Player2: 0 },
+              rallies: [...state.rallies, { winner: tiebreakWinner, stats }],
               servingPlayer: state.servingPlayer === Player.Player1 ? Player.Player2 : Player.Player1,
-              servingEnd: getNextEnd(state),
+              playerPositions: getNextEnd(state),
               gameState: {
                 Player1: Score.Love,
                 Player2: Score.Love,
               },
             };
-            return { ...newState, matchWinner: checkMatchWinner(newState) };
+            return addRallyEvents({ ...newState, matchWinner: checkMatchWinner(newState) });
           }
         }
         const pointsPlayed = state.tiebreak.Player1 + state.tiebreak.Player2 + 1;
         const shouldChangeEnds = pointsPlayed % 6 === 0;
         const shouldChangeServer = (pointsPlayed - 1) % 2 === 0;
-        return {
+        return addRallyEvents({
           ...state,
           tiebreak: {
             ...state.tiebreak,
             [player]: state.tiebreak[player] + 1,
           },
+          rallies: [...state.rallies, { winner: player, stats }],
           servingPlayer: shouldChangeServer ? switchServer(state.servingPlayer) : state.servingPlayer,
           playerPositions: shouldChangeEnds ? switchEnd(state.playerPositions) : state.playerPositions,
-        };
+        });
       }
 
       // Handle deuce
       if (state.gameState[player] === Score.Forty && state.gameState[opponent] === Score.Forty) {
         if (state.gameState.AdvantagePlayer === opponent) {
-          return {
+          return addRallyEvents({
             ...state,
+            rallies: [...state.rallies, { winner: player, stats }],
             gameState: {
               ...state.gameState,
               AdvantagePlayer: undefined,
             },
-          };
+          });
         }
         if (state.gameState.AdvantagePlayer === undefined) {
-          return {
+          return addRallyEvents({
             ...state,
+            rallies: [...state.rallies, { winner: player, stats }],
             gameState: {
               ...state.gameState,
               AdvantagePlayer: player,
             },
-          };
+          });
         }
       }
 
@@ -193,13 +150,14 @@ export function reducer(state: MatchState, action: Action): MatchState {
             ...state,
             sets: newSets,
             games: { Player1: 0, Player2: 0 },
+            rallies: [...state.rallies, { winner: player, stats }],
             servingPlayer: state.servingPlayer === Player.Player1 ? Player.Player2 : Player.Player1,
             gameState: {
               Player1: Score.Love,
               Player2: Score.Love,
             },
           };
-          return { ...newState, playerPositions: getNextEnd(newState), matchWinner: checkMatchWinner(newState) };
+          return addRallyEvents({ ...newState, playerPositions: getNextEnd(newState), matchWinner: checkMatchWinner(newState) });
         }
         // wins games within set
         const newState = {
@@ -209,21 +167,61 @@ export function reducer(state: MatchState, action: Action): MatchState {
             Player1: Score.Love,
             Player2: Score.Love,
           },
+          rallies: [...state.rallies, { winner: player, stats }],
           servingPlayer: state.servingPlayer === Player.Player1 ? Player.Player2 : Player.Player1,
         };
-        return { ...newState, playerPositions: getNextEnd(newState) };
+        return addRallyEvents({ ...newState, playerPositions: getNextEnd(newState) });
       }
       // scores
-      return {
+      return addRallyEvents({
         ...state,
+        rallies: [...state.rallies, { winner: player, stats }],
         gameState: {
           ...state.gameState,
           [player]: newScore,
         },
-      };
+      });
     }
 
     default:
       return state;
   }
+}
+
+function addRallyEvents(state: MatchState) {
+  const {
+    stats: { rallyLength: latestLength, serveSpeed },
+  } = state.rallies[state.rallies.length - 1];
+
+  // win streak
+  const winStreak = getWinStreak(state.rallies);
+
+  if (winStreak > 0 && winStreak % 5 === 0) {
+    return { ...state, events: [...state.events, { type: AnnouncementEventType.WinStreak, streak: winStreak } as AnnouncementEvent] };
+  }
+
+  if (latestLength === 1) {
+    return { ...state, events: [...state.events, { type: AnnouncementEventType.Ace, speed: serveSpeed.toFixed(3) } as AnnouncementEvent] };
+  }
+
+  const previousRallies = state.rallies.slice(0, -1);
+  const prevHighest = previousRallies.reduce((highest, { stats }) => Math.max(highest, stats.rallyLength), 0);
+  if (latestLength >= LONG_RALLY_ANNOUNCEMENT_THRESHOLD && latestLength > prevHighest) {
+    return { ...state, events: [...state.events, { type: AnnouncementEventType.LongRally, length: latestLength } as AnnouncementEvent] };
+  }
+
+  return state;
+}
+
+export function getWinStreak(rallies: MatchState["rallies"]) {
+  if (rallies.length < 1) return 0;
+  const { winner } = rallies[rallies.length - 1];
+  let streak = 0;
+  for (let i = rallies.length - 1; i >= 0; i--) {
+    if (rallies[i].winner !== winner) {
+      break;
+    }
+    streak++;
+  }
+  return streak;
 }

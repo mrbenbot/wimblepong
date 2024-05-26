@@ -1,6 +1,6 @@
 import "./PlayerScore.css";
 import { PLAYER_COLOURS } from "./config";
-import { MatchState, Player } from "./score";
+import { MatchState, Player } from "./types";
 
 const PlayerScore = ({ matchState, player }: { matchState: MatchState; player: Player }) => {
   const { sets, games, tiebreak, servingPlayer, gameState } = matchState;
