@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { Action, getWinStreak, reducer } from "./score"; // Adjust the import path as needed
-import { MatchState, Player, PlayerPositions, Score } from "./types";
+import { Action, addPointState, getWinStreak, reducer } from "./score"; // Adjust the import path as needed
+import { MatchState, Player, PlayerPositions, PointType, Score } from "./types";
 
 describe("Tennis Match Reducer", () => {
   const initialState: MatchState = {
@@ -18,6 +18,7 @@ describe("Tennis Match Reducer", () => {
     matchConfig: {
       setsToWin: 3,
     },
+    pointType: PointType.Normal,
   };
 
   describe("should update the number of games won and sets won correctly", () => {
@@ -205,11 +206,39 @@ describe("Tennis Match Reducer", () => {
       const newState = reducer(state, action);
       expect(newState.matchWinner).toBe(Player.Player1);
     });
+
+    it("should work going from deuce to advantage", () => {
+      const action: Action = { type: "POINT_SCORED", player: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } };
+      const state: MatchState = {
+        ...initialState,
+        playerPositions: PlayerPositions.Initial,
+        servingPlayer: Player.Player1,
+        gameState: { Player1: Score.Forty, Player2: Score.Forty },
+      };
+      const nextState = reducer(state, action); // should be advantage player 1
+      expect(nextState.gameState[Player.Player1]).toBe(Score.Advantage);
+    });
+
+    it.only("should work going from advantage to next game", () => {
+      const action: Action = { type: "POINT_SCORED", player: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } };
+      const state: MatchState = {
+        ...initialState,
+        games: { [Player.Player1]: 0, [Player.Player2]: 0 },
+        playerPositions: PlayerPositions.Initial,
+        servingPlayer: Player.Player1,
+        gameState: { Player1: Score.Advantage, Player2: Score.Forty },
+      };
+      const nextState = reducer(state, action); // should be advantage player 1
+      expect(nextState.gameState[Player.Player1]).toBe(Score.Love);
+      expect(nextState.gameState[Player.Player1]).toBe(Score.Love);
+      expect(nextState.games[Player.Player1]).toBe(1);
+      expect(nextState.games[Player.Player2]).toBe(0);
+    });
   });
 });
 
 describe("getWinStreak", () => {
-  it.only.each([
+  it.each([
     { rallies: [], expected: 0 },
     {
       rallies: [{ winner: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } }],
@@ -240,5 +269,172 @@ describe("getWinStreak", () => {
     },
   ])("win streak should be $expected", ({ rallies, expected }) => {
     expect(getWinStreak(rallies)).toBe(expected);
+  });
+});
+
+describe("addPointState", () => {
+  const initialState: MatchState = {
+    sets: [{ Player1: 0, Player2: 0 }],
+    games: { Player1: 0, Player2: 0 },
+    tiebreak: { Player1: 0, Player2: 0 },
+    rallies: [],
+    servingPlayer: Player.Player1,
+    playerPositions: PlayerPositions.Initial,
+    gameState: {
+      Player1: Score.Love,
+      Player2: Score.Love,
+    },
+    matchConfig: {
+      setsToWin: 3,
+    },
+    events: [],
+    pointType: PointType.Normal,
+  };
+
+  it("should set point type to DEUCE", () => {
+    const state = {
+      ...initialState,
+      gameState: {
+        Player1: Score.Forty,
+        Player2: Score.Forty,
+      },
+    };
+    const updatedState = addPointState(state);
+    expect(updatedState.pointType).toBe(PointType.Deuce);
+  });
+
+  it("should set point type to GAME_POINT", () => {
+    const state = {
+      ...initialState,
+      gameState: {
+        Player1: Score.Forty,
+        Player2: Score.Thirty,
+      },
+    };
+    const updatedState = addPointState(state);
+    expect(updatedState.pointType).toBe(PointType.GamePoint);
+  });
+
+  it("should set point type to GAME_POINT when advantage", () => {
+    const state = {
+      ...initialState,
+      gameState: {
+        Player1: Score.Advantage,
+        Player2: Score.Forty,
+      },
+    };
+    const updatedState = addPointState(state);
+    expect(updatedState.pointType).toBe(PointType.GamePoint);
+  });
+
+  it("should set point type to BREAK_POINT", () => {
+    const state = {
+      ...initialState,
+      servingPlayer: Player.Player2,
+      gameState: {
+        Player1: Score.Forty,
+        Player2: Score.Thirty,
+      },
+    };
+    const updatedState = addPointState(state);
+    expect(updatedState.pointType).toBe(PointType.BreakPoint);
+  });
+
+  it("should set point type to BREAK_POINT when advantage", () => {
+    const state = {
+      ...initialState,
+      servingPlayer: Player.Player2,
+      gameState: {
+        Player1: Score.Advantage,
+        Player2: Score.Forty,
+      },
+    };
+    const updatedState = addPointState(state);
+    expect(updatedState.pointType).toBe(PointType.BreakPoint);
+  });
+
+  it("should set point type to SET_POINT", () => {
+    const state = {
+      ...initialState,
+      games: { Player1: 5, Player2: 4 },
+      gameState: {
+        Player1: Score.Forty,
+        Player2: Score.Thirty,
+      },
+    };
+    const updatedState = addPointState(state);
+    expect(updatedState.pointType).toBe(PointType.SetPoint);
+  });
+
+  it("should set point type to MATCH_POINT", () => {
+    const state: MatchState = {
+      ...initialState,
+      sets: [
+        { [Player.Player1]: 7, [Player.Player2]: 6 },
+        { [Player.Player1]: 6, [Player.Player2]: 7 },
+      ],
+      games: { Player1: 5, Player2: 4 },
+      gameState: {
+        Player1: Score.Forty,
+        Player2: Score.Thirty,
+      },
+      matchConfig: {
+        setsToWin: 3,
+      },
+    };
+    const updatedState = addPointState(state);
+    expect(updatedState.pointType).toBe(PointType.MatchPoint);
+  });
+
+  it("should handle tiebreak and set point type to SET_POINT", () => {
+    const state = {
+      ...initialState,
+      games: { Player1: 6, Player2: 6 },
+      tiebreak: { Player1: 6, Player2: 5 },
+    };
+    const updatedState = addPointState(state);
+    expect(updatedState.pointType).toBe(PointType.SetPoint);
+  });
+
+  it("should handle tiebreak and set point type to MATCH_POINT for server", () => {
+    const state = {
+      ...initialState,
+      sets: [{ Player1: 6, Player2: 4 }],
+      games: { Player1: 6, Player2: 6 },
+      tiebreak: { Player1: 6, Player2: 5 },
+      servingPlayer: Player.Player1,
+      matchConfig: {
+        setsToWin: 3,
+      },
+    };
+    const updatedState = addPointState(state);
+    expect(updatedState.pointType).toBe(PointType.MatchPoint);
+  });
+
+  it("should handle tiebreak and set point type to MATCH_POINT", () => {
+    const state = {
+      ...initialState,
+      servingPlayer: Player.Player2,
+      sets: [{ Player1: 6, Player2: 4 }],
+      games: { Player1: 6, Player2: 6 },
+      tiebreak: { Player1: 6, Player2: 5 },
+      matchConfig: {
+        setsToWin: 3,
+      },
+    };
+    const updatedState = addPointState(state);
+    expect(updatedState.pointType).toBe(PointType.MatchPoint);
+  });
+
+  it("should return NORMAL point type when no specific conditions are met", () => {
+    const state = {
+      ...initialState,
+      gameState: {
+        Player1: Score.Thirty,
+        Player2: Score.Fifteen,
+      },
+    };
+    const updatedState = addPointState(state);
+    expect(updatedState.pointType).toBe(PointType.Normal);
   });
 });

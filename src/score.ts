@@ -1,5 +1,5 @@
 import { LONG_RALLY_ANNOUNCEMENT_THRESHOLD } from "./config";
-import { AnnouncementEvent, AnnouncementEventType, MatchState, Player, PlayerPositions, Score } from "./types";
+import { AnnouncementEvent, AnnouncementEventType, MatchState, Player, PlayerPositions, PointType, Score } from "./types";
 
 export const initialState: MatchState = {
   sets: [],
@@ -16,15 +16,17 @@ export const initialState: MatchState = {
     setsToWin: 3,
   },
   events: [],
+  pointType: PointType.Normal,
 };
 
 export type Action = { type: "POINT_SCORED"; player: Player; stats: { rallyLength: number; serveSpeed: number; server: Player } };
 
 const scoreOrder: Score[] = [Score.Love, Score.Fifteen, Score.Thirty, Score.Forty, Score.Game];
+const scoreOrderInDeuce: Score[] = [Score.Forty, Score.Advantage, Score.Game];
 
-export function getNextScore(currentScore: Score): Score {
-  const currentIndex = scoreOrder.indexOf(currentScore);
-  return scoreOrder[currentIndex + 1];
+export function getNextScore(currentScore: Score, isDeuce: boolean): Score {
+  const currentIndex = (isDeuce ? scoreOrderInDeuce : scoreOrder).indexOf(currentScore);
+  return (isDeuce ? scoreOrderInDeuce : scoreOrder)[currentIndex + 1];
 }
 
 function switchEnd(currentEnd: PlayerPositions): PlayerPositions {
@@ -92,49 +94,56 @@ export function reducer(state: MatchState, action: Action): MatchState {
                 Player2: Score.Love,
               },
             };
-            return addRallyEvents({ ...newState, matchWinner: checkMatchWinner(newState) });
+            return addPointState(addRallyEvents({ ...newState, matchWinner: checkMatchWinner(newState) }));
           }
         }
         const pointsPlayed = state.tiebreak.Player1 + state.tiebreak.Player2 + 1;
         const shouldChangeEnds = pointsPlayed % 6 === 0;
         const shouldChangeServer = (pointsPlayed - 1) % 2 === 0;
-        return addRallyEvents({
-          ...state,
-          tiebreak: {
-            ...state.tiebreak,
-            [player]: state.tiebreak[player] + 1,
-          },
-          rallies: [...state.rallies, { winner: player, stats }],
-          servingPlayer: shouldChangeServer ? switchServer(state.servingPlayer) : state.servingPlayer,
-          playerPositions: shouldChangeEnds ? switchEnd(state.playerPositions) : state.playerPositions,
-        });
+        return addPointState(
+          addRallyEvents({
+            ...state,
+            tiebreak: {
+              ...state.tiebreak,
+              [player]: state.tiebreak[player] + 1,
+            },
+            rallies: [...state.rallies, { winner: player, stats }],
+            servingPlayer: shouldChangeServer ? switchServer(state.servingPlayer) : state.servingPlayer,
+            playerPositions: shouldChangeEnds ? switchEnd(state.playerPositions) : state.playerPositions,
+          })
+        );
       }
 
-      // Handle deuce
-      if (state.gameState[player] === Score.Forty && state.gameState[opponent] === Score.Forty) {
-        if (state.gameState.AdvantagePlayer === opponent) {
-          return addRallyEvents({
+      // Handle back to deuce
+      if (state.gameState[opponent] === Score.Advantage) {
+        return addPointState(
+          addRallyEvents({
             ...state,
             rallies: [...state.rallies, { winner: player, stats }],
             gameState: {
               ...state.gameState,
-              AdvantagePlayer: undefined,
+              [opponent]: Score.Forty,
             },
-          });
-        }
-        if (state.gameState.AdvantagePlayer === undefined) {
-          return addRallyEvents({
+          })
+        );
+      }
+
+      // Handle gaining advantage
+      if (state.gameState[opponent] === Score.Forty && state.gameState[player] === Score.Forty) {
+        return addPointState(
+          addRallyEvents({
             ...state,
             rallies: [...state.rallies, { winner: player, stats }],
             gameState: {
               ...state.gameState,
-              AdvantagePlayer: player,
+              [player]: Score.Advantage,
             },
-          });
-        }
+          })
+        );
       }
 
-      const newScore = getNextScore(state.gameState[player]);
+      const isDeuce = [state.gameState[opponent], state.gameState[player]].every((score) => [Score.Forty, Score.Advantage].includes(score));
+      const newScore = getNextScore(state.gameState[player], isDeuce);
 
       if (newScore === Score.Game) {
         const newGames = {
@@ -157,7 +166,7 @@ export function reducer(state: MatchState, action: Action): MatchState {
               Player2: Score.Love,
             },
           };
-          return addRallyEvents({ ...newState, playerPositions: getNextEnd(newState), matchWinner: checkMatchWinner(newState) });
+          return addPointState(addRallyEvents({ ...newState, playerPositions: getNextEnd(newState), matchWinner: checkMatchWinner(newState) }));
         }
         // wins games within set
         const newState = {
@@ -170,17 +179,19 @@ export function reducer(state: MatchState, action: Action): MatchState {
           rallies: [...state.rallies, { winner: player, stats }],
           servingPlayer: state.servingPlayer === Player.Player1 ? Player.Player2 : Player.Player1,
         };
-        return addRallyEvents({ ...newState, playerPositions: getNextEnd(newState) });
+        return addPointState(addRallyEvents({ ...newState, playerPositions: getNextEnd(newState) }));
       }
       // scores
-      return addRallyEvents({
-        ...state,
-        rallies: [...state.rallies, { winner: player, stats }],
-        gameState: {
-          ...state.gameState,
-          [player]: newScore,
-        },
-      });
+      return addPointState(
+        addRallyEvents({
+          ...state,
+          rallies: [...state.rallies, { winner: player, stats }],
+          gameState: {
+            ...state.gameState,
+            [player]: newScore,
+          },
+        })
+      );
     }
 
     default:
@@ -224,4 +235,91 @@ export function getWinStreak(rallies: MatchState["rallies"]) {
     streak++;
   }
   return streak;
+}
+
+export function addPointState(state: MatchState): MatchState {
+  const { games, gameState, servingPlayer, matchConfig, tiebreak } = state;
+  const receivingPlayer = servingPlayer === Player.Player1 ? Player.Player2 : Player.Player1;
+
+  for (const player of [Player.Player1, Player.Player2]) {
+    const opponent = player === Player.Player1 ? Player.Player2 : Player.Player1;
+    // Check if in tiebreak
+    const inTiebreak = games[player] === 6 && games[opponent] === 6;
+
+    if (inTiebreak) {
+      // Tiebreak logic
+
+      // Determine if it is a match point during tiebreak
+      const setWonByPlayer = state.sets.filter((set) => set[player] > set[opponent]).length;
+      if (setWonByPlayer === Math.floor(matchConfig.setsToWin / 2) && tiebreak[player] >= 6 && tiebreak[player] - tiebreak[opponent] >= 1) {
+        return {
+          ...state,
+          pointType: PointType.MatchPoint,
+        };
+      }
+
+      // Determine if it is a set point during tiebreak
+      if (tiebreak[player] >= 6 && tiebreak[player] - tiebreak[opponent] >= 1) {
+        return {
+          ...state,
+          pointType: PointType.SetPoint,
+        };
+      }
+
+      return {
+        ...state,
+        pointType: PointType.Normal,
+      };
+    }
+
+    // Regular game logic
+    // Determine if it is Deuce
+    if (gameState[player] === Score.Forty && gameState[opponent] === Score.Forty) {
+      return {
+        ...state,
+        pointType: PointType.Deuce,
+      };
+    }
+
+    // Determine if it is a set point
+    if (games[player] === 5 && gameState[player] === Score.Forty && gameState[opponent] !== Score.Forty && gameState[opponent] !== Score.Advantage) {
+      // Determine if it is also a match point
+      const setsWonByServer = state.sets.filter((set) => set[player] > set[opponent]).length;
+      if (setsWonByServer === Math.floor(matchConfig.setsToWin / 2)) {
+        return {
+          ...state,
+          pointType: PointType.MatchPoint,
+        };
+      }
+      return {
+        ...state,
+        pointType: PointType.SetPoint,
+      };
+    }
+  }
+  // Determine if it is a break point
+  if (
+    (gameState[receivingPlayer] === Score.Forty && gameState[servingPlayer] !== Score.Forty && gameState[servingPlayer] !== Score.Advantage) ||
+    (gameState[receivingPlayer] === Score.Advantage && gameState[servingPlayer] === Score.Forty)
+  ) {
+    return {
+      ...state,
+      pointType: PointType.BreakPoint,
+    };
+  }
+
+  // Determine if it is a game point
+  if (
+    (gameState[servingPlayer] === Score.Forty && gameState[receivingPlayer] !== Score.Forty && gameState[receivingPlayer] !== Score.Advantage) ||
+    (gameState[servingPlayer] === Score.Advantage && gameState[receivingPlayer] === Score.Forty)
+  ) {
+    return {
+      ...state,
+      pointType: PointType.GamePoint,
+    };
+  }
+  return {
+    ...state,
+    pointType: PointType.Normal,
+  };
 }

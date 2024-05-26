@@ -1,11 +1,17 @@
 .game-score-container {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
 }
 .score {
   font-size: 4em;
   font-family: "Courier New", Courier, monospace;
   width: 100px;
+}
+.score-middle {
+  font-size: 3em;
+  width: 300px;
 }
 
 .same-score {

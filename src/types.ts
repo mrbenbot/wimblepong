@@ -30,6 +30,7 @@ export enum AnnouncementEventType {
 
 export enum PointType {
   Normal = "NORMAL",
+  Deuce = "DEUCE",
   GamePoint = "GAME_POINT",
   BreakPoint = "BREAK_POINT",
   SetPoint = "SET_POINT",
@@ -56,7 +57,6 @@ export type AnnouncementEvent = LongRallyEvent | AceEvent | WinStreakEvent;
 export interface GameState {
   Player1: Score;
   Player2: Score;
-  AdvantagePlayer?: Player;
 }
 
 export interface MatchState {
@@ -81,4 +81,5 @@ export interface MatchState {
     setsToWin: number;
   };
   events: AnnouncementEvent[];
+  pointType: PointType;
 }

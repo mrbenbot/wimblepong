@@ -12,7 +12,7 @@ const PlayerScore = ({ matchState, player }: { matchState: MatchState; player: P
       <h2 className="cell" style={{ color: PLAYER_COLOURS[player] }}>
         {player} {servingPlayer === player ? "🔴" : " "}
       </h2>
-      <h3 className="cell">SCORE {isTieBreak ? tiebreak[player] : gameState.AdvantagePlayer === player ? "ADV." : gameState[player]}</h3>
+      <h3 className="cell">SCORE {isTieBreak ? tiebreak[player] : gameState[player]}</h3>
       <h3 className="cell">GAMES {games[player]}</h3>
       <h3 className="cell">SETS: {sets.map((set) => set[player] > set[opponent]).length}</h3>
       {/* <h4 className="cell">{sets.map((set) => set[player]).join(" ")}</h4> */}
