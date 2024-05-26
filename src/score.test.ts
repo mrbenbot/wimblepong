@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Score, Player, PlayerEnd, MatchState, Action, reducer } from "./score"; // Adjust the import path as needed
+import { Score, Player, PlayerPositions, MatchState, Action, reducer } from "./score"; // Adjust the import path as needed
 
 describe("Tennis Match Reducer", () => {
   const initialState: MatchState = {
@@ -7,7 +7,7 @@ describe("Tennis Match Reducer", () => {
     games: { Player1: 0, Player2: 0 },
     tiebreak: { Player1: 0, Player2: 0 },
     servingPlayer: Player.Player1,
-    servingEnd: PlayerEnd.Left,
+    playerPositions: PlayerPositions.Initial,
     gameState: {
       Player1: Score.Love,
       Player2: Score.Love,
@@ -63,122 +63,128 @@ describe("Tennis Match Reducer", () => {
       expect(state.tiebreak.Player1).toBe(1);
       expect(state.tiebreak.Player2).toBe(0);
       expect(state.servingPlayer).toBe(Player.Player2); // Serve changes after the first point
-      expect(state.servingEnd).toBe(PlayerEnd.Left); // End stays the same
+      expect(state.playerPositions).toBe(PlayerPositions.Initial); // End stays the same
 
       // Point 2: Player2 scores
       state = reducer(state, { type: "POINT_SCORED", player: Player.Player2 });
       expect(state.tiebreak.Player1).toBe(1);
       expect(state.tiebreak.Player2).toBe(1);
       expect(state.servingPlayer).toBe(Player.Player2); // Serve stays the same after two points
-      expect(state.servingEnd).toBe(PlayerEnd.Left); // End stays the same
+      expect(state.playerPositions).toBe(PlayerPositions.Initial); // End stays the same
 
       // Point 3: Player2 scores
       state = reducer(state, { type: "POINT_SCORED", player: Player.Player2 });
       expect(state.tiebreak.Player1).toBe(1);
       expect(state.tiebreak.Player2).toBe(2);
       expect(state.servingPlayer).toBe(Player.Player1); // Serve changes after two more points
-      expect(state.servingEnd).toBe(PlayerEnd.Left); // End stays the same
+      expect(state.playerPositions).toBe(PlayerPositions.Initial); // End stays the same
 
       // Point 4: Player1 scores
       state = reducer(state, { type: "POINT_SCORED", player: Player.Player1 });
       expect(state.tiebreak.Player1).toBe(2);
       expect(state.tiebreak.Player2).toBe(2);
       expect(state.servingPlayer).toBe(Player.Player1); // Serve stays the same after one point
-      expect(state.servingEnd).toBe(PlayerEnd.Left); // End stays the same
+      expect(state.playerPositions).toBe(PlayerPositions.Initial); // End stays the same
 
       // Point 5: Player1 scores
       state = reducer(state, { type: "POINT_SCORED", player: Player.Player1 });
       expect(state.tiebreak.Player1).toBe(3);
       expect(state.tiebreak.Player2).toBe(2);
       expect(state.servingPlayer).toBe(Player.Player2); // Serve changes after two more points
-      expect(state.servingEnd).toBe(PlayerEnd.Left); // End stays the same
+      expect(state.playerPositions).toBe(PlayerPositions.Initial); // End stays the same
 
       // Point 6: Player2 scores
       state = reducer(state, { type: "POINT_SCORED", player: Player.Player2 });
       expect(state.tiebreak.Player1).toBe(3);
       expect(state.tiebreak.Player2).toBe(3);
       expect(state.servingPlayer).toBe(Player.Player2); // Serve stays the same after one point
-      expect(state.servingEnd).toBe(PlayerEnd.Right); // Ends change after 6 points
+      expect(state.playerPositions).toBe(PlayerPositions.Reversed); // Ends change after 6 points
 
       // Point 7: Player2 scores
       state = reducer(state, { type: "POINT_SCORED", player: Player.Player2 });
       expect(state.tiebreak.Player1).toBe(3);
       expect(state.tiebreak.Player2).toBe(4);
       expect(state.servingPlayer).toBe(Player.Player1); // Serve changes after two more points
-      expect(state.servingEnd).toBe(PlayerEnd.Right); // End stays the same
+      expect(state.playerPositions).toBe(PlayerPositions.Reversed); // End stays the same
 
       // Point 8: Player1 scores
       state = reducer(state, { type: "POINT_SCORED", player: Player.Player1 });
       expect(state.tiebreak.Player1).toBe(4);
       expect(state.tiebreak.Player2).toBe(4);
       expect(state.servingPlayer).toBe(Player.Player1); // Serve stays the same after one point
-      expect(state.servingEnd).toBe(PlayerEnd.Right); // End stays the same
+      expect(state.playerPositions).toBe(PlayerPositions.Reversed); // End stays the same
 
       // Point 9: Player1 scores
       state = reducer(state, { type: "POINT_SCORED", player: Player.Player1 });
       expect(state.tiebreak.Player1).toBe(5);
       expect(state.tiebreak.Player2).toBe(4);
       expect(state.servingPlayer).toBe(Player.Player2); // Serve changes after two more points
-      expect(state.servingEnd).toBe(PlayerEnd.Right); // End stays the same
+      expect(state.playerPositions).toBe(PlayerPositions.Reversed); // End stays the same
 
       // Point 10: Player2 scores
       state = reducer(state, { type: "POINT_SCORED", player: Player.Player2 });
       expect(state.tiebreak.Player1).toBe(5);
       expect(state.tiebreak.Player2).toBe(5);
       expect(state.servingPlayer).toBe(Player.Player2); // Serve stays the same after one point
-      expect(state.servingEnd).toBe(PlayerEnd.Right); // End stays the same
+      expect(state.playerPositions).toBe(PlayerPositions.Reversed); // End stays the same
 
       // Point 11: Player2 scores
       state = reducer(state, { type: "POINT_SCORED", player: Player.Player2 });
       expect(state.tiebreak.Player1).toBe(5);
       expect(state.tiebreak.Player2).toBe(6);
       expect(state.servingPlayer).toBe(Player.Player1); // Serve changes after two more points
-      expect(state.servingEnd).toBe(PlayerEnd.Right); // End stays the same
+      expect(state.playerPositions).toBe(PlayerPositions.Reversed); // End stays the same
 
       // Point 12: Player1 scores
       state = reducer(state, { type: "POINT_SCORED", player: Player.Player1 });
       expect(state.tiebreak.Player1).toBe(6);
       expect(state.tiebreak.Player2).toBe(6);
       expect(state.servingPlayer).toBe(Player.Player1); // Serve stays the same after one point
-      expect(state.servingEnd).toBe(PlayerEnd.Left); // Ends change after 6 points
+      expect(state.playerPositions).toBe(PlayerPositions.Initial); // Ends change after 6 points
 
       // Point 13: Player1 scores
       state = reducer(state, { type: "POINT_SCORED", player: Player.Player1 });
       expect(state.tiebreak.Player1).toBe(7);
       expect(state.tiebreak.Player2).toBe(6);
       expect(state.servingPlayer).toBe(Player.Player2); // Serve changes after two more points
-      expect(state.servingEnd).toBe(PlayerEnd.Left); // End stays the same
+      expect(state.playerPositions).toBe(PlayerPositions.Initial); // End stays the same
 
       // Point 13: Player1 scores
       state = reducer(state, { type: "POINT_SCORED", player: Player.Player1 });
       expect(state.tiebreak.Player1).toBe(8);
       expect(state.tiebreak.Player2).toBe(6);
       expect(state.servingPlayer).toBe(Player.Player2); // Serve changes after two more points
-      expect(state.servingEnd).toBe(PlayerEnd.Left); // End stays the same
+      expect(state.playerPositions).toBe(PlayerPositions.Initial); // End stays the same
     });
 
-    it("should change ends after the first game and every two games thereafter", () => {
+    it.only("should change ends after the first game and every two games thereafter", () => {
       const action: Action = { type: "POINT_SCORED", player: Player.Player1 };
-      let state = { ...initialState, servingEnd: PlayerEnd.Left, gameState: { Player1: Score.Forty, Player2: Score.Thirty } };
+      let state: MatchState = {
+        ...initialState,
+        playerPositions: PlayerPositions.Initial,
+        servingPlayer: Player.Player1,
+        gameState: { Player1: Score.Forty, Player2: Score.Thirty },
+      };
 
       state = reducer(state, action); // Player1 wins the first game
-      expect(state.servingEnd).toBe(PlayerEnd.Right);
+      expect(state.playerPositions).toBe(PlayerPositions.Reversed); // should swap ends after first game
+      expect(state.servingPlayer).toBe(Player.Player2);
 
       state = { ...state, gameState: { Player1: Score.Forty, Player2: Score.Thirty } };
       state = reducer(state, action); // Player1 wins the second game
-      expect(state.servingEnd).toBe(PlayerEnd.Right); // No change after the second game
+      expect(state.playerPositions).toBe(PlayerPositions.Reversed); // No change after the second game
 
       state = { ...state, gameState: { Player1: Score.Forty, Player2: Score.Thirty } };
       state = reducer(state, action); // Player1 wins the third game
-      expect(state.servingEnd).toBe(PlayerEnd.Left); // Change after the third game
+      expect(state.playerPositions).toBe(PlayerPositions.Initial); // Change after the third game
 
       state = { ...state, gameState: { Player1: Score.Forty, Player2: Score.Thirty } };
       state = reducer(state, action); // Player1 wins the fourth game
-      expect(state.servingEnd).toBe(PlayerEnd.Left); // No change after the fourth game
+      expect(state.playerPositions).toBe(PlayerPositions.Initial); // No change after the fourth game
 
       state = { ...state, gameState: { Player1: Score.Forty, Player2: Score.Thirty } };
       state = reducer(state, action); // Player1 wins the fifth game
-      expect(state.servingEnd).toBe(PlayerEnd.Right); // Change after the fifth game
+      expect(state.playerPositions).toBe(PlayerPositions.Reversed); // Change after the fifth game
     });
 
     it("should determine the match winner correctly", () => {

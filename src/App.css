@@ -3,4 +3,13 @@
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  font-family: "Catamaran", sans-serif;
+  font-optical-sizing: auto;
+  /* font-weight: <weight>; */
+  font-style: normal;
+}
+
+.main-container {
+  display: flex;
+  justify-content: center;
 }

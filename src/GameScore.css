@@ -1,0 +1,24 @@
+.game-score-container {
+  display: flex;
+  justify-content: space-evenly;
+}
+.score {
+  font-size: 4em;
+  font-family: "Courier New", Courier, monospace;
+  width: 100px;
+}
+
+.same-score {
+  opacity: 1;
+}
+
+.new-score {
+  opacity: 0; /* Start from invisible */
+  animation: appear 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+}
+
+@keyframes appear {
+  to {
+    opacity: 1;
+  }
+}

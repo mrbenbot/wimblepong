@@ -1,8 +1,8 @@
 export enum Score {
-  Love = "LOVE",
-  Fifteen = "FIFTEEN",
-  Thirty = "THIRTY",
-  Forty = "FORTY",
+  Love = "0",
+  Fifteen = "15",
+  Thirty = "30",
+  Forty = "40",
   Advantage = "ADVANTAGE",
   Game = "GAME",
 }
@@ -12,9 +12,9 @@ export enum SetResult {
   Loss = "LOSS",
 }
 
-export enum PlayerEnd {
-  Left = "LEFT",
-  Right = "RIGHT",
+export enum PlayerPositions {
+  Initial = "INITIAL",
+  Reversed = "REVERSED",
 }
 
 export enum Player {
@@ -43,7 +43,7 @@ export interface MatchState {
   };
   matchWinner?: Player;
   servingPlayer: Player;
-  servingEnd: PlayerEnd;
+  playerPositions: PlayerPositions;
   gameState: GameState;
   matchConfig: {
     setsToWin: number;
@@ -55,7 +55,7 @@ export const initialState: MatchState = {
   games: { Player1: 0, Player2: 0 },
   tiebreak: { Player1: 0, Player2: 0 },
   servingPlayer: Player.Player1,
-  servingEnd: PlayerEnd.Left,
+  playerPositions: PlayerPositions.Initial,
   gameState: {
     Player1: Score.Love,
     Player2: Score.Love,
@@ -74,17 +74,17 @@ export function getNextScore(currentScore: Score): Score {
   return scoreOrder[currentIndex + 1];
 }
 
-function switchEnd(currentEnd: PlayerEnd): PlayerEnd {
-  return currentEnd === PlayerEnd.Left ? PlayerEnd.Right : PlayerEnd.Left;
+function switchEnd(currentEnd: PlayerPositions): PlayerPositions {
+  return currentEnd === PlayerPositions.Initial ? PlayerPositions.Reversed : PlayerPositions.Initial;
 }
 
-function getNextEnd(state: MatchState): PlayerEnd {
+function getNextEnd(state: MatchState): PlayerPositions {
   const totalGamesPlayed = state.sets.reduce((acc, { Player1, Player2 }) => acc + Player1 + Player2, state.games.Player1 + state.games.Player2);
   const shouldSwitchEnd = (totalGamesPlayed - 1) % 2 == 0;
   if (shouldSwitchEnd) {
-    return switchEnd(state.servingEnd);
+    return switchEnd(state.playerPositions);
   }
-  return state.servingEnd;
+  return state.playerPositions;
 }
 function switchServer(currentServer: Player): Player {
   return currentServer === Player.Player1 ? Player.Player2 : Player.Player1;
@@ -151,7 +151,7 @@ export function reducer(state: MatchState, action: Action): MatchState {
             [player]: state.tiebreak[player] + 1,
           },
           servingPlayer: shouldChangeServer ? switchServer(state.servingPlayer) : state.servingPlayer,
-          servingEnd: shouldChangeEnds ? switchEnd(state.servingEnd) : state.servingEnd,
+          playerPositions: shouldChangeEnds ? switchEnd(state.playerPositions) : state.playerPositions,
         };
       }
 
@@ -199,7 +199,7 @@ export function reducer(state: MatchState, action: Action): MatchState {
               Player2: Score.Love,
             },
           };
-          return { ...newState, servingEnd: getNextEnd(newState), matchWinner: checkMatchWinner(newState) };
+          return { ...newState, playerPositions: getNextEnd(newState), matchWinner: checkMatchWinner(newState) };
         }
         // wins games within set
         const newState = {
@@ -211,7 +211,7 @@ export function reducer(state: MatchState, action: Action): MatchState {
           },
           servingPlayer: state.servingPlayer === Player.Player1 ? Player.Player2 : Player.Player1,
         };
-        return { ...newState, servingEnd: getNextEnd(newState) };
+        return { ...newState, playerPositions: getNextEnd(newState) };
       }
       // scores
       return {

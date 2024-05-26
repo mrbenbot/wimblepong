@@ -1,4 +1,5 @@
 import "./Scoreboard.css";
+import { PLAYER_COLOURS } from "./config";
 import { MatchState, Player } from "./score";
 
 const Scoreboard = ({ matchState }: { matchState: MatchState }) => {
@@ -17,21 +18,25 @@ const Scoreboard = ({ matchState }: { matchState: MatchState }) => {
       </div>
       <div className="row">
         <div className="cell">{sets.map((set) => set.Player1).join(" ")}</div>
-        <div className="cell" style={{ color: servingPlayer === Player.Player1 ? "red" : "white" }}>
-          Player 1
+        <div className="cell" style={{ color: PLAYER_COLOURS[Player.Player1] }}>
+          Player 1 {servingPlayer === Player.Player1 ? "🔴" : " "}
         </div>
         <div className="cell">{sets.map((set) => set[Player.Player1] > set[Player.Player2]).length}</div>
         <div className="cell">{games[Player.Player1]}</div>
-        <div className="cell">{isTieBreak ? tiebreak[Player.Player1] : gameState.AdvantagePlayer === Player.Player1 ? "ADV." : gameState[Player.Player1]}</div>
+        <div className="cell">
+          {isTieBreak ? tiebreak[Player.Player1] : gameState.AdvantagePlayer === Player.Player1 ? "ADV." : gameState[Player.Player1]}
+        </div>
       </div>
       <div className="row">
         <div className="cell">{sets.map((set) => set.Player2).join(" ")}</div>
-        <div className="cell" style={{ color: servingPlayer === Player.Player2 ? "red" : "white" }}>
-          Player 2
+        <div className="cell" style={{ color: PLAYER_COLOURS[Player.Player2] }}>
+          Player 2 {servingPlayer === Player.Player2 ? "🔴" : " "}
         </div>
         <div className="cell">{sets.map((set) => set[Player.Player2] > set[Player.Player1]).length}</div>
         <div className="cell">{games[Player.Player2]}</div>
-        <div className="cell">{isTieBreak ? tiebreak[Player.Player2] : gameState.AdvantagePlayer === Player.Player2 ? "ADV." : gameState[Player.Player2]}</div>
+        <div className="cell">
+          {isTieBreak ? tiebreak[Player.Player2] : gameState.AdvantagePlayer === Player.Player2 ? "ADV." : gameState[Player.Player2]}
+        </div>
       </div>
     </div>
   );

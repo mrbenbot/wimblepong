@@ -1,0 +1,22 @@
+.announcement {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-size: 1.2em;
+  border-radius: 5px;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  z-index: 1000;
+}
+
+.announcement.fade-in {
+  opacity: 1;
+}
+
+.announcement.fade-out {
+  opacity: 0;
+}
