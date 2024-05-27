@@ -7,6 +7,7 @@ import "./App.css";
 import PlayerScore from "./PlayerScore";
 import EventAnnouncement from "./EventAnnouncement";
 import { Player, PlayerPositions } from "./types";
+import Scoreboard from "./Scoreboard";
 // import Scoreboard from "./Scoreboard";
 
 export interface GameState {
@@ -65,7 +66,6 @@ const App: React.FC = () => {
 
   return (
     <>
-      {/* <Scoreboard matchState={matchState} /> */}
       <div ref={containerDivRef} className="main-container">
         <div className="game-announcements-wrapper">
           {matchState.events.map((event, i) => (
@@ -73,7 +73,10 @@ const App: React.FC = () => {
           ))}
         </div>
 
-        <div className="second-container">
+        <main className="second-container">
+          <header className="header">
+            <Scoreboard matchState={matchState} />
+          </header>
           <PlayerScore matchState={matchState} player={leftPlayer} />
           <GameCanvas
             gameStateRef={gameStateRef}
@@ -85,11 +88,18 @@ const App: React.FC = () => {
             rightPlayer={rightPlayer}
           />
           <PlayerScore matchState={matchState} player={rightPlayer} />
-        </div>
-        {!connected && <button onClick={selectDevice}>select device</button>}
-        <button onClick={handleFullscreen} className="full-screen-button">
-          enter full screen
-        </button>
+          <footer className="footer">
+            <div>{!connected && <button onClick={selectDevice}>select device</button>}</div>
+            <p className="match-info">
+              Best of {matchState.matchConfig.numberOfSets} sets. Set length {matchState.matchConfig.setLength} games.
+            </p>
+            <div>
+              <button onClick={handleFullscreen} className="full-screen-button">
+                enter full screen
+              </button>
+            </div>
+          </footer>
+        </main>
       </div>
     </>
   );

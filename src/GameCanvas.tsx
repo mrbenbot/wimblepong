@@ -186,7 +186,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, inputRef, dispatc
   }, [inputRef, gameStateRef, dispatch, servingPlayer, playerPosition, paused, leftPlayer, rightPlayer, deltaTimeRef]);
 
   return (
-    <div>
+    <div className="game-canvas-container">
       <GameScore leftPlayer={leftPlayer} rightPlayer={rightPlayer} matchState={matchState} />
       <canvas ref={canvasRef} width={COURT.width} height={COURT.height} />
     </div>

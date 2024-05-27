@@ -13,8 +13,8 @@ export const initialState: MatchState = {
     Player2: Score.Love,
   },
   matchConfig: {
-    numberOfSets: 1,
-    setLength: 2,
+    numberOfSets: 3,
+    setLength: 6,
   },
   events: [],
   pointType: PointType.Normal,

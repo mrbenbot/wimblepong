@@ -2,8 +2,8 @@
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
-  background-color: #cacaca67;
-  color: #ecf0f1;
+  background-color: rgba(255, 255, 255, 0.757);
+  color: #000000;
   font-family: Arial, sans-serif;
   text-align: center;
   /* padding: 10px; */
@@ -17,8 +17,7 @@
 
 .row {
   display: flex;
-  justify-content: space-between;
-  /* padding: 10px; */
+  /* gap: 10px; */
 }
 
 .header {
@@ -28,4 +27,12 @@
 .cell {
   flex: 1;
   text-align: center;
+  text-wrap: nowrap;
+}
+
+.number-cell {
+  width: 15px;
+  text-align: center;
+  padding-left: 5px;
+  padding-right: 5px;
 }
