@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Action, addPointState, getWinStreak, reducer } from "./score"; // Adjust the import path as needed
-import { MatchState, Player, PlayerPositions, PointType, Score } from "./types";
+import { AnnouncementEventType, MatchState, Player, PlayerPositions, PointType, Score } from "./types";
 
 describe("Tennis Match Reducer", () => {
   const initialState: MatchState = {
@@ -200,22 +200,27 @@ describe("Tennis Match Reducer", () => {
       state = reducer(state, action); // Player1 wins the first game
       expect(state.playerPositions).toBe(PlayerPositions.Reversed); // should swap ends after first game
       expect(state.servingPlayer).toBe(Player.Player2);
+      expect(state.events).toEqual(expect.arrayContaining([{ type: AnnouncementEventType.SwitchEnds }]));
 
       state = { ...state, gameState: { Player1: Score.Forty, Player2: Score.Thirty } };
       state = reducer(state, action); // Player1 wins the second game
       expect(state.playerPositions).toBe(PlayerPositions.Reversed); // No change after the second game
+      expect(state.events).not.toEqual(expect.arrayContaining([{ type: AnnouncementEventType.SwitchEnds }]));
 
       state = { ...state, gameState: { Player1: Score.Forty, Player2: Score.Thirty } };
       state = reducer(state, action); // Player1 wins the third game
       expect(state.playerPositions).toBe(PlayerPositions.Initial); // Change after the third game
+      expect(state.events).toEqual(expect.arrayContaining([{ type: AnnouncementEventType.SwitchEnds }]));
 
       state = { ...state, gameState: { Player1: Score.Forty, Player2: Score.Thirty } };
       state = reducer(state, action); // Player1 wins the fourth game
       expect(state.playerPositions).toBe(PlayerPositions.Initial); // No change after the fourth game
+      expect(state.events).not.toEqual(expect.arrayContaining([{ type: AnnouncementEventType.SwitchEnds }]));
 
       state = { ...state, gameState: { Player1: Score.Forty, Player2: Score.Thirty } };
       state = reducer(state, action); // Player1 wins the fifth game
       expect(state.playerPositions).toBe(PlayerPositions.Reversed); // Change after the fifth game
+      expect(state.events).toEqual(expect.arrayContaining([{ type: AnnouncementEventType.SwitchEnds }]));
     });
 
     it.each([
@@ -325,6 +330,7 @@ describe("Tennis Match Reducer", () => {
         };
         const newState = reducer(state, action);
         expect(newState.matchWinner).toBe(winner);
+        expect(newState.events).toEqual(expect.arrayContaining([{ type: AnnouncementEventType.WinGame, winType: "match", player: winner }]));
       }
     );
 

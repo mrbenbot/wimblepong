@@ -22,12 +22,6 @@ export enum Player {
   Player2 = "Player2",
 }
 
-export enum AnnouncementEventType {
-  LongRally = "LONG_RALLY",
-  Ace = "ACE",
-  WinStreak = "WIN_STREAK",
-}
-
 export enum PointType {
   Normal = "NORMAL",
   Deuce = "DEUCE",
@@ -35,6 +29,14 @@ export enum PointType {
   BreakPoint = "BREAK_POINT",
   SetPoint = "SET_POINT",
   MatchPoint = "MATCH_POINT",
+}
+
+export enum AnnouncementEventType {
+  LongRally = "LONG_RALLY",
+  Ace = "ACE",
+  WinStreak = "WIN_STREAK",
+  SwitchEnds = "SWITCH_ENDS",
+  WinGame = "WIN_GAME",
 }
 
 export interface LongRallyEvent {
@@ -52,7 +54,17 @@ export interface WinStreakEvent {
   streak: number;
 }
 
-export type AnnouncementEvent = LongRallyEvent | AceEvent | WinStreakEvent;
+export interface SwitchEndsEvent {
+  type: AnnouncementEventType.SwitchEnds;
+}
+
+export interface WinGameEvent {
+  type: AnnouncementEventType.WinGame;
+  winType: "game" | "set" | "match";
+  player: Player;
+}
+
+export type AnnouncementEvent = LongRallyEvent | AceEvent | WinStreakEvent | SwitchEndsEvent | WinGameEvent;
 
 export interface GameState {
   Player1: Score;

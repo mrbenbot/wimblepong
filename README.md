@@ -31,7 +31,6 @@ export default {
 
 ## Notes
 
-- scoreboard
 - should announce end swaps + serve swaps + general game events
   - Game Wins
   - Set Wins
@@ -44,3 +43,6 @@ export default {
 - sounds?
 - speed + increment needs to be a little faster
 - add undo functionality
+- keep path of ball
+- scoreboard
+- pause

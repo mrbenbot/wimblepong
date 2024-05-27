@@ -69,7 +69,7 @@ const App: React.FC = () => {
       {/* <Scoreboard matchState={matchState} /> */}
       <div ref={containerDivRef} className="main-container">
         {matchState.events.map((event, i) => (
-          <EventAnnouncement key={JSON.stringify(event) + i} message={JSON.stringify(event)} />
+          <EventAnnouncement key={JSON.stringify(event) + i} event={event} />
         ))}
         <GameScore leftPlayer={leftPlayer} rightPlayer={rightPlayer} matchState={matchState} />
         <div className="second-container">

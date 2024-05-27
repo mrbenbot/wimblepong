@@ -77,6 +77,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, inputRef, dispatc
           ball.dy = (paddle1.y + leftHeight / 2 - ball.y) / PADDLE_SPEED_DEVISOR;
           ball.x = paddle1.width + ball.radius;
           if (getButtonPushed(input1.lastData || new Uint8Array())) {
+            dispatch({ type: "CLEAR_EVENTS" });
             ball.speed = INITIAL_SPEED;
             ball.dx = INITIAL_SPEED;
             ball.serveMode = false;
@@ -89,6 +90,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, inputRef, dispatc
           ball.dy = (paddle2.y + rightHeight / 2 - ball.y) / PADDLE_SPEED_DEVISOR;
           ball.x = canvas.width - paddle2.width - ball.radius;
           if (getButtonPushed(input2.lastData || new Uint8Array())) {
+            dispatch({ type: "CLEAR_EVENTS" });
             ball.speed = INITIAL_SPEED;
             ball.dx = -INITIAL_SPEED;
             ball.serveMode = false;

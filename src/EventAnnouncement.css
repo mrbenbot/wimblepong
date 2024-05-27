@@ -20,3 +20,19 @@
 .announcement.fade-out {
   opacity: 0;
 }
+
+.LONG_RALLY {
+  top: 150px;
+}
+.ACE {
+  top: 250px;
+}
+.WIN_STREAK {
+  top: 350px;
+}
+.SWITCH_ENDS {
+  top: 450px;
+}
+.WIN_GAME {
+  top: 550px;
+}
