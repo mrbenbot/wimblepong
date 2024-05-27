@@ -36,3 +36,13 @@ export default {
   - Set Wins
 - speed + increment needs to be a little faster
 - timeout on stats should be longer, with option to quit early?
+- length of game should be configurable ✅
+  - best of a few games?
+  - set length configurable?
+  - number of sets
+- winner should be displayed clearly
+  - stats
+  - confetti?
+- score display left and right should be neater
+- should display game config
+- add undo functionality

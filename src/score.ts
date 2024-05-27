@@ -13,7 +13,8 @@ export const initialState: MatchState = {
     Player2: Score.Love,
   },
   matchConfig: {
-    setsToWin: 3,
+    numberOfSets: 1,
+    setLength: 2,
   },
   events: [],
   pointType: PointType.Normal,
@@ -56,10 +57,10 @@ function checkMatchWinner(state: MatchState): Player | undefined {
     },
     [0, 0]
   );
-  if (player1Sets >= state.matchConfig.setsToWin) {
+  if (player1Sets >= Math.ceil(state.matchConfig.numberOfSets / 2)) {
     return Player.Player1;
   }
-  if (player2Sets >= state.matchConfig.setsToWin) {
+  if (player2Sets >= Math.ceil(state.matchConfig.numberOfSets / 2)) {
     return Player.Player2;
   }
   return undefined;
@@ -75,7 +76,11 @@ export function reducer(state: MatchState, action: Action): MatchState {
       const { player, stats } = action;
       const opponent = player === Player.Player1 ? Player.Player2 : Player.Player1;
 
-      if (state.games.Player1 === 6 && state.games.Player2 === 6 && state.sets.length + 1 !== state.matchConfig.setsToWin) {
+      if (
+        state.games[player] === state.matchConfig.setLength &&
+        state.games[opponent] === state.matchConfig.setLength &&
+        state.sets.length + 1 < state.matchConfig.numberOfSets
+      ) {
         if (state.tiebreak.Player1 >= 7 || state.tiebreak.Player2 >= 7) {
           // Handle tiebreak scoring
           if (Math.abs(state.tiebreak.Player1 - state.tiebreak.Player2) >= 2) {
@@ -152,7 +157,7 @@ export function reducer(state: MatchState, action: Action): MatchState {
         };
 
         // Check for set win condition
-        if (newGames[player] >= 6 && newGames[player] - newGames[opponent] >= 2) {
+        if (newGames[player] >= state.matchConfig.setLength && newGames[player] - newGames[opponent] >= 2) {
           const newSets = [...state.sets, newGames];
 
           const newState = {
@@ -244,14 +249,14 @@ export function addPointState(state: MatchState): MatchState {
   for (const player of [Player.Player1, Player.Player2]) {
     const opponent = player === Player.Player1 ? Player.Player2 : Player.Player1;
     // Check if in tiebreak
-    const inTiebreak = games[player] === 6 && games[opponent] === 6;
+    const inTiebreak = games[player] === state.matchConfig.setLength && games[opponent] === state.matchConfig.setLength;
 
     if (inTiebreak) {
       // Tiebreak logic
 
       // Determine if it is a match point during tiebreak
       const setWonByPlayer = state.sets.filter((set) => set[player] > set[opponent]).length;
-      if (setWonByPlayer === Math.floor(matchConfig.setsToWin / 2) && tiebreak[player] >= 6 && tiebreak[player] - tiebreak[opponent] >= 1) {
+      if (setWonByPlayer === Math.floor(matchConfig.numberOfSets / 2) && tiebreak[player] >= 6 && tiebreak[player] - tiebreak[opponent] >= 1) {
         return {
           ...state,
           pointType: PointType.MatchPoint,
@@ -282,10 +287,15 @@ export function addPointState(state: MatchState): MatchState {
     }
 
     // Determine if it is a set point
-    if (games[player] === 5 && gameState[player] === Score.Forty && gameState[opponent] !== Score.Forty && gameState[opponent] !== Score.Advantage) {
+    if (
+      games[player] === matchConfig.setLength - 1 &&
+      gameState[player] === Score.Forty &&
+      gameState[opponent] !== Score.Forty &&
+      gameState[opponent] !== Score.Advantage
+    ) {
       // Determine if it is also a match point
       const setsWonByServer = state.sets.filter((set) => set[player] > set[opponent]).length;
-      if (setsWonByServer === Math.floor(matchConfig.setsToWin / 2)) {
+      if (setsWonByServer === Math.floor(matchConfig.numberOfSets / 2)) {
         return {
           ...state,
           pointType: PointType.MatchPoint,

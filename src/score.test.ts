@@ -16,7 +16,8 @@ describe("Tennis Match Reducer", () => {
     },
     events: [],
     matchConfig: {
-      setsToWin: 3,
+      numberOfSets: 3,
+      setLength: 6,
     },
     pointType: PointType.Normal,
   };
@@ -49,12 +50,38 @@ describe("Tennis Match Reducer", () => {
       expect(updatedState.sets.length).toBe(0);
     });
 
-    it("should score tie break point if 6 games all", () => {
-      const state = { ...initialState, games: { Player1: 6, Player2: 6 } };
+    it.each([
+      { sets: [], matchConfig: { numberOfSets: 3, setLength: 6 } },
+      { sets: [{ Player1: 7, Player2: 6 }], matchConfig: { numberOfSets: 3, setLength: 6 } },
+      {
+        sets: [
+          { Player1: 7, Player2: 6 },
+          { Player1: 6, Player2: 7 },
+        ],
+        matchConfig: { numberOfSets: 5, setLength: 6 },
+      },
+      {
+        sets: [
+          { Player1: 4, Player2: 3 },
+          { Player1: 3, Player2: 1 },
+          { Player1: 2, Player2: 4 },
+        ],
+        matchConfig: { numberOfSets: 5, setLength: 3 },
+      },
+      {
+        sets: [
+          { Player1: 7, Player2: 5 },
+          { Player1: 6, Player2: 4 },
+          { Player1: 4, Player2: 6 },
+        ],
+        matchConfig: { numberOfSets: 5, setLength: 6 },
+      },
+    ])("should score tie break point if $matchConfig.setLength games all not in final set", ({ sets, matchConfig }) => {
+      const state: MatchState = { ...initialState, sets, matchConfig, games: { Player1: matchConfig.setLength, Player2: matchConfig.setLength } };
       const action: Action = { type: "POINT_SCORED", player: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } };
       const updatedState = reducer(state, action); // Should be tie break
-      expect(updatedState.games.Player1).toBe(6);
-      expect(updatedState.games.Player2).toBe(6);
+      expect(updatedState.games.Player1).toBe(matchConfig.setLength);
+      expect(updatedState.games.Player2).toBe(matchConfig.setLength);
       expect(updatedState.tiebreak.Player1).toBe(1);
       expect(updatedState.tiebreak.Player2).toBe(0);
     });
@@ -191,21 +218,115 @@ describe("Tennis Match Reducer", () => {
       expect(state.playerPositions).toBe(PlayerPositions.Reversed); // Change after the fifth game
     });
 
-    it("should determine the match winner correctly", () => {
-      const action: Action = { type: "POINT_SCORED", player: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } };
-      const state = {
-        ...initialState,
-        sets: [
-          { Player1: 6, Player2: 0 },
-          { Player1: 7, Player2: 6 },
-        ],
-        games: { Player1: 5, Player2: 3 },
-        gameState: { Player1: Score.Forty, Player2: Score.Thirty },
-        matchConfig: { setsToWin: 3 },
-      };
-      const newState = reducer(state, action);
-      expect(newState.matchWinner).toBe(Player.Player1);
-    });
+    it.each([
+      // player 1 winning in straight sets (3 set match)
+      {
+        stateSettings: {
+          sets: [{ Player1: 6, Player2: 0 }],
+          games: { Player1: 5, Player2: 3 },
+          gameState: { Player1: Score.Forty, Player2: Score.Thirty },
+          matchConfig: { numberOfSets: 3, setLength: 6 },
+        },
+        actionSettings: { player: Player.Player1 },
+        winner: Player.Player1,
+      },
+      // player 2 winning in straight sets (3 set match)
+      {
+        stateSettings: {
+          sets: [{ Player1: 0, Player2: 6 }],
+          games: { Player1: 4, Player2: 5 },
+          gameState: { Player1: Score.Forty, Player2: Score.Advantage },
+          matchConfig: { numberOfSets: 3, setLength: 6 },
+        },
+        actionSettings: { player: Player.Player2 },
+        winner: Player.Player2,
+      },
+      // player 1 winning in straight sets (5 set match)
+      {
+        stateSettings: {
+          sets: [
+            { Player1: 6, Player2: 0 },
+            { Player1: 6, Player2: 0 },
+          ],
+          games: { Player1: 5, Player2: 3 },
+          gameState: { Player1: Score.Forty, Player2: Score.Thirty },
+          matchConfig: { numberOfSets: 5, setLength: 6 },
+        },
+        actionSettings: { player: Player.Player1 },
+        winner: Player.Player1,
+      },
+      // player 2 winning in straight sets (5 set match)
+      {
+        stateSettings: {
+          sets: [
+            { Player1: 0, Player2: 6 },
+            { Player1: 0, Player2: 6 },
+          ],
+          games: { Player1: 4, Player2: 5 },
+          gameState: { Player1: Score.Forty, Player2: Score.Advantage },
+          matchConfig: { numberOfSets: 5, setLength: 6 },
+        },
+        actionSettings: { player: Player.Player2 },
+        winner: Player.Player2,
+      },
+      // player 1 winning in 3rd set (3 set match)
+      {
+        stateSettings: {
+          sets: [
+            { Player1: 0, Player2: 6 },
+            { Player1: 6, Player2: 0 },
+          ],
+          games: { Player1: 5, Player2: 4 },
+          gameState: { Player1: Score.Advantage, Player2: Score.Forty },
+          matchConfig: { numberOfSets: 3, setLength: 6 },
+        },
+        actionSettings: { player: Player.Player1 },
+        winner: Player.Player1,
+      },
+      // player 2 winning in 3rd set (3 set match)
+      {
+        stateSettings: {
+          sets: [
+            { Player1: 0, Player2: 6 },
+            { Player1: 6, Player2: 0 },
+          ],
+          games: { Player1: 4, Player2: 5 },
+          gameState: { Player1: Score.Forty, Player2: Score.Advantage },
+          matchConfig: { numberOfSets: 3, setLength: 6 },
+        },
+        actionSettings: { player: Player.Player2 },
+        winner: Player.Player2,
+      },
+      // player 2 winning in 3rd set (3 set match)
+      {
+        stateSettings: {
+          sets: [
+            { Player1: 0, Player2: 4 },
+            { Player1: 4, Player2: 0 },
+          ],
+          games: { Player1: 2, Player2: 3 },
+          gameState: { Player1: Score.Forty, Player2: Score.Advantage },
+          matchConfig: { numberOfSets: 3, setLength: 4 },
+        },
+        actionSettings: { player: Player.Player2 },
+        winner: Player.Player2,
+      },
+    ])(
+      "$winner winning in set $stateSettings.sets.length + 1 ($stateSettings.matchConfig.numberOfSets set match of set length $stateSettings.matchConfig.setLength)",
+      ({ stateSettings, actionSettings, winner }) => {
+        const action: Action = {
+          type: "POINT_SCORED",
+          stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 },
+          ...actionSettings,
+        };
+        const state: MatchState = {
+          ...initialState,
+          ...stateSettings,
+        };
+        const newState = reducer(state, action);
+        expect(newState.matchWinner).toBe(winner);
+      }
+    );
 
     it("should work going from deuce to advantage", () => {
       const action: Action = { type: "POINT_SCORED", player: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } };
@@ -285,7 +406,8 @@ describe("addPointState", () => {
       Player2: Score.Love,
     },
     matchConfig: {
-      setsToWin: 3,
+      numberOfSets: 3,
+      setLength: 6,
     },
     events: [],
     pointType: PointType.Normal,
@@ -366,6 +488,20 @@ describe("addPointState", () => {
     expect(updatedState.pointType).toBe(PointType.SetPoint);
   });
 
+  it.each([{ setLength: 4, numberOfSets: 3 }])("should set point type to SET_POINT in set length $setLength", (matchConfig) => {
+    const state = {
+      ...initialState,
+      games: { Player1: 3, Player2: 2 },
+      gameState: {
+        Player1: Score.Forty,
+        Player2: Score.Thirty,
+      },
+      matchConfig,
+    };
+    const updatedState = addPointState(state);
+    expect(updatedState.pointType).toBe(PointType.SetPoint);
+  });
+
   it("should set point type to MATCH_POINT", () => {
     const state: MatchState = {
       ...initialState,
@@ -379,7 +515,8 @@ describe("addPointState", () => {
         Player2: Score.Thirty,
       },
       matchConfig: {
-        setsToWin: 3,
+        numberOfSets: 3,
+        setLength: 6,
       },
     };
     const updatedState = addPointState(state);
@@ -404,7 +541,8 @@ describe("addPointState", () => {
       tiebreak: { Player1: 6, Player2: 5 },
       servingPlayer: Player.Player1,
       matchConfig: {
-        setsToWin: 3,
+        numberOfSets: 3,
+        setLength: 6,
       },
     };
     const updatedState = addPointState(state);
@@ -412,14 +550,31 @@ describe("addPointState", () => {
   });
 
   it("should handle tiebreak and set point type to MATCH_POINT", () => {
-    const state = {
+    const state: MatchState = {
       ...initialState,
       servingPlayer: Player.Player2,
       sets: [{ Player1: 6, Player2: 4 }],
       games: { Player1: 6, Player2: 6 },
       tiebreak: { Player1: 6, Player2: 5 },
       matchConfig: {
-        setsToWin: 3,
+        numberOfSets: 3,
+        setLength: 6,
+      },
+    };
+    const updatedState = addPointState(state);
+    expect(updatedState.pointType).toBe(PointType.MatchPoint);
+  });
+
+  it("should handle tiebreak and set point type to MATCH_POINT in set length of 4", () => {
+    const state: MatchState = {
+      ...initialState,
+      servingPlayer: Player.Player2,
+      sets: [{ Player1: 4, Player2: 2 }],
+      games: { Player1: 4, Player2: 4 },
+      tiebreak: { Player1: 6, Player2: 5 },
+      matchConfig: {
+        numberOfSets: 3,
+        setLength: 4,
       },
     };
     const updatedState = addPointState(state);

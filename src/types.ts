@@ -78,7 +78,8 @@ export interface MatchState {
   playerPositions: PlayerPositions;
   gameState: GameState;
   matchConfig: {
-    setsToWin: number;
+    numberOfSets: number;
+    setLength: number;
   };
   events: AnnouncementEvent[];
   pointType: PointType;

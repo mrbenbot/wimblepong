@@ -36,7 +36,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url(./assets/wimblepong.png);
+  background-image: url(/wimblepong.png);
   background-repeat: no-repeat;
   background-position: center;
   background-size: 10%;
