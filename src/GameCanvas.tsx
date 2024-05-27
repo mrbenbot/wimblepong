@@ -7,6 +7,7 @@ import {
   COURT,
   DELTA_TIME_DIVISOR,
   INITIAL_SPEED,
+  PADDLE_CONTACT_SPEED_BOOST_DIVISOR,
   PADDLE_SPEED_DEVISOR,
   PLAYER_COLOURS,
   SERVING_HEIGHT_MULTIPLIER,
@@ -117,15 +118,15 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, inputRef, dispatc
         // Update ball collision detection and response
         if (ball.x - ball.radius < paddle1.x + paddle1.width && ball.y > paddle1.y && ball.y < paddle1.y + leftHeight) {
           const bounceAngle = getBounceAngle(paddle1.y, leftHeight, ball.y);
-          ball.dx = ball.speed * Math.cos(bounceAngle);
-          ball.dy = ball.speed * -Math.sin(bounceAngle);
+          ball.dx = (ball.speed + Math.abs(paddle1.dy) / PADDLE_CONTACT_SPEED_BOOST_DIVISOR) * Math.cos(bounceAngle);
+          ball.dy = (ball.speed + Math.abs(paddle1.dy) / PADDLE_CONTACT_SPEED_BOOST_DIVISOR) * -Math.sin(bounceAngle);
           ball.x = paddle1.x + paddle1.width + ball.radius; // Adjust ball position to avoid sticking
           ball.speed += SPEED_INCREMENT;
           stats.rallyLength += 1;
         } else if (ball.x + ball.radius > paddle2.x && ball.y > paddle2.y && ball.y < paddle2.y + rightHeight) {
           const bounceAngle = getBounceAngle(paddle2.y, rightHeight, ball.y);
-          ball.dx = -ball.speed * Math.cos(bounceAngle);
-          ball.dy = ball.speed * -Math.sin(bounceAngle);
+          ball.dx = -(ball.speed + Math.abs(paddle2.dy) / PADDLE_CONTACT_SPEED_BOOST_DIVISOR) * Math.cos(bounceAngle);
+          ball.dy = (ball.speed + Math.abs(paddle2.dy) / PADDLE_CONTACT_SPEED_BOOST_DIVISOR) * -Math.sin(bounceAngle);
           ball.x = paddle2.x - ball.radius; // Adjust ball position to avoid sticking
           ball.speed += SPEED_INCREMENT;
           stats.rallyLength += 1;
