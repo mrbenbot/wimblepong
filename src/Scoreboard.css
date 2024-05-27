@@ -6,7 +6,7 @@
   color: #ecf0f1;
   font-family: Arial, sans-serif;
   text-align: center;
-  padding: 10px;
+  /* padding: 10px; */
   border-radius: 5px;
 }
 
@@ -18,8 +18,7 @@
 .row {
   display: flex;
   justify-content: space-between;
-  padding: 10px;
-  border-bottom: 1px solid #34495e;
+  /* padding: 10px; */
 }
 
 .header {

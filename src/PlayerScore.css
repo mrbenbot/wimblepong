@@ -1,4 +1,20 @@
 .player-score {
-  width: 300px;
+  width: 210px;
   font-size: 2rem;
+  display: grid;
+  grid-template-columns: 200px;
+  grid-template-rows: 70px 50px 50px 50px;
+}
+.serving {
+  height: 20px;
+}
+
+.games,
+.sets {
+  display: flex;
+  justify-content: space-between;
+}
+
+.score-number {
+  font-family: "Courier New", Courier, monospace;
 }

@@ -8,6 +8,7 @@ import PlayerScore from "./PlayerScore";
 import EventAnnouncement from "./EventAnnouncement";
 import GameScore from "./GameScore";
 import { Player, PlayerPositions } from "./types";
+// import Scoreboard from "./Scoreboard";
 
 export interface GameState {
   paddle1: { x: number; y: number; dy: number; width: number; height: number };
@@ -65,13 +66,13 @@ const App: React.FC = () => {
 
   return (
     <>
+      {/* <Scoreboard matchState={matchState} /> */}
       <div ref={containerDivRef} className="main-container">
         {matchState.events.map((event, i) => (
           <EventAnnouncement key={JSON.stringify(event) + i} message={JSON.stringify(event)} />
         ))}
         <GameScore leftPlayer={leftPlayer} rightPlayer={rightPlayer} matchState={matchState} />
         <div className="second-container">
-          {/* <Scoreboard matchState={matchState} /> */}
           <PlayerScore matchState={matchState} player={leftPlayer} />
           <GameCanvas
             gameStateRef={gameStateRef}

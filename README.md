@@ -31,14 +31,16 @@ export default {
 
 ## Notes
 
+- scoreboard
 - should announce end swaps + serve swaps + general game events
   - Game Wins
   - Set Wins
-- speed + increment needs to be a little faster
 - timeout on stats should be longer, with option to quit early?
 - winner should be displayed clearly
   - stats
   - confetti?
 - score display left and right should be neater
 - should display game config
+- sounds?
+- speed + increment needs to be a little faster
 - add undo functionality
