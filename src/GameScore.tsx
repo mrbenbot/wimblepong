@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
 import "./GameScore.css";
-import { PointType, Score } from "./types";
+import { MatchState, Player, PointType, Score } from "./types";
 
 const scoreMap: {
   [key in Score]?: string;
@@ -12,38 +11,27 @@ const pointMap: {
   [key in PointType]?: string;
 } = {
   [PointType.Normal]: "",
+  [PointType.Deuce]: "Deuce",
+  [PointType.BreakPoint]: "Break Point",
+  [PointType.GamePoint]: "Game Point",
+  [PointType.SetPoint]: "Set Point",
+  [PointType.MatchPoint]: "Match Point",
 };
 
-const GameScore = ({ leftScore, rightScore, pointType }: { leftScore: Score; rightScore: Score; pointType: PointType }) => {
-  const [leftScoreState, setLeftScoreState] = useState(leftScore);
-  const [rightScoreState, setRightScoreState] = useState(rightScore);
-  const [leftKey, setLeftKey] = useState(0);
-  const [rightKey, setRightKey] = useState(0);
-
-  useEffect(() => {
-    if (leftScore !== leftScoreState) {
-      setLeftScoreState(leftScore);
-      setLeftKey((prevKey) => prevKey + 1);
-    }
-  }, [leftScore, leftScoreState]);
-
-  useEffect(() => {
-    if (rightScore !== rightScoreState) {
-      setRightScoreState(rightScore);
-      setRightKey((prevKey) => prevKey + 1);
-    }
-  }, [rightScore, rightScoreState]);
+const GameScore = ({ leftPlayer, rightPlayer, matchState }: { leftPlayer: Player; rightPlayer: Player; matchState: MatchState }) => {
+  const leftScore = matchState.gameState[leftPlayer];
+  const rightScore = matchState.gameState[rightPlayer];
 
   return (
     <div className="game-score-container">
-      <div key={`left-${leftKey}`} className="score score-left new-score">
-        {scoreMap?.[leftScoreState] ?? leftScoreState}
+      <div key={`left-${leftScore}`} className="score score-left new-score">
+        {scoreMap?.[leftScore] ?? leftScore}
       </div>
-      <div key={`middle-${leftKey}`} className="score score-middle new-score">
-        {pointMap?.[pointType] ?? pointType}
+      <div key={`middle-${matchState.pointType}`} className="score score-middle new-score">
+        {pointMap?.[matchState.pointType] ?? matchState.pointType}
       </div>
-      <div key={`right-${rightKey}`} className="score score-right new-score">
-        {scoreMap?.[rightScoreState] ?? rightScoreState}
+      <div key={`right-${rightScore}`} className="score score-right new-score">
+        {scoreMap?.[rightScore] ?? rightScore}
       </div>
     </div>
   );

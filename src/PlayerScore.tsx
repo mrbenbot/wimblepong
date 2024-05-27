@@ -12,7 +12,7 @@ const PlayerScore = ({ matchState, player }: { matchState: MatchState; player: P
         {player} {servingPlayer === player ? "🔴" : " "}
       </h2>
       <h3 className="cell">GAMES: {games[player]}</h3>
-      <h3 className="cell">SETS: {sets.map((set) => set[player] > set[opponent]).length}</h3>
+      <h3 className="cell">SETS: {sets.filter((set) => set[player] > set[opponent]).length}</h3>
     </div>
   );
 };
