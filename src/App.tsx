@@ -6,7 +6,6 @@ import { BALL, COURT, INITIAL_SPEED, PADDLE } from "./config";
 import "./App.css";
 import PlayerScore from "./PlayerScore";
 import EventAnnouncement from "./EventAnnouncement";
-import GameScore from "./GameScore";
 import { Player, PlayerPositions } from "./types";
 // import Scoreboard from "./Scoreboard";
 
@@ -68,10 +67,12 @@ const App: React.FC = () => {
     <>
       {/* <Scoreboard matchState={matchState} /> */}
       <div ref={containerDivRef} className="main-container">
-        {matchState.events.map((event, i) => (
-          <EventAnnouncement key={JSON.stringify(event) + i} event={event} />
-        ))}
-        <GameScore leftPlayer={leftPlayer} rightPlayer={rightPlayer} matchState={matchState} />
+        <div className="game-announcements-wrapper">
+          {matchState.events.map((event, i) => (
+            <EventAnnouncement key={JSON.stringify(event) + i} event={event} />
+          ))}
+        </div>
+
         <div className="second-container">
           <PlayerScore matchState={matchState} player={leftPlayer} />
           <GameCanvas
@@ -85,11 +86,11 @@ const App: React.FC = () => {
           />
           <PlayerScore matchState={matchState} player={rightPlayer} />
         </div>
+        {!connected && <button onClick={selectDevice}>select device</button>}
+        <button onClick={handleFullscreen} className="full-screen-button">
+          enter full screen
+        </button>
       </div>
-      {!connected && <button onClick={selectDevice}>select device</button>}
-      <button onClick={handleFullscreen} className="full-screen-button">
-        enter full screen
-      </button>
     </>
   );
 };

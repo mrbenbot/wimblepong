@@ -15,6 +15,7 @@ import {
 } from "./config";
 import "./GameCanvas.css";
 import { MatchState, Player } from "./types";
+import GameScore from "./GameScore";
 
 interface GameCanvasProps {
   gameStateRef: React.MutableRefObject<GameState>;
@@ -186,6 +187,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, inputRef, dispatc
 
   return (
     <div>
+      <GameScore leftPlayer={leftPlayer} rightPlayer={rightPlayer} matchState={matchState} />
       <canvas ref={canvasRef} width={COURT.width} height={COURT.height} />
     </div>
   );

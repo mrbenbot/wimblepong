@@ -1,6 +1,69 @@
 import { useState, useEffect } from "react";
 import "./EventAnnouncement.css";
-import { AnnouncementEvent } from "./types";
+import { AceEvent, AnnouncementEvent, AnnouncementEventType, LongRallyEvent, WinGameEvent, WinStreakEvent } from "./types";
+
+// LongRallyEvent Component
+const LongRallyEventComponent: React.FC<LongRallyEvent> = ({ length }) => (
+  <div className="announcement long-rally">
+    <h2>Long Rally!</h2>
+    <p>Rally Length: {length} shots</p>
+  </div>
+);
+
+// AceEvent Component
+const AceEventComponent: React.FC<AceEvent> = ({ speed }) => (
+  <div className="announcement ace">
+    <h2>Ace!</h2>
+    <p>Serve Speed: {speed}</p>
+  </div>
+);
+
+// WinStreakEvent Component
+const WinStreakEventComponent: React.FC<WinStreakEvent> = ({ streak }) => (
+  <div className="announcement win-streak">
+    <h2>Winning Streak!</h2>
+    <p>{streak} points in a row</p>
+  </div>
+);
+
+// SwitchEndsEvent Component
+const SwitchEndsEventComponent = () => (
+  <div className="announcement switch-ends">
+    <h2>Switch Ends!</h2>
+    <p>Players switch sides of the court</p>
+  </div>
+);
+
+const winTypeText = {
+  game: "Game",
+  set: "Game and Set",
+  match: "Game, Set and Match",
+};
+
+// WinGameEvent Component
+const WinGameEventComponent: React.FC<WinGameEvent> = ({ winType, player }) => (
+  <div className="announcement win-game">
+    <h2>{winTypeText[winType]}</h2>
+    <p>to {player}</p>
+  </div>
+);
+
+const getEvent = (event: AnnouncementEvent) => {
+  switch (event.type) {
+    case AnnouncementEventType.LongRally:
+      return <LongRallyEventComponent {...event} />;
+    case AnnouncementEventType.Ace:
+      return <AceEventComponent {...event} />;
+    case AnnouncementEventType.WinStreak:
+      return <WinStreakEventComponent {...event} />;
+    case AnnouncementEventType.SwitchEnds:
+      return <SwitchEndsEventComponent />;
+    case AnnouncementEventType.WinGame:
+      return <WinGameEventComponent {...event} />;
+    default:
+      return null;
+  }
+};
 
 const EventAnnouncement = ({ event, duration = 10000 }: { event: AnnouncementEvent; duration?: number }) => {
   const [visible, setVisible] = useState(false);
@@ -15,7 +78,7 @@ const EventAnnouncement = ({ event, duration = 10000 }: { event: AnnouncementEve
     }
   }, [event, duration]);
 
-  return <div className={`announcement ${visible ? "fade-in" : "fade-out"} ${event.type}`}>{JSON.stringify(event)}</div>;
+  return <div className={`announcement-container ${visible ? "fade-in" : "fade-out"} ${event.type}-container`}>{getEvent(event)}</div>;
 };
 
 export default EventAnnouncement;

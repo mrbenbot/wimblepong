@@ -31,10 +31,6 @@ export default {
 
 ## Notes
 
-- should announce end swaps + serve swaps + general game events
-  - Game Wins
-  - Set Wins
-- timeout on stats should be longer, with option to quit early?
 - winner should be displayed clearly
   - stats
   - confetti?
@@ -46,3 +42,6 @@ export default {
 - keep path of ball
 - scoreboard
 - pause
+- landing page
+- keyboard input
+- ability to reset / play again

@@ -1,38 +1,55 @@
-.announcement {
-  position: fixed;
-  top: 450px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 10px 20px;
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
-  font-size: 1.2em;
-  border-radius: 5px;
+.announcement-container {
   opacity: 0;
   transition: opacity 0.5s ease-in-out;
-  z-index: 1000;
+  width: 300px;
 }
 
-.announcement.fade-in {
+.announcement-container.fade-in {
   opacity: 1;
 }
 
-.announcement.fade-out {
+.announcement-container.fade-out {
   opacity: 0;
 }
 
-.LONG_RALLY {
-  top: 150px;
+/* styles.css */
+.announcement {
+  padding: 10px;
+  border-radius: 5px;
+  margin: 10px 0;
+  font-family: "Arial", sans-serif;
+  color: #fff;
+  text-align: center;
+  animation: fadeIn 0.5s ease-in-out;
 }
-.ACE {
-  top: 250px;
+
+.announcement.long-rally {
+  background-color: #f39c12;
 }
-.WIN_STREAK {
-  top: 350px;
+
+.announcement.ace {
+  background-color: #e74c3c;
 }
-.SWITCH_ENDS {
-  top: 450px;
+
+.announcement.win-streak {
+  background-color: #2ecc71;
 }
-.WIN_GAME {
-  top: 550px;
+
+.announcement.switch-ends {
+  background-color: #3498db;
+}
+
+.announcement.win-game {
+  background-color: #9b59b6;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
