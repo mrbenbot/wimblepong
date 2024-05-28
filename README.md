@@ -45,6 +45,8 @@ export default {
 - maybe make the serve follow have more momentum?
 - paint a net on the screen?
 - fast balls should leave marks on the screen?
+- make all events additional or keep hierarchy?
+  - make hierarchy configurable?
 
 # Testing
 
