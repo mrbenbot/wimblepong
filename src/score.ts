@@ -76,9 +76,11 @@ export function reducer(state: MatchState, action: Action): MatchState {
       ) {
         if (state.tiebreak.Player1 >= 7 || state.tiebreak.Player2 >= 7) {
           // Handle tiebreak scoring
-          if (Math.abs(state.tiebreak.Player1 - state.tiebreak.Player2) >= 2) {
+          if (Math.abs(state.tiebreak.Player1 - state.tiebreak.Player2) >= 1) {
             const tiebreakWinner = state.tiebreak.Player1 > state.tiebreak.Player2 ? Player.Player1 : Player.Player2;
             const finalSetScore = { ...state.games, [tiebreakWinner]: state.games[tiebreakWinner] + 1 };
+            const newSets = [...state.sets, finalSetScore];
+            const totalGamesPlayed = newSets.reduce((total, set) => total + set[Player.Player1] + set[Player.Player2], 0);
             const newState: MatchState = {
               ...state,
               events: [],
@@ -86,7 +88,7 @@ export function reducer(state: MatchState, action: Action): MatchState {
               tiebreak: { Player1: 0, Player2: 0 },
               games: { Player1: 0, Player2: 0 },
               rallies: [...state.rallies, { winner: tiebreakWinner, stats }],
-              servingPlayer: state.servingPlayer === Player.Player1 ? Player.Player2 : Player.Player1,
+              servingPlayer: totalGamesPlayed % 2 === 0 ? Player.Player1 : Player.Player2,
               gameState: {
                 Player1: Score.Love,
                 Player2: Score.Love,
@@ -249,19 +251,16 @@ export function getWinStreak(rallies: MatchState["rallies"]) {
 
 export function addPointState(state: MatchState): MatchState {
   const { games, gameState, servingPlayer, matchConfig, tiebreak } = state;
-  const receivingPlayer = servingPlayer === Player.Player1 ? Player.Player2 : Player.Player1;
-
   for (const player of [Player.Player1, Player.Player2]) {
     const opponent = player === Player.Player1 ? Player.Player2 : Player.Player1;
+    const setsWonByPlayer = state.sets.filter((set) => set[player] > set[opponent]).length;
+
     // Check if in tiebreak
     const inTiebreak = games[player] === state.matchConfig.setLength && games[opponent] === state.matchConfig.setLength;
 
     if (inTiebreak) {
-      // Tiebreak logic
-
       // Determine if it is a match point during tiebreak
-      const setWonByPlayer = state.sets.filter((set) => set[player] > set[opponent]).length;
-      if (setWonByPlayer === Math.floor(matchConfig.numberOfSets / 2) && tiebreak[player] >= 6 && tiebreak[player] - tiebreak[opponent] >= 1) {
+      if (setsWonByPlayer === Math.floor(matchConfig.numberOfSets / 2) && tiebreak[player] >= 6 && tiebreak[player] - tiebreak[opponent] >= 1) {
         return {
           ...state,
           pointType: PointType.MatchPoint,
@@ -291,50 +290,29 @@ export function addPointState(state: MatchState): MatchState {
       };
     }
 
-    // Determine if it is a set point
-    if (
-      games[player] === matchConfig.setLength - 1 &&
-      gameState[player] === Score.Forty &&
-      gameState[opponent] !== Score.Forty &&
-      gameState[opponent] !== Score.Advantage
-    ) {
-      // Determine if it is also a match point
-      const setsWonByServer = state.sets.filter((set) => set[player] > set[opponent]).length;
-      if (setsWonByServer === Math.floor(matchConfig.numberOfSets / 2)) {
+    if (isGamePoint(gameState[player], gameState[opponent])) {
+      const isSetPoint = games[player] >= matchConfig.setLength - 1 && games[player] - games[opponent] > 0;
+      if (isSetPoint) {
+        const isMatchPoint = setsWonByPlayer === Math.floor(matchConfig.numberOfSets / 2);
         return {
           ...state,
-          pointType: PointType.MatchPoint,
+          pointType: isMatchPoint ? PointType.MatchPoint : PointType.SetPoint,
         };
       }
       return {
         ...state,
-        pointType: PointType.SetPoint,
+        pointType: servingPlayer === player ? PointType.GamePoint : PointType.BreakPoint,
       };
     }
-  }
-  // Determine if it is a break point
-  if (
-    (gameState[receivingPlayer] === Score.Forty && gameState[servingPlayer] !== Score.Forty && gameState[servingPlayer] !== Score.Advantage) ||
-    (gameState[receivingPlayer] === Score.Advantage && gameState[servingPlayer] === Score.Forty)
-  ) {
-    return {
-      ...state,
-      pointType: PointType.BreakPoint,
-    };
-  }
-
-  // Determine if it is a game point
-  if (
-    (gameState[servingPlayer] === Score.Forty && gameState[receivingPlayer] !== Score.Forty && gameState[receivingPlayer] !== Score.Advantage) ||
-    (gameState[servingPlayer] === Score.Advantage && gameState[receivingPlayer] === Score.Forty)
-  ) {
-    return {
-      ...state,
-      pointType: PointType.GamePoint,
-    };
   }
   return {
     ...state,
     pointType: PointType.Normal,
   };
+}
+
+function isGamePoint(scoreOne: Score, scoreTwo: Score): boolean {
+  return (
+    (scoreOne === Score.Forty && ![Score.Forty, Score.Advantage].includes(scoreTwo)) || (scoreOne === Score.Advantage && scoreTwo === Score.Forty)
+  );
 }

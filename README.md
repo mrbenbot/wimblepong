@@ -51,8 +51,6 @@ export default {
 
 # Testing
 
-- tie break seemed to go to eight
-- incorrectly said it was set point when it wasn't
-- didn't say set point when it was (tie break)
 - should announce tie break as an event
-- when controller lost contact half way through it didnt pause that great
+- should announce winning the tiebreak
+- when controller lost contact half way through it didn't pause that great
