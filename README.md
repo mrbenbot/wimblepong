@@ -35,12 +35,9 @@ export default {
   - stats
   - confetti?
 - score display left and right should be neater
-- should display game config
 - sounds?
-- speed + increment needs to be a little faster
 - add undo functionality
 - keep path of ball
-- scoreboard
 - pause
 - landing page
 - keyboard input
@@ -53,4 +50,3 @@ export default {
 
 - should announce tie break as an event
 - should announce winning the tiebreak
-- when controller lost contact half way through it didn't pause that great

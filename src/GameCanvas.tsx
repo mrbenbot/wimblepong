@@ -159,10 +159,9 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, inputRef, dispatc
 
     const resetBall = () => {
       const { ball, stats } = gameStateRef.current;
-
+      ball.y = canvas.height / 2;
       ball.speed = INITIAL_SPEED;
       ball.serveMode = true;
-      stats.rallyLength = 0;
       stats.rallyLength = 0;
     };
 
@@ -175,6 +174,8 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, inputRef, dispatc
       loopId = requestAnimationFrame(gameLoop);
     };
 
+    // set deltaTimeRef so that initial delta time is not crazy big
+    deltaTimeRef.current = performance.now();
     loopId = requestAnimationFrame(gameLoop);
 
     return () => {
