@@ -45,3 +45,15 @@ export default {
 - landing page
 - keyboard input
 - ability to reset / play again
+- maybe make the serve follow have more momentum?
+- paint a net on the screen?
+- fast balls should leave marks on the screen?
+
+# Testing
+
+- tie break score not correct in main game score
+- tie break seemed to go to eight
+- incorrectly said it was set point when it wasn't
+- didn't say set point when it was (tie break)
+- should announce tie break as an event
+- when controller lost contact half way through it didnt pause that great
