@@ -176,6 +176,7 @@ describe("Tennis Match Reducer", () => {
       state = reducer(state, { type: "POINT_SCORED", player: Player.Player2, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
       expect(state.tiebreak.Player1).toBe(5);
       expect(state.tiebreak.Player2).toBe(6);
+      expect(state.pointType).toBe(PointType.SetPoint);
       expect(state.servingPlayer).toBe(Player.Player1); // Serve changes after two more points
       expect(state.playerPositions).toBe(PlayerPositions.Reversed); // End stays the same
 
@@ -201,6 +202,28 @@ describe("Tennis Match Reducer", () => {
       expect(state.servingPlayer).toBe(Player.Player2); // 13 games played so player two serves in the 14th
       expect(state.playerPositions).toBe(PlayerPositions.Reversed); // End Changes because 14th game
       expect(state.sets).toEqual([{ [Player.Player1]: 7, [Player.Player2]: 6 }]);
+    });
+
+    it("should win the tiebreak at 7 - 5", () => {
+      const state: MatchState = {
+        ...initialState,
+        servingPlayer: Player.Player1,
+
+        sets: [],
+        games: { Player1: 6, Player2: 6 },
+        tiebreak: { Player1: 6, Player2: 5 },
+      };
+
+      const nextState = reducer(state, {
+        type: "POINT_SCORED",
+        player: Player.Player1,
+        stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 },
+      });
+      expect(nextState.tiebreak.Player1).toBe(0);
+      expect(nextState.tiebreak.Player2).toBe(0);
+      expect(nextState.servingPlayer).toBe(Player.Player2); // 13 games played so player two serves in the 14th
+      expect(nextState.playerPositions).toBe(PlayerPositions.Reversed); // End Changes because 14th game
+      expect(nextState.sets).toEqual([{ [Player.Player1]: 7, [Player.Player2]: 6 }]);
     });
 
     it("should change ends after the first game and every two games thereafter", () => {

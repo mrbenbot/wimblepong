@@ -14,7 +14,7 @@ export const initialState: MatchState = {
   },
   matchConfig: {
     numberOfSets: 3,
-    setLength: 6,
+    setLength: 1,
   },
   events: [],
   pointType: PointType.Normal,
@@ -74,11 +74,10 @@ export function reducer(state: MatchState, action: Action): MatchState {
         state.games[opponent] === state.matchConfig.setLength &&
         state.sets.length + 1 < state.matchConfig.numberOfSets
       ) {
-        if (state.tiebreak.Player1 >= 7 || state.tiebreak.Player2 >= 7) {
+        if (state.tiebreak[player] >= 6) {
           // Handle tiebreak scoring
-          if (Math.abs(state.tiebreak.Player1 - state.tiebreak.Player2) >= 1) {
-            const tiebreakWinner = state.tiebreak.Player1 > state.tiebreak.Player2 ? Player.Player1 : Player.Player2;
-            const finalSetScore = { ...state.games, [tiebreakWinner]: state.games[tiebreakWinner] + 1 };
+          if (state.tiebreak[player] - state.tiebreak[opponent] >= 1) {
+            const finalSetScore = { ...state.games, [player]: state.games[player] + 1 };
             const newSets = [...state.sets, finalSetScore];
             const totalGamesPlayed = newSets.reduce((total, set) => total + set[Player.Player1] + set[Player.Player2], 0);
             const newState: MatchState = {
@@ -87,7 +86,7 @@ export function reducer(state: MatchState, action: Action): MatchState {
               sets: [...state.sets, finalSetScore],
               tiebreak: { Player1: 0, Player2: 0 },
               games: { Player1: 0, Player2: 0 },
-              rallies: [...state.rallies, { winner: tiebreakWinner, stats }],
+              rallies: [...state.rallies, { winner: player, stats }],
               servingPlayer: totalGamesPlayed % 2 === 0 ? Player.Player1 : Player.Player2,
               gameState: {
                 Player1: Score.Love,
@@ -95,7 +94,8 @@ export function reducer(state: MatchState, action: Action): MatchState {
               },
             };
             const isWinner = checkIsWinner(newState, player, opponent);
-            return switchEndsIfNeeded(addPointState(addRallyEvents({ ...newState, matchWinner: isWinner ? player : undefined })));
+            const winEvent: WinGameEvent = { type: AnnouncementEventType.WinGame, winType: isWinner ? "match" : "set", player };
+            return switchEndsIfNeeded(addPointState(addRallyEvents({ ...newState, matchWinner: isWinner ? player : undefined, events: [winEvent] })));
           }
         }
         const pointsPlayed = state.tiebreak.Player1 + state.tiebreak.Player2 + 1;
@@ -111,7 +111,7 @@ export function reducer(state: MatchState, action: Action): MatchState {
             rallies: [...state.rallies, { winner: player, stats }],
             servingPlayer: shouldChangeServer ? switchServer(state.servingPlayer) : state.servingPlayer,
             playerPositions: shouldChangeEnds ? switchEnd(state.playerPositions) : state.playerPositions,
-            events: [],
+            events: [...(shouldChangeEnds ? [{ type: AnnouncementEventType.SwitchEnds } as AnnouncementEvent] : [])],
           })
         );
       }
@@ -274,11 +274,6 @@ export function addPointState(state: MatchState): MatchState {
           pointType: PointType.SetPoint,
         };
       }
-
-      return {
-        ...state,
-        pointType: PointType.Normal,
-      };
     }
 
     // Regular game logic
