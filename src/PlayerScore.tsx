@@ -6,6 +6,7 @@ const PlayerScore = ({ matchState, player }: { matchState: MatchState; player: P
   const { sets, games, servingPlayer } = matchState;
 
   const opponent = player === Player.Player1 ? Player.Player2 : Player.Player1;
+
   return (
     <div className="player-score">
       <h2 className="player display-item" style={{ color: PLAYER_COLOURS[player] }}>

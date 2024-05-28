@@ -19,19 +19,22 @@ const pointMap: {
 };
 
 const GameScore = ({ leftPlayer, rightPlayer, matchState }: { leftPlayer: Player; rightPlayer: Player; matchState: MatchState }) => {
-  const leftScore = matchState.gameState[leftPlayer];
-  const rightScore = matchState.gameState[rightPlayer];
+  const { gameState, matchConfig, games, tiebreak, sets } = matchState;
+  const leftScore = gameState[leftPlayer];
+  const rightScore = gameState[rightPlayer];
+  const isTieBreak =
+    games.Player1 === matchConfig.setLength && games.Player2 === matchConfig.setLength && sets.length + 1 !== matchState.matchConfig.numberOfSets;
 
   return (
     <div className="game-score-container">
       <div key={`left-${leftScore}`} className="score score-left new-score">
-        {scoreMap?.[leftScore] ?? leftScore}
+        {isTieBreak ? tiebreak[leftPlayer] : scoreMap?.[leftScore] ?? leftScore}
       </div>
       <div key={`middle-${matchState.pointType}`} className="score score-middle new-score">
         {pointMap?.[matchState.pointType] ?? matchState.pointType}
       </div>
       <div key={`right-${rightScore}`} className="score score-right new-score">
-        {scoreMap?.[rightScore] ?? rightScore}
+        {isTieBreak ? tiebreak[rightPlayer] : scoreMap?.[rightScore] ?? rightScore}
       </div>
     </div>
   );

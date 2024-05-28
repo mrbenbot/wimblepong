@@ -51,7 +51,6 @@ export default {
 
 # Testing
 
-- tie break score not correct in main game score
 - tie break seemed to go to eight
 - incorrectly said it was set point when it wasn't
 - didn't say set point when it was (tie break)
