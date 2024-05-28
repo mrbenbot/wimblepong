@@ -37,6 +37,7 @@ export enum AnnouncementEventType {
   WinStreak = "WIN_STREAK",
   SwitchEnds = "SWITCH_ENDS",
   WinGame = "WIN_GAME",
+  DeuceCount = "DEUCE_COUNT",
 }
 
 export interface LongRallyEvent {
@@ -58,13 +59,18 @@ export interface SwitchEndsEvent {
   type: AnnouncementEventType.SwitchEnds;
 }
 
+export interface DeuceCountEvent {
+  type: AnnouncementEventType.DeuceCount;
+  count: number;
+}
+
 export interface WinGameEvent {
   type: AnnouncementEventType.WinGame;
   winType: "game" | "set" | "match";
   player: Player;
 }
 
-export type AnnouncementEvent = LongRallyEvent | AceEvent | WinStreakEvent | SwitchEndsEvent | WinGameEvent;
+export type AnnouncementEvent = LongRallyEvent | AceEvent | WinStreakEvent | SwitchEndsEvent | WinGameEvent | DeuceCountEvent;
 
 export interface GameState {
   Player1: Score;
@@ -84,7 +90,7 @@ export interface MatchState {
     [Player.Player1]: number;
     [Player.Player2]: number;
   };
-  rallies: { winner: Player; stats: { rallyLength: number; serveSpeed: number; server: Player } }[];
+  rallies: { winner: Player; pointType: PointType; stats: { rallyLength: number; serveSpeed: number; server: Player } }[];
   matchWinner?: Player;
   servingPlayer: Player;
   playerPositions: PlayerPositions;

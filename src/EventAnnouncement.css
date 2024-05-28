@@ -43,6 +43,10 @@
   background-color: #9b59b6;
 }
 
+.announcement.deuce-count {
+  background-color: #f016de;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

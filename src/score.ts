@@ -24,42 +24,8 @@ export type Action =
   | { type: "POINT_SCORED"; player: Player; stats: { rallyLength: number; serveSpeed: number; server: Player } }
   | { type: "CLEAR_EVENTS" };
 
-const scoreOrder: Score[] = [Score.Love, Score.Fifteen, Score.Thirty, Score.Forty, Score.Game];
-const scoreOrderInDeuce: Score[] = [Score.Forty, Score.Advantage, Score.Game];
-
-export function getNextScore(currentScore: Score, isDeuce: boolean): Score {
-  const currentIndex = (isDeuce ? scoreOrderInDeuce : scoreOrder).indexOf(currentScore);
-  return (isDeuce ? scoreOrderInDeuce : scoreOrder)[currentIndex + 1];
-}
-
-function switchEnd(currentEnd: PlayerPositions): PlayerPositions {
-  return currentEnd === PlayerPositions.Initial ? PlayerPositions.Reversed : PlayerPositions.Initial;
-}
-
-function switchEndsIfNeeded(state: MatchState): MatchState {
-  const totalGamesPlayed = state.sets.reduce((acc, { Player1, Player2 }) => acc + Player1 + Player2, state.games.Player1 + state.games.Player2);
-  const shouldSwitchEnd = (totalGamesPlayed - 1) % 2 == 0;
-  if (shouldSwitchEnd) {
-    return { ...state, playerPositions: switchEnd(state.playerPositions), events: [...state.events, { type: AnnouncementEventType.SwitchEnds }] };
-  }
-  return state;
-}
-function switchServer(currentServer: Player): Player {
-  return currentServer === Player.Player1 ? Player.Player2 : Player.Player1;
-}
-
-function checkIsWinner(state: MatchState, player: Player, opponent: Player): boolean {
-  const playerSets = state.sets.reduce((acc, set) => {
-    if (set[player] > set[opponent]) {
-      return acc + 1;
-    } else {
-      return acc;
-    }
-  }, 0);
-  return playerSets >= Math.ceil(state.matchConfig.numberOfSets / 2);
-}
-
 export function reducer(state: MatchState, action: Action): MatchState {
+  // console.log("REDUCER CALLED", action, state);
   if (state.matchWinner) {
     return state; // No changes if there's already a match winner
   }
@@ -69,46 +35,41 @@ export function reducer(state: MatchState, action: Action): MatchState {
       const { player, stats } = action;
       const opponent = player === Player.Player1 ? Player.Player2 : Player.Player1;
 
-      if (
-        state.games[player] === state.matchConfig.setLength &&
-        state.games[opponent] === state.matchConfig.setLength &&
-        state.sets.length + 1 < state.matchConfig.numberOfSets
-      ) {
-        if (state.tiebreak[player] >= 6) {
-          // Handle tiebreak scoring
-          if (state.tiebreak[player] - state.tiebreak[opponent] >= 1) {
-            const finalSetScore = { ...state.games, [player]: state.games[player] + 1 };
-            const newSets = [...state.sets, finalSetScore];
-            const totalGamesPlayed = newSets.reduce((total, set) => total + set[Player.Player1] + set[Player.Player2], 0);
-            const newState: MatchState = {
-              ...state,
-              events: [],
-              sets: [...state.sets, finalSetScore],
-              tiebreak: { Player1: 0, Player2: 0 },
-              games: { Player1: 0, Player2: 0 },
-              rallies: [...state.rallies, { winner: player, stats }],
-              servingPlayer: totalGamesPlayed % 2 === 0 ? Player.Player1 : Player.Player2,
-              gameState: {
-                Player1: Score.Love,
-                Player2: Score.Love,
-              },
-            };
-            const isWinner = checkIsWinner(newState, player, opponent);
-            const winEvent: WinGameEvent = { type: AnnouncementEventType.WinGame, winType: isWinner ? "match" : "set", player };
-            return switchEndsIfNeeded(addPointState(addRallyEvents({ ...newState, matchWinner: isWinner ? player : undefined, events: [winEvent] })));
-          }
+      if (isTieBreak(state)) {
+        if (isTieBreakSetPoint(state, player, opponent)) {
+          // Handle tiebreak win
+          const finalSetScore = { ...state.games, [player]: state.games[player] + 1 };
+          const newSets = [...state.sets, finalSetScore];
+          const totalGamesPlayed = newSets.reduce((total, set) => total + set[Player.Player1] + set[Player.Player2], 0);
+          const newState: MatchState = {
+            ...state,
+            events: [],
+            sets: [...state.sets, finalSetScore],
+            tiebreak: { Player1: 0, Player2: 0 },
+            games: { Player1: 0, Player2: 0 },
+            rallies: [...state.rallies, { winner: player, pointType: state.pointType, stats }],
+            servingPlayer: totalGamesPlayed % 2 === 0 ? Player.Player1 : Player.Player2,
+            gameState: {
+              Player1: Score.Love,
+              Player2: Score.Love,
+            },
+          };
+          const isWinner = checkIsWinner(newState, player, opponent);
+          const winEvent: WinGameEvent = { type: AnnouncementEventType.WinGame, winType: isWinner ? "match" : "set", player };
+          return switchEndsIfNeeded(addRallyEvents(addPointState({ ...newState, matchWinner: isWinner ? player : undefined, events: [winEvent] })));
         }
+        // handle tie break point score
         const pointsPlayed = state.tiebreak.Player1 + state.tiebreak.Player2 + 1;
         const shouldChangeEnds = pointsPlayed % 6 === 0;
         const shouldChangeServer = (pointsPlayed - 1) % 2 === 0;
-        return addPointState(
-          addRallyEvents({
+        return addRallyEvents(
+          addPointState({
             ...state,
             tiebreak: {
               ...state.tiebreak,
               [player]: state.tiebreak[player] + 1,
             },
-            rallies: [...state.rallies, { winner: player, stats }],
+            rallies: [...state.rallies, { winner: player, pointType: state.pointType, stats }],
             servingPlayer: shouldChangeServer ? switchServer(state.servingPlayer) : state.servingPlayer,
             playerPositions: shouldChangeEnds ? switchEnd(state.playerPositions) : state.playerPositions,
             events: [...(shouldChangeEnds ? [{ type: AnnouncementEventType.SwitchEnds } as AnnouncementEvent] : [])],
@@ -116,12 +77,13 @@ export function reducer(state: MatchState, action: Action): MatchState {
         );
       }
 
+      // regular game logic
       // Handle back to deuce
       if (state.gameState[opponent] === Score.Advantage) {
-        return addPointState(
-          addRallyEvents({
+        return addRallyEvents(
+          addPointState({
             ...state,
-            rallies: [...state.rallies, { winner: player, stats }],
+            rallies: [...state.rallies, { winner: player, pointType: state.pointType, stats }],
             gameState: {
               ...state.gameState,
               [opponent]: Score.Forty,
@@ -132,11 +94,11 @@ export function reducer(state: MatchState, action: Action): MatchState {
       }
 
       // Handle gaining advantage
-      if (state.gameState[opponent] === Score.Forty && state.gameState[player] === Score.Forty) {
-        return addPointState(
-          addRallyEvents({
+      if (isDeuce(state)) {
+        return addRallyEvents(
+          addPointState({
             ...state,
-            rallies: [...state.rallies, { winner: player, stats }],
+            rallies: [...state.rallies, { winner: player, pointType: state.pointType, stats }],
             gameState: {
               ...state.gameState,
               [player]: Score.Advantage,
@@ -146,8 +108,8 @@ export function reducer(state: MatchState, action: Action): MatchState {
         );
       }
 
-      const isDeuce = [state.gameState[opponent], state.gameState[player]].every((score) => [Score.Forty, Score.Advantage].includes(score));
-      const newScore = getNextScore(state.gameState[player], isDeuce);
+      const isDeuceMode = [state.gameState[opponent], state.gameState[player]].every((score) => [Score.Forty, Score.Advantage].includes(score));
+      const newScore = getNextScore(state.gameState[player], isDeuceMode);
 
       if (newScore === Score.Game) {
         const newGames = {
@@ -155,7 +117,7 @@ export function reducer(state: MatchState, action: Action): MatchState {
           [player]: state.games[player] + 1,
         };
 
-        // Check for set win condition
+        // Check for match / set win condition
         if (newGames[player] >= state.matchConfig.setLength && newGames[player] - newGames[opponent] >= 2) {
           const newSets = [...state.sets, newGames];
 
@@ -163,7 +125,7 @@ export function reducer(state: MatchState, action: Action): MatchState {
             ...state,
             sets: newSets,
             games: { Player1: 0, Player2: 0 },
-            rallies: [...state.rallies, { winner: player, stats }],
+            rallies: [...state.rallies, { winner: player, pointType: state.pointType, stats }],
             servingPlayer: state.servingPlayer === Player.Player1 ? Player.Player2 : Player.Player1,
             gameState: {
               Player1: Score.Love,
@@ -173,9 +135,9 @@ export function reducer(state: MatchState, action: Action): MatchState {
           };
           const isWinner = checkIsWinner(newState, player, opponent);
           const winEvent: WinGameEvent = { type: AnnouncementEventType.WinGame, winType: isWinner ? "match" : "set", player };
-          return switchEndsIfNeeded(addPointState(addRallyEvents({ ...newState, matchWinner: player, events: [winEvent] })));
+          return switchEndsIfNeeded(addRallyEvents(addPointState({ ...newState, matchWinner: player, events: [winEvent] })));
         }
-        // wins games within set
+        // win games within set
         const newState = {
           ...state,
           games: newGames,
@@ -183,17 +145,17 @@ export function reducer(state: MatchState, action: Action): MatchState {
             Player1: Score.Love,
             Player2: Score.Love,
           },
-          rallies: [...state.rallies, { winner: player, stats }],
+          rallies: [...state.rallies, { winner: player, pointType: state.pointType, stats }],
           servingPlayer: state.servingPlayer === Player.Player1 ? Player.Player2 : Player.Player1,
           events: [{ type: AnnouncementEventType.WinGame, winType: "game", player: player } as WinGameEvent],
         };
-        return switchEndsIfNeeded(addPointState(addRallyEvents({ ...newState })));
+        return switchEndsIfNeeded(addRallyEvents(addPointState({ ...newState })));
       }
       // scores
-      return addPointState(
-        addRallyEvents({
+      return addRallyEvents(
+        addPointState({
           ...state,
-          rallies: [...state.rallies, { winner: player, stats }],
+          rallies: [...state.rallies, { winner: player, pointType: state.pointType, stats }],
           gameState: {
             ...state.gameState,
             [player]: newScore,
@@ -211,29 +173,85 @@ export function reducer(state: MatchState, action: Action): MatchState {
   }
 }
 
-function addRallyEvents(state: MatchState) {
+const scoreOrder: Score[] = [Score.Love, Score.Fifteen, Score.Thirty, Score.Forty, Score.Game];
+const scoreOrderInDeuce: Score[] = [Score.Forty, Score.Advantage, Score.Game];
+
+export function getNextScore(currentScore: Score, isDeuceMode: boolean): Score {
+  const currentIndex = (isDeuceMode ? scoreOrderInDeuce : scoreOrder).indexOf(currentScore);
+  return (isDeuceMode ? scoreOrderInDeuce : scoreOrder)[currentIndex + 1];
+}
+
+function switchEnd(currentEnd: PlayerPositions): PlayerPositions {
+  return currentEnd === PlayerPositions.Initial ? PlayerPositions.Reversed : PlayerPositions.Initial;
+}
+
+function switchEndsIfNeeded(state: MatchState): MatchState {
+  const totalGamesPlayed = state.sets.reduce((acc, { Player1, Player2 }) => acc + Player1 + Player2, state.games.Player1 + state.games.Player2);
+  const shouldSwitchEnd = (totalGamesPlayed - 1) % 2 == 0;
+  if (shouldSwitchEnd) {
+    return { ...state, playerPositions: switchEnd(state.playerPositions), events: [...state.events, { type: AnnouncementEventType.SwitchEnds }] };
+  }
+  return state;
+}
+
+function switchServer(currentServer: Player): Player {
+  return currentServer === Player.Player1 ? Player.Player2 : Player.Player1;
+}
+
+function checkIsWinner(state: MatchState, player: Player, opponent: Player): boolean {
+  const playerSets = state.sets.reduce((acc, set) => {
+    if (set[player] > set[opponent]) {
+      return acc + 1;
+    } else {
+      return acc;
+    }
+  }, 0);
+  return playerSets >= Math.ceil(state.matchConfig.numberOfSets / 2);
+}
+
+function addRallyEvents(state: MatchState): MatchState {
   const {
     stats: { rallyLength: latestLength, serveSpeed },
   } = state.rallies[state.rallies.length - 1];
+
+  const deuceCount = getDeuceCount(state);
+  if (deuceCount >= 3) {
+    return { ...state, events: [...state.events, { type: AnnouncementEventType.DeuceCount, count: deuceCount }] };
+  }
 
   // win streak
   const winStreak = getWinStreak(state.rallies);
 
   if (winStreak > 0 && winStreak % 5 === 0) {
-    return { ...state, events: [...state.events, { type: AnnouncementEventType.WinStreak, streak: winStreak } as AnnouncementEvent] };
+    return { ...state, events: [...state.events, { type: AnnouncementEventType.WinStreak, streak: winStreak }] };
   }
 
   if (latestLength === 1) {
-    return { ...state, events: [...state.events, { type: AnnouncementEventType.Ace, speed: serveSpeed.toFixed(3) } as AnnouncementEvent] };
+    return { ...state, events: [...state.events, { type: AnnouncementEventType.Ace, speed: serveSpeed.toFixed(3) }] };
   }
 
   const previousRallies = state.rallies.slice(0, -1);
   const prevHighest = previousRallies.reduce((highest, { stats }) => Math.max(highest, stats.rallyLength), 0);
   if (latestLength >= LONG_RALLY_ANNOUNCEMENT_THRESHOLD && latestLength > prevHighest) {
-    return { ...state, events: [...state.events, { type: AnnouncementEventType.LongRally, length: latestLength } as AnnouncementEvent] };
+    return { ...state, events: [...state.events, { type: AnnouncementEventType.LongRally, length: latestLength }] };
   }
 
   return state;
+}
+
+export function getDeuceCount(state: MatchState): number {
+  if (state.pointType === PointType.Deuce) {
+    let deuceCount = 1;
+    for (let i = 1; i < state.rallies.length; i++) {
+      if (state.rallies[state.rallies.length - i * 2]?.pointType === PointType.Deuce) {
+        deuceCount++;
+      } else {
+        return deuceCount;
+      }
+    }
+    return deuceCount;
+  }
+  return 0;
 }
 
 export function getWinStreak(rallies: MatchState["rallies"]) {
@@ -255,10 +273,7 @@ export function addPointState(state: MatchState): MatchState {
     const opponent = player === Player.Player1 ? Player.Player2 : Player.Player1;
     const setsWonByPlayer = state.sets.filter((set) => set[player] > set[opponent]).length;
 
-    // Check if in tiebreak
-    const inTiebreak = games[player] === state.matchConfig.setLength && games[opponent] === state.matchConfig.setLength;
-
-    if (inTiebreak) {
+    if (isTieBreak(state)) {
       // Determine if it is a match point during tiebreak
       if (setsWonByPlayer === Math.floor(matchConfig.numberOfSets / 2) && tiebreak[player] >= 6 && tiebreak[player] - tiebreak[opponent] >= 1) {
         return {
@@ -268,7 +283,7 @@ export function addPointState(state: MatchState): MatchState {
       }
 
       // Determine if it is a set point during tiebreak
-      if (tiebreak[player] >= 6 && tiebreak[player] - tiebreak[opponent] >= 1) {
+      if (isTieBreakSetPoint(state, player, opponent)) {
         return {
           ...state,
           pointType: PointType.SetPoint,
@@ -277,8 +292,7 @@ export function addPointState(state: MatchState): MatchState {
     }
 
     // Regular game logic
-    // Determine if it is Deuce
-    if (gameState[player] === Score.Forty && gameState[opponent] === Score.Forty) {
+    if (isDeuce(state)) {
       return {
         ...state,
         pointType: PointType.Deuce,
@@ -310,4 +324,20 @@ function isGamePoint(scoreOne: Score, scoreTwo: Score): boolean {
   return (
     (scoreOne === Score.Forty && ![Score.Forty, Score.Advantage].includes(scoreTwo)) || (scoreOne === Score.Advantage && scoreTwo === Score.Forty)
   );
+}
+
+function isTieBreak(state: MatchState): boolean {
+  return (
+    state.games[Player.Player1] === state.matchConfig.setLength &&
+    state.games[Player.Player2] === state.matchConfig.setLength &&
+    state.sets.length + 1 < state.matchConfig.numberOfSets
+  );
+}
+
+function isTieBreakSetPoint(state: MatchState, player: Player, opponent: Player) {
+  return state.tiebreak[player] >= 6 && state.tiebreak[player] - state.tiebreak[opponent] >= 1;
+}
+
+function isDeuce(state: MatchState): boolean {
+  return state.gameState[Player.Player1] === Score.Forty && state.gameState[Player.Player2] === Score.Forty;
 }

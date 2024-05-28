@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "./EventAnnouncement.css";
-import { AceEvent, AnnouncementEvent, AnnouncementEventType, LongRallyEvent, WinGameEvent, WinStreakEvent } from "./types";
+import { AceEvent, AnnouncementEvent, AnnouncementEventType, DeuceCountEvent, LongRallyEvent, WinGameEvent, WinStreakEvent } from "./types";
 
 // LongRallyEvent Component
 const LongRallyEventComponent: React.FC<LongRallyEvent> = ({ length }) => (
@@ -23,6 +23,16 @@ const WinStreakEventComponent: React.FC<WinStreakEvent> = ({ streak }) => (
   <div className="announcement win-streak">
     <h2>Winning Streak!</h2>
     <p>{streak} points in a row</p>
+  </div>
+);
+
+// WinStreakEvent Component
+const DeuceCountEventComponent: React.FC<DeuceCountEvent> = ({ count }) => (
+  <div className="announcement deuce-count">
+    <h2>
+      {count}
+      {["st", "nd", "rd"][count - 1] ?? "th"} Deuce
+    </h2>
   </div>
 );
 
@@ -60,6 +70,8 @@ const getEvent = (event: AnnouncementEvent) => {
       return <SwitchEndsEventComponent />;
     case AnnouncementEventType.WinGame:
       return <WinGameEventComponent {...event} />;
+    case AnnouncementEventType.DeuceCount:
+      return <DeuceCountEventComponent {...event} />;
     default:
       return null;
   }

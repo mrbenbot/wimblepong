@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Action, addPointState, getWinStreak, reducer } from "./score"; // Adjust the import path as needed
+import { Action, addPointState, getDeuceCount, getWinStreak, reducer } from "./score"; // Adjust the import path as needed
 import { AnnouncementEventType, MatchState, Player, PlayerPositions, PointType, Score } from "./types";
 
 describe("Tennis Match Reducer", () => {
@@ -433,7 +433,7 @@ describe("getWinStreak", () => {
       expected: 1,
     },
   ])("win streak should be $expected", ({ rallies, expected }) => {
-    expect(getWinStreak(rallies)).toBe(expected);
+    expect(getWinStreak(rallies as MatchState["rallies"])).toBe(expected);
   });
 });
 
@@ -661,5 +661,60 @@ describe("addPointState", () => {
     };
     const updatedState = addPointState(state);
     expect(updatedState.pointType).toBe(PointType.Normal);
+  });
+});
+
+describe("getDeuceCount", () => {
+  const initialState: MatchState = {
+    sets: [],
+    games: { Player1: 0, Player2: 0 },
+    tiebreak: { Player1: 0, Player2: 0 },
+    rallies: [],
+    servingPlayer: Player.Player1,
+    playerPositions: PlayerPositions.Initial,
+    gameState: {
+      Player1: Score.Love,
+      Player2: Score.Love,
+    },
+    events: [],
+    matchConfig: {
+      numberOfSets: 3,
+      setLength: 6,
+    },
+    pointType: PointType.Normal,
+  };
+
+  const defaultStats = { rallyLength: 1, serveSpeed: 1, server: Player.Player1 };
+
+  it.each([
+    { rallies: [], pointType: PointType.GamePoint, expected: 0 },
+    { rallies: [], pointType: PointType.Deuce, expected: 1 },
+    { rallies: [{ stats: defaultStats, winner: Player.Player1, pointType: PointType.GamePoint }], pointType: PointType.Deuce, expected: 1 },
+    {
+      rallies: [
+        { stats: defaultStats, winner: Player.Player1, pointType: PointType.Deuce },
+        { stats: defaultStats, winner: Player.Player1, pointType: PointType.GamePoint },
+        { stats: defaultStats, winner: Player.Player1, pointType: PointType.Deuce },
+      ],
+      pointType: PointType.Deuce,
+      expected: 2,
+    },
+    {
+      rallies: [
+        { stats: defaultStats, winner: Player.Player1, pointType: PointType.Deuce },
+        { stats: defaultStats, winner: Player.Player1, pointType: PointType.GamePoint },
+        { stats: defaultStats, winner: Player.Player1, pointType: PointType.Deuce },
+        { stats: defaultStats, winner: Player.Player1, pointType: PointType.GamePoint },
+      ],
+      pointType: PointType.Deuce,
+      expected: 3,
+    },
+  ])("should count $expected previous deuces", ({ rallies, pointType, expected }) => {
+    const matchState: MatchState = {
+      ...initialState,
+      rallies,
+      pointType,
+    };
+    expect(getDeuceCount(matchState)).toBe(expected);
   });
 });
