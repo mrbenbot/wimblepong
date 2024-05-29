@@ -102,3 +102,13 @@ export interface MatchState {
   events: AnnouncementEvent[];
   pointType: PointType;
 }
+
+export interface InputData {
+  lastData: Uint8Array | null;
+  lastUpdated: number | null;
+}
+
+export interface DataRef {
+  [Player.Player1]: InputData;
+  [Player.Player2]: InputData;
+}

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Player } from "./types";
+import { DataRef, InputData, Player } from "./types";
 
 function arraysEqual(a: Uint8Array | null, b: Uint8Array) {
   if (!a || a.length !== b.length) return false;
@@ -7,16 +7,6 @@ function arraysEqual(a: Uint8Array | null, b: Uint8Array) {
     if (a[i] !== b[i]) return false;
   }
   return true;
-}
-
-export interface InputData {
-  lastData: Uint8Array | null;
-  lastUpdated: number | null;
-}
-
-export interface DataRef {
-  [Player.Player1]: InputData;
-  [Player.Player2]: InputData;
 }
 
 enum DeviceConnectionStatus {
@@ -132,7 +122,42 @@ const useDJHeroInput = () => {
     };
   }, [dataRef]);
 
-  return { connected: deviceConnectionStatus === DeviceConnectionStatus.TwoConnected && bothReceiving, selectDevice, dataRef };
+  return {
+    connected: deviceConnectionStatus === DeviceConnectionStatus.TwoConnected && bothReceiving,
+    selectDevice,
+    dataRef,
+    getPaddleUpdate,
+    getButtonPushed,
+  };
 };
+
+function getPaddleUpdate(
+  input: InputData,
+  paddle: {
+    x: number;
+    y: number;
+    dy: number;
+    width: number;
+    height: number;
+  },
+  deltaTime: number,
+  inverse: boolean
+) {
+  if (inverse) {
+    paddle.dy = -getPaddleDirection(input.lastData || new Uint8Array());
+  } else {
+    paddle.dy = getPaddleDirection(input.lastData || new Uint8Array());
+  }
+  paddle.y += paddle.dy * deltaTime;
+}
+
+export function getPaddleDirection(data: Uint8Array) {
+  return 128 - data[6] || 0;
+}
+
+export function getButtonPushed(data: Uint8Array) {
+  // 7 green 9 red 12 blue 11 black
+  return data[11] === 255;
+}
 
 export default useDJHeroInput;

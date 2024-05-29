@@ -1,14 +1,12 @@
 import React, { useReducer, useRef } from "react";
-import useDJHeroInput from "./ConnectDevices";
 import GameCanvas from "./GameCanvas";
 import { initialState, reducer } from "./score";
 import { BALL, COURT, INITIAL_SPEED, PADDLE } from "./config";
 import "./App.css";
 import PlayerScore from "./PlayerScore";
 import EventAnnouncement from "./EventAnnouncement";
-import { Player, PlayerPositions } from "./types";
+import { DataRef, InputData, Player, PlayerPositions } from "./types";
 import Scoreboard from "./Scoreboard";
-// import Scoreboard from "./Scoreboard";
 
 export interface GameState {
   paddle1: { x: number; y: number; dy: number; width: number; height: number };
@@ -35,8 +33,24 @@ const getLeftRightPlayer = (playerPositions: PlayerPositions) => {
   return { leftPlayer: Player.Player1, rightPlayer: Player.Player2 };
 };
 
-const App: React.FC = () => {
-  const { connected, selectDevice, dataRef } = useDJHeroInput();
+const App: React.FC<{
+  connected?: boolean;
+  selectDevice?: () => Promise<void>;
+  dataRef: React.MutableRefObject<DataRef>;
+  getPaddleUpdate: (
+    input: InputData,
+    paddle: {
+      x: number;
+      y: number;
+      dy: number;
+      width: number;
+      height: number;
+    },
+    deltaTime: number,
+    inverse: boolean
+  ) => void;
+  getButtonPushed: (data: Uint8Array) => boolean;
+}> = ({ connected = true, selectDevice, dataRef, getPaddleUpdate, getButtonPushed }) => {
   const gameStateRef = useRef<GameState>({
     paddle1: { x: 0, y: COURT.height / 2 - PADDLE.height / 2, dy: 0, width: PADDLE.width, height: PADDLE.height },
     paddle2: { x: COURT.width - PADDLE.width, y: COURT.height / 2 - PADDLE.height / 2, dy: 0, width: PADDLE.width, height: PADDLE.height },
@@ -86,10 +100,12 @@ const App: React.FC = () => {
             paused={!connected}
             leftPlayer={leftPlayer}
             rightPlayer={rightPlayer}
+            getPaddleUpdate={getPaddleUpdate}
+            getButtonPushed={getButtonPushed}
           />
           <PlayerScore matchState={matchState} player={rightPlayer} />
           <footer className="footer">
-            <div>{!connected && <button onClick={selectDevice}>select device</button>}</div>
+            {selectDevice && <div>{!connected && <button onClick={selectDevice}>select device</button>}</div>}
             <p className="match-info">
               Best of {matchState.matchConfig.numberOfSets} sets. Set length {matchState.matchConfig.setLength} games.
             </p>

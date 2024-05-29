@@ -51,4 +51,5 @@ export default {
 # Testing
 
 - should announce tie break as an event
-- should announce winning the tiebreak
+- should take input from a mouse?
+- full screen button should not show in full screen mode

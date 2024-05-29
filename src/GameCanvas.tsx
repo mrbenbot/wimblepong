@@ -1,6 +1,5 @@
 import React, { useRef, useEffect } from "react";
 import { GameState } from "./App";
-import { DataRef } from "./ConnectDevices";
 import { Action } from "./score";
 import {
   BALL_COLOUR,
@@ -14,7 +13,7 @@ import {
   SPEED_INCREMENT,
 } from "./config";
 import "./GameCanvas.css";
-import { MatchState, Player } from "./types";
+import { DataRef, InputData, MatchState, Player } from "./types";
 import GameScore from "./GameScore";
 
 interface GameCanvasProps {
@@ -25,6 +24,19 @@ interface GameCanvasProps {
   paused: boolean;
   leftPlayer: Player;
   rightPlayer: Player;
+  getPaddleUpdate: (
+    input: InputData,
+    paddle: {
+      x: number;
+      y: number;
+      dy: number;
+      width: number;
+      height: number;
+    },
+    deltaTime: number,
+    inverse: boolean
+  ) => void;
+  getButtonPushed: (data: Uint8Array) => boolean;
 }
 
 const getBounceAngle = (paddleY: number, paddleHeight: number, ballY: number) => {
@@ -33,7 +45,17 @@ const getBounceAngle = (paddleY: number, paddleHeight: number, ballY: number) =>
   return normalizedIntersectY * (Math.PI / 4); // 45 degrees max
 };
 
-const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, inputRef, dispatch, matchState, paused, leftPlayer, rightPlayer }) => {
+const GameCanvas: React.FC<GameCanvasProps> = ({
+  gameStateRef,
+  inputRef,
+  dispatch,
+  matchState,
+  paused,
+  leftPlayer,
+  rightPlayer,
+  getPaddleUpdate,
+  getButtonPushed,
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const deltaTimeRef = useRef(0);
 
@@ -143,11 +165,13 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, inputRef, dispatc
         }
       }
 
-      paddle1.dy = -getPaddleDirection(input1.lastData || new Uint8Array());
-      paddle1.y += paddle1.dy * deltaTime;
+      // paddle1.dy = -getPaddleDirection(input1.lastData || new Uint8Array());
+      // paddle1.y += paddle1.dy * deltaTime;
+      getPaddleUpdate(input1, paddle1, deltaTime, true);
 
-      paddle2.dy = getPaddleDirection(input2.lastData || new Uint8Array());
-      paddle2.y += paddle2.dy * deltaTime;
+      // paddle2.dy = getPaddleDirection(input2.lastData || new Uint8Array());
+      // paddle2.y += paddle2.dy * deltaTime;
+      getPaddleUpdate(input2, paddle2, deltaTime, false);
 
       // Ensure paddles stay within screen bounds
       if (paddle1.y < 0) paddle1.y = 0;
@@ -184,7 +208,19 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, inputRef, dispatc
         cancelAnimationFrame(loopId);
       }
     };
-  }, [inputRef, gameStateRef, dispatch, servingPlayer, playerPosition, paused, leftPlayer, rightPlayer, deltaTimeRef]);
+  }, [
+    inputRef,
+    gameStateRef,
+    dispatch,
+    servingPlayer,
+    playerPosition,
+    paused,
+    leftPlayer,
+    rightPlayer,
+    deltaTimeRef,
+    getPaddleUpdate,
+    getButtonPushed,
+  ]);
 
   return (
     <div className="game-canvas-container">
@@ -193,14 +229,5 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, inputRef, dispatc
     </div>
   );
 };
-
-function getPaddleDirection(data: Uint8Array) {
-  return 128 - data[6];
-}
-
-function getButtonPushed(data: Uint8Array) {
-  // 7 green 9 red 12 blue 11 black
-  return data[11] === 255;
-}
 
 export default GameCanvas;
