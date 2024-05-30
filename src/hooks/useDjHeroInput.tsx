@@ -16,9 +16,11 @@ enum DeviceConnectionStatus {
   Unknown = "UNKNOWN",
 }
 
+const connectionStatuses = [DeviceConnectionStatus.NoneConnected, DeviceConnectionStatus.OneConnected, DeviceConnectionStatus.TwoConnected];
+
 const players = [Player.Player1, Player.Player2];
 
-const useDJHeroInput = () => {
+const useDJHeroInput = (numberOfControllers: number = 2) => {
   const [deviceConnectionStatus, setDeviceConnectionStatus] = useState(DeviceConnectionStatus.NoneConnected);
   const [bothReceiving, setBothReceiving] = useState(false);
   const [devices, setDevices] = useState<HIDDevice[]>([]);
@@ -38,9 +40,7 @@ const useDJHeroInput = () => {
     await newDevice.open();
     const newDevices = [...new Set([...devices, newDevice])];
     newDevice.addEventListener("inputreport", handleInputReport(players[newDevices.length === 1 ? 1 : 0]));
-    setDeviceConnectionStatus(
-      [DeviceConnectionStatus.NoneConnected, DeviceConnectionStatus.OneConnected, DeviceConnectionStatus.TwoConnected][newDevices.length]
-    );
+    setDeviceConnectionStatus(connectionStatuses[newDevices.length]);
     setDevices(newDevices);
   };
 
@@ -48,9 +48,7 @@ const useDJHeroInput = () => {
     const handleDisconnect = async (event: HIDConnectionEvent) => {
       console.log(`HID disconnected: ${event.device.productName}`);
       const remainingDevices = await navigator.hid.getDevices();
-      setDeviceConnectionStatus(
-        [DeviceConnectionStatus.NoneConnected, DeviceConnectionStatus.OneConnected, DeviceConnectionStatus.TwoConnected][remainingDevices.length]
-      );
+      setDeviceConnectionStatus(connectionStatuses[remainingDevices.length]);
       setDevices(remainingDevices);
     };
 
@@ -81,7 +79,7 @@ const useDJHeroInput = () => {
       if (mounted) {
         const existingDevices = await navigator.hid.getDevices();
         console.log("received: ", existingDevices);
-        if (existingDevices.length > 2) {
+        if (existingDevices.length > numberOfControllers) {
           setDeviceConnectionStatus(DeviceConnectionStatus.Unknown);
           return;
         }
@@ -96,9 +94,7 @@ const useDJHeroInput = () => {
           }
         });
 
-        setDeviceConnectionStatus(
-          [DeviceConnectionStatus.NoneConnected, DeviceConnectionStatus.OneConnected, DeviceConnectionStatus.TwoConnected][existingDevices.length]
-        );
+        setDeviceConnectionStatus(connectionStatuses[existingDevices.length]);
 
         setDevices(existingDevices);
       }
@@ -107,20 +103,24 @@ const useDJHeroInput = () => {
     return () => {
       mounted = false;
     };
-  }, [handleInputReport]);
+  }, [handleInputReport, numberOfControllers]);
 
   useEffect(() => {
     const id = setInterval(() => {
       const now = Date.now();
-      const diff0 = now - (dataRef.current[Player.Player1].lastUpdated ?? 0);
-      const diff1 = now - (dataRef.current[Player.Player2].lastUpdated ?? 0);
-      // console.log(dataRef.current);
-      setBothReceiving(diff0 < 500 && diff1 < 500);
+      if (numberOfControllers === 2) {
+        const diff0 = now - (dataRef.current[Player.Player1].lastUpdated ?? 0);
+        const diff1 = now - (dataRef.current[Player.Player2].lastUpdated ?? 0);
+        setBothReceiving(diff0 < 500 && diff1 < 500);
+      } else {
+        const diff0 = now - (dataRef.current[Player.Player1].lastUpdated ?? 0);
+        setBothReceiving(diff0 < 500);
+      }
     }, 1000);
     return () => {
       clearInterval(id);
     };
-  }, [dataRef]);
+  }, [dataRef, numberOfControllers]);
 
   const getPlayerActions = (player: Player, _state: MutableGameState, _canvas: HTMLCanvasElement, _leftPlayer: boolean) => {
     const { lastData } = dataRef.current[player];
@@ -138,7 +138,7 @@ const useDJHeroInput = () => {
   };
 
   return {
-    connected: deviceConnectionStatus === DeviceConnectionStatus.TwoConnected && bothReceiving,
+    connected: deviceConnectionStatus === connectionStatuses[numberOfControllers] && bothReceiving,
     selectDevice,
     getPlayerActions,
   };

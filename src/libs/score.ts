@@ -281,7 +281,6 @@ export function addPointState(state: MatchState): MatchState {
           pointType: PointType.MatchPoint,
         };
       }
-      console.log(player, opponent);
       // Determine if it is a set point during tiebreak
       if (isTieBreakSetPoint(state, player, opponent)) {
         return {

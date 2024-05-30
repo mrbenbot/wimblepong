@@ -8,39 +8,39 @@ import GamepadApp from "./GamepadApp";
 Set Length -> 1 - 6
 Match Length -> 1,3,5
 Input Mode
-  - Mouse vs Computer
+  - Mouse vs Computer ✅
   - Gamepad vs Computer 
   - Gamepad vs Gamepad
-  - HID vs Gamepad
-  - Gamepad vs HID
-  - Mouse vs Gamepad
-  - Mouse vs HID
+  - HID vs Computer ✅
+  - HID vs HID ✅
   - Computer (Model) vs Computer
   - Computer (Model) vs Computer (Model)
  */
 
 const MenuComponent: React.FC = () => {
-  const [selectedOption, setSelectedOption] = useState<"mouse" | "dj" | "gamepad" | null>(null);
+  const [selectedOption, setSelectedOption] = useState<"mouse" | "dj" | "dj/computer" | "gamepad" | null>(null);
 
   return (
     <div>
       <h1>Select an Option</h1>
       <div>
-        <button onClick={() => setSelectedOption("mouse")}>Mouse</button>
-        <button onClick={() => setSelectedOption("dj")}>DJ</button>
-        <button onClick={() => setSelectedOption("gamepad")}>Gamepad</button>
+        <button onClick={() => setSelectedOption("mouse")}>Mouse vs Computer</button>
+        <button onClick={() => setSelectedOption("dj")}>DJ vs DJ</button>
+        <button onClick={() => setSelectedOption("dj/computer")}>DJ vs Computer</button>
+        <button onClick={() => setSelectedOption("gamepad")}>Gamepad vs Gamepad</button>
       </div>
       <div>
         {selectedOption === "mouse" && <MouseControlApp />}
-        {selectedOption === "dj" && <DJHeroApp />}
+        {selectedOption === "dj/computer" && <DJHeroApp numberOfControllers={1} />}
+        {selectedOption === "dj" && <DJHeroApp numberOfControllers={2} />}
         {selectedOption === "gamepad" && <GamepadApp />}
       </div>
-      <label>
+      {/* <label>
         Set Length: <select></select>
       </label>
       <label>
         Game Length: <select></select>
-      </label>
+      </label> */}
     </div>
   );
 };

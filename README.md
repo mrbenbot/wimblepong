@@ -54,3 +54,6 @@ export default {
 - full screen button should not show in full screen mode
 - should be able to choose input for each player
 - said it was set point when opponent had match point in the tiebreak
+- clean up player serve jaggedness
+- scoreboard previous sets are a bit squished
+- select match and set length
