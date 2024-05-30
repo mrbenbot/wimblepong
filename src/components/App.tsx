@@ -1,7 +1,7 @@
 import React, { useReducer, useRef } from "react";
 import GameCanvas from "./GameCanvas";
-import { initialState, reducer } from "./score";
-import { BALL, COURT, INITIAL_SPEED, PADDLE } from "./config";
+import { initialState, reducer } from "../libs/score";
+import { BALL, COURT, INITIAL_SPEED, PADDLE } from "../config";
 import "./App.css";
 import PlayerScore from "./PlayerScore";
 import EventAnnouncement from "./EventAnnouncement";

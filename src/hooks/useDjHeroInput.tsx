@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { DataRef, MutableGameState, Player } from "./types";
+import { DataRef, MutableGameState, Player } from "../types";
 
 function arraysEqual(a: Uint8Array | null, b: Uint8Array) {
   if (!a || a.length !== b.length) return false;

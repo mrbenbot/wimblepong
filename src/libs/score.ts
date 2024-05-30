@@ -1,5 +1,5 @@
-import { LONG_RALLY_ANNOUNCEMENT_THRESHOLD } from "./config";
-import { AnnouncementEvent, AnnouncementEventType, MatchState, Player, PlayerPositions, PointType, Score, WinGameEvent } from "./types";
+import { LONG_RALLY_ANNOUNCEMENT_THRESHOLD } from "../config";
+import { AnnouncementEvent, AnnouncementEventType, MatchState, Player, PlayerPositions, PointType, Score, WinGameEvent } from "../types";
 
 export const initialState: MatchState = {
   sets: [],
@@ -281,7 +281,7 @@ export function addPointState(state: MatchState): MatchState {
           pointType: PointType.MatchPoint,
         };
       }
-
+      console.log(player, opponent);
       // Determine if it is a set point during tiebreak
       if (isTieBreakSetPoint(state, player, opponent)) {
         return {

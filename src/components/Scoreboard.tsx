@@ -1,5 +1,5 @@
 import "./Scoreboard.css";
-import { PLAYER_COLOURS } from "./config";
+import { PLAYER_COLOURS } from "../config";
 import { MatchState, Player, Score } from "./types";
 
 const scoreMap: {

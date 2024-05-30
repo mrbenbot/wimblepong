@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { GetPlayerActionsFunction, MutableGameState, Player } from "./types";
+import { GetPlayerActionsFunction, MutableGameState, Player } from "../types";
 import { GAMEPAD_AXIS_MULTIPLIER } from "./config";
 
 const players = { [Player.Player1]: 0, [Player.Player2]: 1 };

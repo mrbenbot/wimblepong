@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach, MockInstance } from "vitest";
 import { render } from "@testing-library/react";
 import { act, useEffect } from "react";
-import useGamepad from "./useGamepad";
-import { GetPlayerActionsFunction, Player } from "./types";
+import useGamepad from "../useGamepad";
+import { GetPlayerActionsFunction, Player } from "../types";
 import { GAMEPAD_AXIS_MULTIPLIER } from "./config";
 
 type SpyType = MockInstance<

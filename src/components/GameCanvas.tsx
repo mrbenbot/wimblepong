@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import { Action } from "./score";
+import { Action } from "../libs/score";
 import {
   BALL_COLOUR,
   COURT,
@@ -11,7 +11,7 @@ import {
   PLAYER_COLOURS,
   SERVING_HEIGHT_MULTIPLIER,
   SPEED_INCREMENT,
-} from "./config";
+} from "../config";
 import "./GameCanvas.css";
 import { GetPlayerActionsFunction, MatchState, MutableGameState, Player, PlayerPositions } from "./types";
 import GameScore from "./GameScore";
