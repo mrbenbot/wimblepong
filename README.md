@@ -52,4 +52,5 @@ export default {
 - should be able to choose input for each player
 - clean up player serve jaggedness
 - scoreboard previous sets are a bit squished
-- select match and set length
+- win streak should have the player name / color
+- input player names
