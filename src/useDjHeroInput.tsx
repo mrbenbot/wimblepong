@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { DataRef, InputData, Player } from "./types";
+import { DataRef, MutableGameState, Player } from "./types";
 
 function arraysEqual(a: Uint8Array | null, b: Uint8Array) {
   if (!a || a.length !== b.length) return false;
@@ -122,34 +122,27 @@ const useDJHeroInput = () => {
     };
   }, [dataRef]);
 
+  const getPlayerActions = (player: Player, _state: MutableGameState, _canvas: HTMLCanvasElement, _leftPlayer: boolean) => {
+    const { lastData } = dataRef.current[player];
+    if (lastData) {
+      return {
+        buttonPressed: getButtonPushed(lastData),
+        paddleDirection: getPaddleDirection(lastData),
+      };
+    } else {
+      return {
+        buttonPressed: false,
+        paddleDirection: 0,
+      };
+    }
+  };
+
   return {
     connected: deviceConnectionStatus === DeviceConnectionStatus.TwoConnected && bothReceiving,
     selectDevice,
-    dataRef,
-    getPaddleUpdate,
-    getButtonPushed,
+    getPlayerActions,
   };
 };
-
-function getPaddleUpdate(
-  input: InputData,
-  paddle: {
-    x: number;
-    y: number;
-    dy: number;
-    width: number;
-    height: number;
-  },
-  deltaTime: number,
-  inverse: boolean
-) {
-  if (inverse) {
-    paddle.dy = -getPaddleDirection(input.lastData || new Uint8Array());
-  } else {
-    paddle.dy = getPaddleDirection(input.lastData || new Uint8Array());
-  }
-  paddle.y += paddle.dy * deltaTime;
-}
 
 export function getPaddleDirection(data: Uint8Array) {
   return 128 - data[6] || 0;

@@ -1,50 +1,34 @@
 import { useEffect, useRef } from "react";
-import { DataRef, InputData, Player } from "./types";
+import { InputData, MutableGameState, Player } from "./types";
+
+const MAX_PADDLE_SPEED = 25;
+const MAX_COMPUTER_PADDLE_SPEED = 10;
 
 const useMouseInput = () => {
-  const ZERO = 128;
-  const PADDLE_SPEED_MOUSE = 5;
-
-  const dataRef = useRef<DataRef>({
-    [Player.Player1]: { lastData: null, lastUpdated: null },
-    [Player.Player2]: { lastData: null, lastUpdated: null },
+  const dataRef = useRef({
+    [Player.Player1]: { buttonPressed: false, mouseY: 0 },
+    [Player.Player2]: { buttonPressed: false, mouseY: 0 },
   });
 
   useEffect(() => {
-    if (!dataRef.current[Player.Player1].lastData || !dataRef.current[Player.Player2].lastData) {
-      dataRef.current[Player.Player1].lastData = new Uint8Array(12);
-      dataRef.current[Player.Player2].lastData = new Uint8Array(12);
-
-      dataRef.current[Player.Player1].lastData[6] = ZERO;
-      dataRef.current[Player.Player2].lastData[6] = ZERO;
-    }
-
-    function updateDirection(deltaY: number) {
-      const lastData1 = dataRef.current[Player.Player1].lastData;
-      const lastData2 = dataRef.current[Player.Player2].lastData;
-      if (lastData1 && lastData2) {
-        const newDirection1 = Math.max(0, Math.min(255, 128 - deltaY * PADDLE_SPEED_MOUSE));
-        const newDirection2 = Math.max(0, Math.min(255, 128 - deltaY * PADDLE_SPEED_MOUSE));
-        lastData1[6] = newDirection1;
-        lastData2[6] = newDirection2;
-        console.log(`Direction Y value: Player1=${newDirection1}, Player2=${newDirection2}`);
+    function mouseMoveEventHandler(event: MouseEvent) {
+      const player1Data = dataRef.current[Player.Player1];
+      const player2Data = dataRef.current[Player.Player2];
+      if (player1Data && player2Data) {
+        player1Data.mouseY = event.clientY;
+        player2Data.mouseY = event.clientY;
       }
     }
 
     function buttonPressed(on: boolean) {
-      const lastData1 = dataRef.current[Player.Player1].lastData;
-      const lastData2 = dataRef.current[Player.Player2].lastData;
-      if (lastData1 && lastData2) {
-        console.log(`button pressed: ${on}`);
-        lastData1[11] = on ? 255 : 0;
-        lastData2[11] = on ? 255 : 0;
+      const player1Data = dataRef.current[Player.Player1];
+      const player2Data = dataRef.current[Player.Player2];
+      if (player1Data && player2Data) {
+        player1Data.buttonPressed = on;
+        player2Data.buttonPressed = on;
       }
     }
 
-    function wheelEventHandler(event: WheelEvent) {
-      event.preventDefault();
-      updateDirection(event.deltaY / 100);
-    }
     function keyDownEventHandler(event: KeyboardEvent) {
       if (event.code === "Space") {
         buttonPressed(true);
@@ -57,17 +41,41 @@ const useMouseInput = () => {
       }
     }
 
-    document.addEventListener("wheel", wheelEventHandler);
+    document.addEventListener("mousemove", mouseMoveEventHandler);
     document.addEventListener("keydown", keyDownEventHandler);
     document.addEventListener("keyup", keyUpEventHandler);
     return () => {
-      document.removeEventListener("wheel", wheelEventHandler);
+      document.removeEventListener("mousemove", mouseMoveEventHandler);
       document.removeEventListener("keydown", keyDownEventHandler);
       document.removeEventListener("keyup", keyUpEventHandler);
     };
   }, [dataRef]);
 
-  return { dataRef, getPaddleUpdate, getButtonPushed };
+  const getPlayerActions = (player: Player, _state: MutableGameState, canvas: HTMLCanvasElement, leftPlayer: boolean) => {
+    const { buttonPressed, mouseY } = dataRef.current[player];
+    const rects = canvas.getBoundingClientRect();
+    if (leftPlayer) {
+      return {
+        buttonPressed,
+        paddleDirection: boundedValue(_state.paddle1.y - mouseY + rects.top + _state.paddle1.height, -MAX_PADDLE_SPEED, MAX_PADDLE_SPEED),
+      };
+    } else {
+      // return {
+      //   buttonPressed,
+      //   paddleDirection: -boundedValue(_state.paddle1.y - mouseY + rects.top + _state.paddle1.height, -MAX_PADDLE_SPEED, MAX_PADDLE_SPEED),
+      // };
+      return {
+        buttonPressed,
+        paddleDirection: -boundedValue(
+          _state.paddle2.y - _state.ball.y + _state.paddle2.height / 2,
+          -MAX_COMPUTER_PADDLE_SPEED,
+          MAX_COMPUTER_PADDLE_SPEED
+        ),
+      };
+    }
+  };
+
+  return { dataRef, getPaddleUpdate, getButtonPushed, getPlayerActions };
 };
 
 function getPaddleUpdate(
@@ -97,6 +105,10 @@ export function getPaddleDirection(data: Uint8Array) {
 export function getButtonPushed(data: Uint8Array) {
   // 7 green 9 red 12 blue 11 black
   return data[11] === 255;
+}
+
+function boundedValue(n: number, lower: number, upper: number) {
+  return Math.min(Math.max(n, lower), upper);
 }
 
 export default useMouseInput;

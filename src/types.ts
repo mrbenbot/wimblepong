@@ -112,3 +112,32 @@ export interface DataRef {
   [Player.Player1]: InputData;
   [Player.Player2]: InputData;
 }
+
+export interface MutableGameState {
+  paddle1: { x: number; y: number; dy: number; width: number; height: number };
+  paddle2: { x: number; y: number; dy: number; width: number; height: number };
+  ball: {
+    x: number;
+    y: number;
+    dx: number;
+    dy: number;
+    radius: number;
+    speed: number;
+    serveMode: boolean;
+  };
+  stats: {
+    rallyLength: number;
+    serveSpeed: number;
+    server: Player;
+  };
+}
+
+export type GetPlayerActionsFunction = (
+  player: Player,
+  _state: MutableGameState,
+  canvas: HTMLCanvasElement,
+  leftPlayer: boolean
+) => {
+  buttonPressed: boolean;
+  paddleDirection: number;
+};

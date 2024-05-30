@@ -1,11 +1,11 @@
 import React, { useRef, useEffect } from "react";
-import { GameState } from "./App";
 import { Action } from "./score";
 import {
   BALL_COLOUR,
   COURT,
   DELTA_TIME_DIVISOR,
   INITIAL_SPEED,
+  PADDLE,
   PADDLE_CONTACT_SPEED_BOOST_DIVISOR,
   PADDLE_SPEED_DEVISOR,
   PLAYER_COLOURS,
@@ -13,30 +13,18 @@ import {
   SPEED_INCREMENT,
 } from "./config";
 import "./GameCanvas.css";
-import { DataRef, InputData, MatchState, Player } from "./types";
+import { GetPlayerActionsFunction, MatchState, MutableGameState, Player } from "./types";
 import GameScore from "./GameScore";
 
 interface GameCanvasProps {
-  gameStateRef: React.MutableRefObject<GameState>;
-  inputRef: React.MutableRefObject<DataRef>;
+  gameStateRef: React.MutableRefObject<MutableGameState>;
   dispatch: React.Dispatch<Action>;
   matchState: MatchState;
   paused: boolean;
   leftPlayer: Player;
   rightPlayer: Player;
-  getPaddleUpdate: (
-    input: InputData,
-    paddle: {
-      x: number;
-      y: number;
-      dy: number;
-      width: number;
-      height: number;
-    },
-    deltaTime: number,
-    inverse: boolean
-  ) => void;
-  getButtonPushed: (data: Uint8Array) => boolean;
+
+  getPlayerActions: GetPlayerActionsFunction;
 }
 
 const getBounceAngle = (paddleY: number, paddleHeight: number, ballY: number) => {
@@ -45,17 +33,7 @@ const getBounceAngle = (paddleY: number, paddleHeight: number, ballY: number) =>
   return normalizedIntersectY * (Math.PI / 4); // 45 degrees max
 };
 
-const GameCanvas: React.FC<GameCanvasProps> = ({
-  gameStateRef,
-  inputRef,
-  dispatch,
-  matchState,
-  paused,
-  leftPlayer,
-  rightPlayer,
-  getPaddleUpdate,
-  getButtonPushed,
-}) => {
+const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchState, paused, leftPlayer, rightPlayer, getPlayerActions }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const deltaTimeRef = useRef(0);
 
@@ -69,19 +47,36 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
     if (paused) return;
     console.log("render");
 
-    const leftHeight =
-      leftPlayer === servingPlayer ? gameStateRef.current.paddle1.height * SERVING_HEIGHT_MULTIPLIER : gameStateRef.current.paddle1.height;
-    const rightHeight =
-      rightPlayer === servingPlayer ? gameStateRef.current.paddle2.height * SERVING_HEIGHT_MULTIPLIER : gameStateRef.current.paddle2.height;
+    if (servingPlayer === leftPlayer) {
+      gameStateRef.current.paddle1.height = PADDLE.height * SERVING_HEIGHT_MULTIPLIER;
+      gameStateRef.current.paddle2.height = PADDLE.height;
+    } else {
+      gameStateRef.current.paddle1.height = PADDLE.height;
+      gameStateRef.current.paddle2.height = PADDLE.height * SERVING_HEIGHT_MULTIPLIER;
+    }
+    // const leftHeight =
+    //   leftPlayer === servingPlayer ? gameStateRef.current.paddle1.height * SERVING_HEIGHT_MULTIPLIER : gameStateRef.current.paddle1.height;
+    // const rightHeight =
+    //   rightPlayer === servingPlayer ? gameStateRef.current.paddle2.height * SERVING_HEIGHT_MULTIPLIER : gameStateRef.current.paddle2.height;
 
     const draw = () => {
       context.clearRect(0, 0, canvas.width, canvas.height);
 
       // Draw paddles
       context.fillStyle = PLAYER_COLOURS[leftPlayer];
-      context.fillRect(gameStateRef.current.paddle1.x, gameStateRef.current.paddle1.y, gameStateRef.current.paddle1.width, leftHeight);
+      context.fillRect(
+        gameStateRef.current.paddle1.x,
+        gameStateRef.current.paddle1.y,
+        gameStateRef.current.paddle1.width,
+        gameStateRef.current.paddle1.height
+      );
       context.fillStyle = PLAYER_COLOURS[rightPlayer];
-      context.fillRect(gameStateRef.current.paddle2.x, gameStateRef.current.paddle2.y, gameStateRef.current.paddle2.width, rightHeight);
+      context.fillRect(
+        gameStateRef.current.paddle2.x,
+        gameStateRef.current.paddle2.y,
+        gameStateRef.current.paddle2.width,
+        gameStateRef.current.paddle2.height
+      );
 
       // Draw ball
       context.fillStyle = BALL_COLOUR;
@@ -94,13 +89,14 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
       // Update ball position
       const { ball, paddle1, paddle2, stats } = gameStateRef.current;
       // Update paddle positions based on input
-      const { [leftPlayer]: input1, [rightPlayer]: input2 } = inputRef.current;
+      const leftPlayerActions = getPlayerActions(leftPlayer, gameStateRef.current, canvas, true);
+      const rightPlayerActions = getPlayerActions(rightPlayer, gameStateRef.current, canvas, false);
 
       if (ball.serveMode) {
         if (leftPlayer === servingPlayer) {
-          ball.dy = (paddle1.y + leftHeight / 2 - ball.y) / PADDLE_SPEED_DEVISOR;
+          ball.dy = (paddle1.y + paddle1.height / 2 - ball.y) / PADDLE_SPEED_DEVISOR;
           ball.x = paddle1.width + ball.radius;
-          if (getButtonPushed(input1.lastData || new Uint8Array())) {
+          if (leftPlayerActions.buttonPressed) {
             dispatch({ type: "CLEAR_EVENTS" });
             ball.speed = INITIAL_SPEED;
             ball.dx = INITIAL_SPEED;
@@ -111,9 +107,9 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
             stats.server = leftPlayer;
           }
         } else {
-          ball.dy = (paddle2.y + rightHeight / 2 - ball.y) / PADDLE_SPEED_DEVISOR;
+          ball.dy = (paddle2.y + paddle2.height / 2 - ball.y) / PADDLE_SPEED_DEVISOR;
           ball.x = canvas.width - paddle2.width - ball.radius;
-          if (getButtonPushed(input2.lastData || new Uint8Array())) {
+          if (rightPlayerActions.buttonPressed) {
             dispatch({ type: "CLEAR_EVENTS" });
             ball.speed = INITIAL_SPEED;
             ball.dx = -INITIAL_SPEED;
@@ -139,15 +135,15 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
         }
 
         // Update ball collision detection and response
-        if (ball.x - ball.radius < paddle1.x + paddle1.width && ball.y > paddle1.y && ball.y < paddle1.y + leftHeight) {
-          const bounceAngle = getBounceAngle(paddle1.y, leftHeight, ball.y);
+        if (ball.x - ball.radius < paddle1.x + paddle1.width && ball.y > paddle1.y && ball.y < paddle1.y + paddle1.height) {
+          const bounceAngle = getBounceAngle(paddle1.y, paddle1.height, ball.y);
           ball.dx = (ball.speed + Math.abs(paddle1.dy) / PADDLE_CONTACT_SPEED_BOOST_DIVISOR) * Math.cos(bounceAngle);
           ball.dy = (ball.speed + Math.abs(paddle1.dy) / PADDLE_CONTACT_SPEED_BOOST_DIVISOR) * -Math.sin(bounceAngle);
           ball.x = paddle1.x + paddle1.width + ball.radius; // Adjust ball position to avoid sticking
           ball.speed += SPEED_INCREMENT;
           stats.rallyLength += 1;
-        } else if (ball.x + ball.radius > paddle2.x && ball.y > paddle2.y && ball.y < paddle2.y + rightHeight) {
-          const bounceAngle = getBounceAngle(paddle2.y, rightHeight, ball.y);
+        } else if (ball.x + ball.radius > paddle2.x && ball.y > paddle2.y && ball.y < paddle2.y + paddle2.height) {
+          const bounceAngle = getBounceAngle(paddle2.y, paddle2.height, ball.y);
           ball.dx = -(ball.speed + Math.abs(paddle2.dy) / PADDLE_CONTACT_SPEED_BOOST_DIVISOR) * Math.cos(bounceAngle);
           ball.dy = (ball.speed + Math.abs(paddle2.dy) / PADDLE_CONTACT_SPEED_BOOST_DIVISOR) * -Math.sin(bounceAngle);
           ball.x = paddle2.x - ball.radius; // Adjust ball position to avoid sticking
@@ -165,20 +161,18 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
         }
       }
 
-      // paddle1.dy = -getPaddleDirection(input1.lastData || new Uint8Array());
-      // paddle1.y += paddle1.dy * deltaTime;
-      getPaddleUpdate(input1, paddle1, deltaTime, true);
+      paddle1.dy = -leftPlayerActions.paddleDirection;
+      paddle1.y += paddle1.dy * deltaTime;
 
-      // paddle2.dy = getPaddleDirection(input2.lastData || new Uint8Array());
-      // paddle2.y += paddle2.dy * deltaTime;
-      getPaddleUpdate(input2, paddle2, deltaTime, false);
+      paddle2.dy = rightPlayerActions.paddleDirection;
+      paddle2.y += paddle2.dy * deltaTime;
 
       // Ensure paddles stay within screen bounds
       if (paddle1.y < 0) paddle1.y = 0;
-      if (paddle1.y + leftHeight > canvas.height) paddle1.y = canvas.height - leftHeight;
+      if (paddle1.y + paddle1.height > canvas.height) paddle1.y = canvas.height - paddle1.height;
 
       if (paddle2.y < 0) paddle2.y = 0;
-      if (paddle2.y + rightHeight > canvas.height) paddle2.y = canvas.height - rightHeight;
+      if (paddle2.y + paddle2.height > canvas.height) paddle2.y = canvas.height - paddle2.height;
     };
 
     const resetBall = () => {
@@ -208,19 +202,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
         cancelAnimationFrame(loopId);
       }
     };
-  }, [
-    inputRef,
-    gameStateRef,
-    dispatch,
-    servingPlayer,
-    playerPosition,
-    paused,
-    leftPlayer,
-    rightPlayer,
-    deltaTimeRef,
-    getPaddleUpdate,
-    getButtonPushed,
-  ]);
+  }, [gameStateRef, dispatch, servingPlayer, playerPosition, paused, leftPlayer, rightPlayer, deltaTimeRef, getPlayerActions]);
 
   return (
     <div className="game-canvas-container">
