@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import MouseControlApp from "./MouseControlApp";
 import DJHeroApp from "./DJHeroApp";
 import GamepadApp from "./GamepadApp";
+import { MatchState } from "../types";
 
 /*
 Set Length -> 1 - 6
@@ -19,6 +20,7 @@ Input Mode
 
 const MenuComponent: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState<"mouse" | "dj" | "dj/computer" | "gamepad" | null>(null);
+  const [matchConfig, setMatchConfig] = useState<MatchState["matchConfig"]>({ numberOfSets: 3, setLength: 6 });
 
   return (
     <div>
@@ -30,17 +32,29 @@ const MenuComponent: React.FC = () => {
         <button onClick={() => setSelectedOption("gamepad")}>Gamepad vs Gamepad</button>
       </div>
       <div>
-        {selectedOption === "mouse" && <MouseControlApp />}
-        {selectedOption === "dj/computer" && <DJHeroApp numberOfControllers={1} />}
-        {selectedOption === "dj" && <DJHeroApp numberOfControllers={2} />}
-        {selectedOption === "gamepad" && <GamepadApp />}
+        {selectedOption === "mouse" && <MouseControlApp matchConfig={matchConfig}/>}
+        {selectedOption === "dj/computer" && <DJHeroApp numberOfControllers={1}  matchConfig={matchConfig}/>}
+        {selectedOption === "dj" && <DJHeroApp numberOfControllers={2}  matchConfig={matchConfig}/>}
+        {selectedOption === "gamepad" && <GamepadApp  matchConfig={matchConfig}/>}
       </div>
-      {/* <label>
-        Set Length: <select></select>
+      <br />
+      <label>
+        Set Length: First to{" "}
+        <select onChange={(e) => setMatchConfig({ ...matchConfig, setLength: Number(e.target.value) })}>
+          {[1, 2,3,4,5, 6].map((length) => (
+            <option key={length}>{length}</option>
+          ))}
+        </select> Games
+        <br/>
       </label>
       <label>
-        Game Length: <select></select>
-      </label> */}
+        Match Length: Best of{' '}
+        <select onChange={(e) => setMatchConfig({ ...matchConfig, numberOfSets: Number(e.target.value) })}>
+          {[1, 3, 5].map((length) => (
+            <option key={length}>{length}</option>
+          ))}
+        </select> Sets
+      </label>
     </div>
   );
 };

@@ -1,10 +1,10 @@
 import { useCallback } from "react";
 import App from "./App";
 import useMouseInput from "../hooks/useMouse";
-import { GetPlayerActionsFunction, Player } from "../types";
+import { GetPlayerActionsFunction, MatchState, Player } from "../types";
 import { getComputerPlayer } from "../libs/computerPlayer";
 
-export default function MouseControlApp() {
+export default function MouseControlApp({ matchConfig }: { matchConfig: MatchState["matchConfig"] }) {
   const { getPlayerActions } = useMouseInput();
 
   const getPlayerActionsRouter = useCallback<GetPlayerActionsFunction>(
@@ -19,7 +19,7 @@ export default function MouseControlApp() {
 
   return (
     <>
-      <App getPlayerActions={getPlayerActionsRouter} />
+      <App getPlayerActions={getPlayerActionsRouter} matchConfig={matchConfig} />
     </>
   );
 }
