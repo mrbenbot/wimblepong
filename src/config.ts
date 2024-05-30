@@ -12,6 +12,15 @@ export const SERVING_HEIGHT_MULTIPLIER = 2;
 export const SPEED_INCREMENT = 0.4;
 export const INITIAL_SPEED = 10;
 export const DELTA_TIME_DIVISOR = 21;
+export const PADDLE_CONTACT_SPEED_BOOST_DIVISOR = 4;
+
+// web hid
 export const PADDLE_SPEED_DEVISOR = 15;
 export const LONG_RALLY_ANNOUNCEMENT_THRESHOLD = 10;
-export const PADDLE_CONTACT_SPEED_BOOST_DIVISOR = 4;
+
+// mouse input
+export const MAX_MOUSE_PADDLE_SPEED = 25;
+export const MAX_COMPUTER_PADDLE_SPEED = 10;
+
+// gamepad api
+export const GAMEPAD_AXIS_MULTIPLIER = 150;

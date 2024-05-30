@@ -51,5 +51,6 @@ export default {
 # Testing
 
 - should announce tie break as an event
-- should take input from a mouse?
 - full screen button should not show in full screen mode
+- should be able to choose input for each player
+- said it was set point when opponent had match point in the tiebreak

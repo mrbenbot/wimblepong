@@ -13,7 +13,7 @@ import {
   SPEED_INCREMENT,
 } from "./config";
 import "./GameCanvas.css";
-import { GetPlayerActionsFunction, MatchState, MutableGameState, Player } from "./types";
+import { GetPlayerActionsFunction, MatchState, MutableGameState, Player, PlayerPositions } from "./types";
 import GameScore from "./GameScore";
 
 interface GameCanvasProps {
@@ -37,7 +37,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchSt
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const deltaTimeRef = useRef(0);
 
-  const { servingPlayer, playerPositions: playerPosition } = matchState;
+  const { servingPlayer, playerPositions } = matchState;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -54,10 +54,8 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchSt
       gameStateRef.current.paddle1.height = PADDLE.height;
       gameStateRef.current.paddle2.height = PADDLE.height * SERVING_HEIGHT_MULTIPLIER;
     }
-    // const leftHeight =
-    //   leftPlayer === servingPlayer ? gameStateRef.current.paddle1.height * SERVING_HEIGHT_MULTIPLIER : gameStateRef.current.paddle1.height;
-    // const rightHeight =
-    //   rightPlayer === servingPlayer ? gameStateRef.current.paddle2.height * SERVING_HEIGHT_MULTIPLIER : gameStateRef.current.paddle2.height;
+
+    const positionsReversed = playerPositions === PlayerPositions.Reversed;
 
     const draw = () => {
       context.clearRect(0, 0, canvas.width, canvas.height);
@@ -89,8 +87,8 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchSt
       // Update ball position
       const { ball, paddle1, paddle2, stats } = gameStateRef.current;
       // Update paddle positions based on input
-      const leftPlayerActions = getPlayerActions(leftPlayer, gameStateRef.current, canvas, true);
-      const rightPlayerActions = getPlayerActions(rightPlayer, gameStateRef.current, canvas, false);
+      const leftPlayerActions = getPlayerActions(leftPlayer, gameStateRef.current, canvas, positionsReversed);
+      const rightPlayerActions = getPlayerActions(rightPlayer, gameStateRef.current, canvas, positionsReversed);
 
       if (ball.serveMode) {
         if (leftPlayer === servingPlayer) {
@@ -202,7 +200,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchSt
         cancelAnimationFrame(loopId);
       }
     };
-  }, [gameStateRef, dispatch, servingPlayer, playerPosition, paused, leftPlayer, rightPlayer, deltaTimeRef, getPlayerActions]);
+  }, [gameStateRef, dispatch, servingPlayer, playerPositions, paused, leftPlayer, rightPlayer, deltaTimeRef, getPlayerActions]);
 
   return (
     <div className="game-canvas-container">

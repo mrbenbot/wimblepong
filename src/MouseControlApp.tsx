@@ -1,7 +1,7 @@
 import App from "./App";
 import useMouseInput from "./useMouse";
 
-export default function DJHeroApp() {
+export default function MouseControlApp() {
   const { getPlayerActions } = useMouseInput();
 
   return (

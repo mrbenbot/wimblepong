@@ -1,8 +1,6 @@
 import { useEffect, useRef } from "react";
-import { InputData, MutableGameState, Player } from "./types";
-
-const MAX_PADDLE_SPEED = 25;
-const MAX_COMPUTER_PADDLE_SPEED = 10;
+import { GetPlayerActionsFunction, InputData, MutableGameState, Player } from "./types";
+import { MAX_COMPUTER_PADDLE_SPEED, MAX_MOUSE_PADDLE_SPEED } from "./config";
 
 const useMouseInput = () => {
   const dataRef = useRef({
@@ -51,19 +49,43 @@ const useMouseInput = () => {
     };
   }, [dataRef]);
 
-  const getPlayerActions = (player: Player, _state: MutableGameState, canvas: HTMLCanvasElement, leftPlayer: boolean) => {
+  const getPlayerActions: GetPlayerActionsFunction = (
+    player: Player,
+    _state: MutableGameState,
+    canvas: HTMLCanvasElement,
+    positionsReversed: boolean
+  ) => {
     const { buttonPressed, mouseY } = dataRef.current[player];
     const rects = canvas.getBoundingClientRect();
-    if (leftPlayer) {
+    if (player === Player.Player1) {
+      if (positionsReversed) {
+        return {
+          buttonPressed,
+          paddleDirection: -boundedValue(
+            _state.paddle2.y - mouseY + rects.top + _state.paddle2.height,
+            -MAX_MOUSE_PADDLE_SPEED,
+            MAX_MOUSE_PADDLE_SPEED
+          ),
+        };
+      }
       return {
         buttonPressed,
-        paddleDirection: boundedValue(_state.paddle1.y - mouseY + rects.top + _state.paddle1.height, -MAX_PADDLE_SPEED, MAX_PADDLE_SPEED),
+        paddleDirection: boundedValue(_state.paddle1.y - mouseY + rects.top + _state.paddle1.height, -MAX_MOUSE_PADDLE_SPEED, MAX_MOUSE_PADDLE_SPEED),
       };
     } else {
-      // return {
-      //   buttonPressed,
-      //   paddleDirection: -boundedValue(_state.paddle1.y - mouseY + rects.top + _state.paddle1.height, -MAX_PADDLE_SPEED, MAX_PADDLE_SPEED),
-      // };
+      if (_state.ball.serveMode) {
+        return { buttonPressed: true, paddleDirection: 0 };
+      }
+      if (positionsReversed) {
+        return {
+          buttonPressed,
+          paddleDirection: boundedValue(
+            _state.paddle1.y - _state.ball.y + _state.paddle1.height / 2,
+            -MAX_COMPUTER_PADDLE_SPEED,
+            MAX_COMPUTER_PADDLE_SPEED
+          ),
+        };
+      }
       return {
         buttonPressed,
         paddleDirection: -boundedValue(
