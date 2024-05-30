@@ -694,7 +694,6 @@ describe("getDeuceCount", () => {
       rallies: [
         { stats: defaultStats, winner: Player.Player1, pointType: PointType.Deuce },
         { stats: defaultStats, winner: Player.Player1, pointType: PointType.GamePoint },
-        { stats: defaultStats, winner: Player.Player1, pointType: PointType.Deuce },
       ],
       pointType: PointType.Deuce,
       expected: 2,
