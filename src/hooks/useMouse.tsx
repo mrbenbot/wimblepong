@@ -1,29 +1,22 @@
 import { useEffect, useRef } from "react";
-import { GetPlayerActionsFunction, InputData, MutableGameState, Player } from "../types";
-import { MAX_COMPUTER_PADDLE_SPEED, MAX_MOUSE_PADDLE_SPEED } from "../config";
+import { GetPlayerActionsFunction } from "../types";
+import { MAX_MOUSE_PADDLE_SPEED } from "../config";
 
 const useMouseInput = () => {
-  const dataRef = useRef({
-    [Player.Player1]: { buttonPressed: false, mouseY: 0 },
-    [Player.Player2]: { buttonPressed: false, mouseY: 0 },
-  });
+  const dataRef = useRef({ buttonPressed: false, mouseY: 0 });
 
   useEffect(() => {
     function mouseMoveEventHandler(event: MouseEvent) {
-      const player1Data = dataRef.current[Player.Player1];
-      const player2Data = dataRef.current[Player.Player2];
-      if (player1Data && player2Data) {
+      const player1Data = dataRef.current;
+      if (player1Data) {
         player1Data.mouseY = event.clientY;
-        player2Data.mouseY = event.clientY;
       }
     }
 
     function buttonPressed(on: boolean) {
-      const player1Data = dataRef.current[Player.Player1];
-      const player2Data = dataRef.current[Player.Player2];
-      if (player1Data && player2Data) {
+      const player1Data = dataRef.current;
+      if (player1Data) {
         player1Data.buttonPressed = on;
-        player2Data.buttonPressed = on;
       }
     }
 
@@ -49,85 +42,27 @@ const useMouseInput = () => {
     };
   }, [dataRef]);
 
-  const getPlayerActions: GetPlayerActionsFunction = (
-    player: Player,
-    _state: MutableGameState,
-    canvas: HTMLCanvasElement,
-    positionsReversed: boolean
-  ) => {
-    const { buttonPressed, mouseY } = dataRef.current[player];
+  const getPlayerActions: GetPlayerActionsFunction = (_player, _state, canvas, positionsReversed) => {
+    const { buttonPressed, mouseY } = dataRef.current;
     const rects = canvas.getBoundingClientRect();
-    if (player === Player.Player1) {
-      if (positionsReversed) {
-        return {
-          buttonPressed,
-          paddleDirection: -boundedValue(
-            _state.paddle2.y - mouseY + rects.top + _state.paddle2.height,
-            -MAX_MOUSE_PADDLE_SPEED,
-            MAX_MOUSE_PADDLE_SPEED
-          ),
-        };
-      }
-      return {
-        buttonPressed,
-        paddleDirection: boundedValue(_state.paddle1.y - mouseY + rects.top + _state.paddle1.height, -MAX_MOUSE_PADDLE_SPEED, MAX_MOUSE_PADDLE_SPEED),
-      };
-    } else {
-      if (_state.ball.serveMode) {
-        return { buttonPressed: true, paddleDirection: 0 };
-      }
-      if (positionsReversed) {
-        return {
-          buttonPressed,
-          paddleDirection: boundedValue(
-            _state.paddle1.y - _state.ball.y + _state.paddle1.height / 2,
-            -MAX_COMPUTER_PADDLE_SPEED,
-            MAX_COMPUTER_PADDLE_SPEED
-          ),
-        };
-      }
+    if (positionsReversed) {
       return {
         buttonPressed,
         paddleDirection: -boundedValue(
-          _state.paddle2.y - _state.ball.y + _state.paddle2.height / 2,
-          -MAX_COMPUTER_PADDLE_SPEED,
-          MAX_COMPUTER_PADDLE_SPEED
+          _state.paddle2.y - mouseY + rects.top + _state.paddle2.height,
+          -MAX_MOUSE_PADDLE_SPEED,
+          MAX_MOUSE_PADDLE_SPEED
         ),
       };
     }
+    return {
+      buttonPressed,
+      paddleDirection: boundedValue(_state.paddle1.y - mouseY + rects.top + _state.paddle1.height, -MAX_MOUSE_PADDLE_SPEED, MAX_MOUSE_PADDLE_SPEED),
+    };
   };
 
-  return { dataRef, getPaddleUpdate, getButtonPushed, getPlayerActions };
+  return { dataRef, getPlayerActions };
 };
-
-function getPaddleUpdate(
-  input: InputData,
-  paddle: {
-    x: number;
-    y: number;
-    dy: number;
-    width: number;
-    height: number;
-  },
-  deltaTime: number,
-  inverse: boolean
-) {
-  if (inverse) {
-    paddle.dy = -getPaddleDirection(input.lastData || new Uint8Array());
-  } else {
-    paddle.dy = getPaddleDirection(input.lastData || new Uint8Array());
-  }
-  paddle.y += paddle.dy * deltaTime;
-}
-
-export function getPaddleDirection(data: Uint8Array) {
-  return 128 - data[6] || 0;
-}
-
-export function getButtonPushed(data: Uint8Array) {
-  // 7 green 9 red 12 blue 11 black
-  return data[11] === 255;
-}
 
 function boundedValue(n: number, lower: number, upper: number) {
   return Math.min(Math.max(n, lower), upper);

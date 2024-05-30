@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach, MockInstance } from "vitest";
 import { render } from "@testing-library/react";
-import { act, useEffect } from "react";
+import React, { act, useEffect } from "react";
 import useGamepad from "../hooks/useGamepad";
 import { GetPlayerActionsFunction, Player } from "../types";
 import { GAMEPAD_AXIS_MULTIPLIER } from "../config";
