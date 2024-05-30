@@ -50,7 +50,8 @@ export default {
 - should announce tie break as an event
 - full screen button should not show in full screen mode
 - should be able to choose input for each player
-- clean up player serve jaggedness
+- clean up computer player serve jaggedness
+  - pause before serving
 - scoreboard previous sets are a bit squished
 - win streak should have the player name / color
 - input player names

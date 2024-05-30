@@ -32,28 +32,30 @@ const MenuComponent: React.FC = () => {
         <button onClick={() => setSelectedOption("gamepad")}>Gamepad vs Gamepad</button>
       </div>
       <div>
-        {selectedOption === "mouse" && <MouseControlApp matchConfig={matchConfig}/>}
-        {selectedOption === "dj/computer" && <DJHeroApp numberOfControllers={1}  matchConfig={matchConfig}/>}
-        {selectedOption === "dj" && <DJHeroApp numberOfControllers={2}  matchConfig={matchConfig}/>}
-        {selectedOption === "gamepad" && <GamepadApp  matchConfig={matchConfig}/>}
+        {selectedOption === "mouse" && <MouseControlApp matchConfig={matchConfig} />}
+        {selectedOption === "dj/computer" && <DJHeroApp numberOfControllers={1} matchConfig={matchConfig} />}
+        {selectedOption === "dj" && <DJHeroApp numberOfControllers={2} matchConfig={matchConfig} />}
+        {selectedOption === "gamepad" && <GamepadApp matchConfig={matchConfig} />}
       </div>
       <br />
       <label>
         Set Length: First to{" "}
-        <select onChange={(e) => setMatchConfig({ ...matchConfig, setLength: Number(e.target.value) })}>
-          {[1, 2,3,4,5, 6].map((length) => (
+        <select onChange={(e) => setMatchConfig({ ...matchConfig, setLength: Number(e.target.value) })} value={matchConfig.setLength}>
+          {[1, 2, 3, 4, 5, 6].map((length) => (
             <option key={length}>{length}</option>
           ))}
-        </select> Games
-        <br/>
+        </select>{" "}
+        Games
+        <br />
       </label>
       <label>
-        Match Length: Best of{' '}
-        <select onChange={(e) => setMatchConfig({ ...matchConfig, numberOfSets: Number(e.target.value) })}>
+        Match Length: Best of{" "}
+        <select onChange={(e) => setMatchConfig({ ...matchConfig, numberOfSets: Number(e.target.value) })} value={matchConfig.numberOfSets}>
           {[1, 3, 5].map((length) => (
             <option key={length}>{length}</option>
           ))}
-        </select> Sets
+        </select>{" "}
+        Sets
       </label>
     </div>
   );
