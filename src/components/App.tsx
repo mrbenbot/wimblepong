@@ -5,7 +5,7 @@ import { BALL, COURT, INITIAL_SPEED, PADDLE } from "../config";
 import "./App.css";
 import PlayerScore from "./PlayerScore";
 import EventAnnouncement from "./EventAnnouncement";
-import { GetPlayerActionsFunction, MutableGameState, Player, PlayerPositions } from "./types";
+import { GetPlayerActionsFunction, MutableGameState, Player, PlayerPositions } from "../types";
 import Scoreboard from "./Scoreboard";
 
 const getLeftRightPlayer = (playerPositions: PlayerPositions) => {

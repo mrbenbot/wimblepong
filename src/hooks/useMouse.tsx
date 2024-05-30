@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { GetPlayerActionsFunction, InputData, MutableGameState, Player } from "../types";
-import { MAX_COMPUTER_PADDLE_SPEED, MAX_MOUSE_PADDLE_SPEED } from "./config";
+import { MAX_COMPUTER_PADDLE_SPEED, MAX_MOUSE_PADDLE_SPEED } from "../config";
 
 const useMouseInput = () => {
   const dataRef = useRef({

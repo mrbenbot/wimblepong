@@ -1,5 +1,5 @@
 import App from "./App";
-import useGamepad from "./useGamepad";
+import useGamepad from "../hooks/useGamepad";
 
 export default function GamepadApp() {
   const { connected, getPlayerActions } = useGamepad();

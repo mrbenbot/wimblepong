@@ -13,7 +13,7 @@ import {
   SPEED_INCREMENT,
 } from "../config";
 import "./GameCanvas.css";
-import { GetPlayerActionsFunction, MatchState, MutableGameState, Player, PlayerPositions } from "./types";
+import { GetPlayerActionsFunction, MatchState, MutableGameState, Player, PlayerPositions } from "../types";
 import GameScore from "./GameScore";
 
 interface GameCanvasProps {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "./EventAnnouncement.css";
-import { AceEvent, AnnouncementEvent, AnnouncementEventType, DeuceCountEvent, LongRallyEvent, WinGameEvent, WinStreakEvent } from "./types";
+import { AceEvent, AnnouncementEvent, AnnouncementEventType, DeuceCountEvent, LongRallyEvent, WinGameEvent, WinStreakEvent } from "../types";
 
 // LongRallyEvent Component
 const LongRallyEventComponent: React.FC<LongRallyEvent> = ({ length }) => (

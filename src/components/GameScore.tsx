@@ -1,5 +1,5 @@
 import "./GameScore.css";
-import { MatchState, Player, PointType, Score } from "./types";
+import { MatchState, Player, PointType, Score } from "../types";
 
 const scoreMap: {
   [key in Score]?: string;
