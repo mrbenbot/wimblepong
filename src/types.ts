@@ -29,6 +29,7 @@ export enum PointType {
   BreakPoint = "BREAK_POINT",
   SetPoint = "SET_POINT",
   MatchPoint = "MATCH_POINT",
+  Tiebreak = "TIEBREAK",
 }
 
 export enum AnnouncementEventType {

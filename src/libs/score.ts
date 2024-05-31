@@ -35,8 +35,8 @@ export function reducer(state: MatchState, action: Action): MatchState {
       const { player, stats } = action;
       const opponent = player === Player.Player1 ? Player.Player2 : Player.Player1;
 
-      if (isTieBreak(state)) {
-        if (isTieBreakSetPoint(state, player, opponent)) {
+      if (isTiebreak(state)) {
+        if (isTiebreakSetPoint(state, player, opponent)) {
           // Handle tiebreak win
           const finalSetScore = { ...state.games, [player]: state.games[player] + 1 };
           const newSets = [...state.sets, finalSetScore];
@@ -273,7 +273,7 @@ export function addPointState(state: MatchState): MatchState {
     const opponent = player === Player.Player1 ? Player.Player2 : Player.Player1;
     const setsWonByPlayer = state.sets.filter((set) => set[player] > set[opponent]).length;
 
-    if (isTieBreak(state)) {
+    if (isTiebreak(state)) {
       // Determine if it is a match point during tiebreak
       if (setsWonByPlayer === Math.floor(matchConfig.numberOfSets / 2) && tiebreak[player] >= 6 && tiebreak[player] - tiebreak[opponent] >= 1) {
         return {
@@ -282,7 +282,7 @@ export function addPointState(state: MatchState): MatchState {
         };
       }
       // Determine if it is a set point during tiebreak
-      if (isTieBreakSetPoint(state, player, opponent)) {
+      if (isTiebreakSetPoint(state, player, opponent)) {
         return {
           ...state,
           pointType: PointType.SetPoint,
@@ -313,9 +313,10 @@ export function addPointState(state: MatchState): MatchState {
       };
     }
   }
+
   return {
     ...state,
-    pointType: PointType.Normal,
+    pointType: isTiebreak(state) ? PointType.Tiebreak : PointType.Normal,
   };
 }
 
@@ -325,7 +326,7 @@ function isGamePoint(scoreOne: Score, scoreTwo: Score): boolean {
   );
 }
 
-function isTieBreak(state: MatchState): boolean {
+function isTiebreak(state: MatchState): boolean {
   return (
     state.games[Player.Player1] === state.matchConfig.setLength &&
     state.games[Player.Player2] === state.matchConfig.setLength &&
@@ -333,7 +334,7 @@ function isTieBreak(state: MatchState): boolean {
   );
 }
 
-function isTieBreakSetPoint(state: MatchState, player: Player, opponent: Player) {
+function isTiebreakSetPoint(state: MatchState, player: Player, opponent: Player) {
   return state.tiebreak[player] >= 6 && state.tiebreak[player] - state.tiebreak[opponent] >= 1;
 }
 

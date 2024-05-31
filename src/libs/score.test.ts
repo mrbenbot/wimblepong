@@ -593,6 +593,16 @@ describe("addPointState", () => {
     expect(updatedState.pointType).toBe(PointType.MatchPoint);
   });
 
+  it("should handle tiebreak and set point type to TIEBREAK", () => {
+    const state = {
+      ...initialState,
+      games: { Player1: 6, Player2: 6 },
+      tiebreak: { Player1: 0, Player2: 0 },
+    };
+    const updatedState = addPointState(state);
+    expect(updatedState.pointType).toBe(PointType.Tiebreak);
+  });
+
   it("should handle tiebreak and set point type to SET_POINT", () => {
     const state = {
       ...initialState,
