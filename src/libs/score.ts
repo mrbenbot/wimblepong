@@ -214,29 +214,30 @@ function addRallyEvents(state: MatchState): MatchState {
     stats: { rallyLength: latestLength, serveSpeed },
   } = state.rallies[state.rallies.length - 1];
 
+  const events: AnnouncementEvent[] = [];
+
   const deuceCount = getDeuceCount(state);
   if (deuceCount >= 3) {
-    return { ...state, events: [...state.events, { type: AnnouncementEventType.DeuceCount, count: deuceCount }] };
+    events.push({ type: AnnouncementEventType.DeuceCount, count: deuceCount });
   }
 
   // win streak
   const winStreak = getWinStreak(state.rallies);
-
   if (winStreak > 0 && winStreak % 5 === 0) {
-    return { ...state, events: [...state.events, { type: AnnouncementEventType.WinStreak, streak: winStreak }] };
+    events.push({ type: AnnouncementEventType.WinStreak, streak: winStreak });
   }
 
   if (latestLength === 1) {
-    return { ...state, events: [...state.events, { type: AnnouncementEventType.Ace, speed: serveSpeed.toFixed(3) }] };
+    events.push({ type: AnnouncementEventType.Ace, speed: serveSpeed.toFixed(3) });
   }
 
   const previousRallies = state.rallies.slice(0, -1);
   const prevHighest = previousRallies.reduce((highest, { stats }) => Math.max(highest, stats.rallyLength), 0);
   if (latestLength >= LONG_RALLY_ANNOUNCEMENT_THRESHOLD && latestLength > prevHighest) {
-    return { ...state, events: [...state.events, { type: AnnouncementEventType.LongRally, length: latestLength }] };
+    events.push({ type: AnnouncementEventType.LongRally, length: latestLength });
   }
 
-  return state;
+  return { ...state, events: [...state.events, ...events] };
 }
 
 export function getDeuceCount(state: MatchState): number {

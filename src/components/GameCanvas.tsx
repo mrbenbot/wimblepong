@@ -90,7 +90,13 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchSt
       const leftPlayerActions = getPlayerActions(leftPlayer, gameStateRef.current, canvas, positionsReversed);
       const rightPlayerActions = getPlayerActions(rightPlayer, gameStateRef.current, canvas, positionsReversed);
 
-      if (ball.serveMode) {
+      if (ball.scoreMode) {
+        if (ball.scoreModeTimeout < 50) {
+          ball.scoreModeTimeout += deltaTime;
+        } else {
+          resetBall();
+        }
+      } else if (ball.serveMode) {
         if (leftPlayer === servingPlayer) {
           ball.dy = (paddle1.y + paddle1.height / 2 - ball.y) / PADDLE_SPEED_DEVISOR;
           ball.x = paddle1.width + ball.radius;
@@ -152,10 +158,10 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchSt
         // Check for scoring
         if (ball.x - ball.radius < 0) {
           dispatch({ type: "POINT_SCORED", player: rightPlayer, stats: { ...stats } });
-          resetBall();
+          ball.scoreMode = true;
         } else if (ball.x + ball.radius > canvas.width) {
           dispatch({ type: "POINT_SCORED", player: leftPlayer, stats: { ...stats } });
-          resetBall();
+          ball.scoreMode = true;
         }
       }
 
@@ -178,6 +184,8 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchSt
       ball.y = canvas.height / 2;
       ball.speed = INITIAL_SPEED;
       ball.serveMode = true;
+      ball.scoreMode = false;
+      ball.scoreModeTimeout = 0;
       stats.rallyLength = 0;
     };
 

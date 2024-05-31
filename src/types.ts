@@ -125,6 +125,8 @@ export interface MutableGameState {
     radius: number;
     speed: number;
     serveMode: boolean;
+    scoreMode: boolean;
+    scoreModeTimeout: number;
   };
   stats: {
     rallyLength: number;

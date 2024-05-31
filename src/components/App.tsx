@@ -24,7 +24,17 @@ const App: React.FC<{
   const gameStateRef = useRef<MutableGameState>({
     paddle1: { x: 0, y: COURT.height / 2 - PADDLE.height / 2, dy: 0, width: PADDLE.width, height: PADDLE.height },
     paddle2: { x: COURT.width - PADDLE.width, y: COURT.height / 2 - PADDLE.height / 2, dy: 0, width: PADDLE.width, height: PADDLE.height },
-    ball: { x: PADDLE.width + BALL.radius, y: 150, dx: 0, dy: 0, radius: BALL.radius, speed: INITIAL_SPEED, serveMode: true },
+    ball: {
+      x: PADDLE.width + BALL.radius,
+      y: 150,
+      dx: 0,
+      dy: 0,
+      radius: BALL.radius,
+      speed: INITIAL_SPEED,
+      serveMode: true,
+      scoreModeTimeout: 0,
+      scoreMode: false,
+    },
     stats: { rallyLength: 0, serveSpeed: 0, server: Player.Player1 },
   });
   const [matchState, dispatch] = useReducer(reducer, { ...initialState, matchConfig });
