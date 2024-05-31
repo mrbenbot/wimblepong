@@ -2,9 +2,11 @@ import App from "./App";
 import useDJHeroInput from "../hooks/useDjHeroInput";
 import { useCallback } from "react";
 import { GetPlayerActionsFunction, MatchState, Player } from "../types";
-import { getComputerPlayer } from "../libs/computerPlayer";
+import { getComputerPlayerActionsFunction } from "../libs/computerPlayer";
 
-export default function DJHeroApp({ numberOfControllers, matchConfig }: { numberOfControllers: number, matchConfig: MatchState["matchConfig"] }) {
+const getComputerPlayer = getComputerPlayerActionsFunction();
+
+export default function DJHeroApp({ numberOfControllers, matchConfig }: { numberOfControllers: number; matchConfig: MatchState["matchConfig"] }) {
   const { connected, selectDevice, getPlayerActions } = useDJHeroInput(numberOfControllers);
 
   const getPlayerActionsRouter = useCallback<GetPlayerActionsFunction>(
@@ -23,7 +25,7 @@ export default function DJHeroApp({ numberOfControllers, matchConfig }: { number
 
   return (
     <>
-      <App connected={connected} selectDevice={selectDevice} getPlayerActions={getPlayerActionsRouter} matchConfig={matchConfig}/>
+      <App connected={connected} selectDevice={selectDevice} getPlayerActions={getPlayerActionsRouter} matchConfig={matchConfig} />
     </>
   );
 }

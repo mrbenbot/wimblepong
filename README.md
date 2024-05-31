@@ -12,17 +12,15 @@
 - keep path of ball
 - pause
 - ability to reset / play again
-- maybe make the serve follow have more momentum?
 - paint a net on the screen?
 - fast balls should leave marks on the screen?
-- make all events additional or keep hierarchy?
-  - make hierarchy configurable?
+- order events
+- come up in sequence?
 
 ## Testing
 
-- clean up computer player serve jaggedness
-  - pause before serving
 - full screen button should not show in full screen mode
-- scoreboard previous sets are a bit squished
+- style the scoreboard like BBC wimbledon
 - win streak should have the player name / color
 - input player names
+- reactify computer player
