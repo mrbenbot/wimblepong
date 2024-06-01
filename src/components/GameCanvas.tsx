@@ -15,6 +15,7 @@ import {
 import "./GameCanvas.css";
 import { GetPlayerActionsFunction, MatchState, MutableGameState, Player, PlayerPositions } from "../types";
 import GameScore from "./GameScore";
+import useRandomNotePlayer, { NoteType } from "../hooks/playNote";
 
 interface GameCanvasProps {
   gameStateRef: React.MutableRefObject<MutableGameState>;
@@ -36,6 +37,7 @@ const getBounceAngle = (paddleY: number, paddleHeight: number, ballY: number) =>
 const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchState, paused, leftPlayer, rightPlayer, getPlayerActions }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const deltaTimeRef = useRef(0);
+  const playNote = useRandomNotePlayer();
 
   const { servingPlayer, playerPositions } = matchState;
 
@@ -102,6 +104,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchSt
           ball.x = paddle1.width + ball.radius;
           if (leftPlayerActions.buttonPressed) {
             dispatch({ type: "CLEAR_EVENTS" });
+            playNote(NoteType.Paddle);
             ball.speed = INITIAL_SPEED;
             ball.dx = INITIAL_SPEED;
             ball.serveMode = false;
@@ -115,6 +118,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchSt
           ball.x = canvas.width - paddle2.width - ball.radius;
           if (rightPlayerActions.buttonPressed) {
             dispatch({ type: "CLEAR_EVENTS" });
+            playNote(NoteType.Paddle);
             ball.speed = INITIAL_SPEED;
             ball.dx = -INITIAL_SPEED;
             ball.serveMode = false;
@@ -146,6 +150,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchSt
           ball.x = paddle1.x + paddle1.width + ball.radius; // Adjust ball position to avoid sticking
           ball.speed += SPEED_INCREMENT;
           stats.rallyLength += 1;
+          playNote(NoteType.Paddle);
         } else if (ball.x + ball.radius > paddle2.x && ball.y > paddle2.y && ball.y < paddle2.y + paddle2.height) {
           const bounceAngle = getBounceAngle(paddle2.y, paddle2.height, ball.y);
           ball.dx = -(ball.speed + Math.abs(paddle2.dy) / PADDLE_CONTACT_SPEED_BOOST_DIVISOR) * Math.cos(bounceAngle);
@@ -153,14 +158,17 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchSt
           ball.x = paddle2.x - ball.radius; // Adjust ball position to avoid sticking
           ball.speed += SPEED_INCREMENT;
           stats.rallyLength += 1;
+          playNote(NoteType.Paddle);
         }
 
         // Check for scoring
         if (ball.x - ball.radius < 0) {
           dispatch({ type: "POINT_SCORED", player: rightPlayer, stats: { ...stats } });
+          playNote(NoteType.Point);
           ball.scoreMode = true;
         } else if (ball.x + ball.radius > canvas.width) {
           dispatch({ type: "POINT_SCORED", player: leftPlayer, stats: { ...stats } });
+          playNote(NoteType.Point);
           ball.scoreMode = true;
         }
       }

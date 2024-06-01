@@ -7,7 +7,6 @@
 - winner should be displayed clearly
   - stats
   - confetti?
-- sounds?
 - add undo functionality
 - keep path of ball
 - pause
@@ -15,12 +14,15 @@
 - paint a net on the screen?
 - fast balls should leave marks on the screen?
 - order events
-- come up in sequence?
-
-## Testing
-
+  - come up in sequence?
 - full screen button should not show in full screen mode
 - style the scoreboard like BBC wimbledon
 - win streak should have the player name / color
 - input player names
 - reactify computer player
+- refactor sounds to react to dispatch events?
+
+## Computer Player
+
+- create python env for open ai gym
+- allow upload of model in front end
