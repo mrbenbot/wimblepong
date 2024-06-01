@@ -164,11 +164,11 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchSt
         // Check for scoring
         if (ball.x - ball.radius < 0) {
           dispatch({ type: "POINT_SCORED", player: rightPlayer, stats: { ...stats } });
-          playNote(NoteType.Point);
+          playNote(rightPlayer === Player.Player1 ? NoteType.WinPoint : NoteType.LoosePoint);
           ball.scoreMode = true;
         } else if (ball.x + ball.radius > canvas.width) {
           dispatch({ type: "POINT_SCORED", player: leftPlayer, stats: { ...stats } });
-          playNote(NoteType.Point);
+          playNote(leftPlayer === Player.Player1 ? NoteType.WinPoint : NoteType.LoosePoint);
           ball.scoreMode = true;
         }
       }
@@ -216,7 +216,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchSt
         cancelAnimationFrame(loopId);
       }
     };
-  }, [gameStateRef, dispatch, servingPlayer, playerPositions, paused, leftPlayer, rightPlayer, deltaTimeRef, getPlayerActions]);
+  }, [gameStateRef, dispatch, servingPlayer, playerPositions, paused, leftPlayer, rightPlayer, deltaTimeRef, getPlayerActions, playNote]);
 
   return (
     <div className="game-canvas-container">

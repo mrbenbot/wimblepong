@@ -44,7 +44,8 @@ const theme = themeA.concat(themeA).concat(themeB).concat(themeC);
 
 export enum NoteType {
   Paddle = "PADDLE",
-  Point = "POINT",
+  WinPoint = "WIN_POINT",
+  LoosePoint = "LOOSE_POINT",
 }
 
 const useRandomNotePlayer = () => {
@@ -96,18 +97,35 @@ const useRandomNotePlayer = () => {
     _playNote(frequency, 0.05);
   }, [_playNote]);
 
+  const playMelody = useCallback(
+    async (noteDurations: { note: string; duration: number }[]) => {
+      for (const { note, duration } of noteDurations) {
+        _playNote(noteFrequencies[note], duration);
+        await new Promise((res) => setTimeout(res, duration * 1000));
+      }
+    },
+    [_playNote]
+  );
+
   const playNote = useCallback(
     (type: NoteType) => {
       switch (type) {
         case NoteType.Paddle:
           return playNextThemeNote();
-        case NoteType.Point:
+        case NoteType.WinPoint:
+          return playMelody([
+            { note: "C4", duration: 0.05 },
+            { note: "E4", duration: 0.05 },
+            { note: "G4", duration: 0.05 },
+            { note: "C5", duration: 0.2 },
+          ]);
+        case NoteType.LoosePoint:
           return _playNote(50, 0.4);
         default:
           return;
       }
     },
-    [playNextThemeNote, _playNote]
+    [playNextThemeNote, _playNote, playMelody]
   );
 
   return playNote;
