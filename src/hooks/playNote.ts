@@ -46,9 +46,10 @@ export enum NoteType {
   Paddle = "PADDLE",
   WinPoint = "WIN_POINT",
   LoosePoint = "LOOSE_POINT",
+  WallContact = "WALL_CONTACT",
 }
 
-const useRandomNotePlayer = () => {
+const useSynthesizer = () => {
   const audioContextRef = useRef<AudioContext | null>(null);
   const themeNoteCounterRef = useRef(0);
 
@@ -107,11 +108,18 @@ const useRandomNotePlayer = () => {
     [_playNote]
   );
 
+  const playWallNoise = useCallback(() => {
+    themeNoteCounterRef.current++;
+    _playNote(100, 0.01);
+  }, [_playNote]);
+
   const playNote = useCallback(
     (type: NoteType) => {
       switch (type) {
         case NoteType.Paddle:
           return playNextThemeNote();
+        case NoteType.WallContact:
+          return playWallNoise();
         case NoteType.WinPoint:
           return playMelody([
             { note: "C4", duration: 0.05 },
@@ -125,10 +133,10 @@ const useRandomNotePlayer = () => {
           return;
       }
     },
-    [playNextThemeNote, _playNote, playMelody]
+    [playNextThemeNote, _playNote, playMelody, playWallNoise]
   );
 
   return playNote;
 };
 
-export default useRandomNotePlayer;
+export default useSynthesizer;

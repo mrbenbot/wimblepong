@@ -115,8 +115,8 @@ export interface DataRef {
 }
 
 export interface MutableGameState {
-  paddle1: { x: number; y: number; dy: number; width: number; height: number };
-  paddle2: { x: number; y: number; dy: number; width: number; height: number };
+  paddle1: { x: number; y: number; dy: number; width: number; height: number; colour: string };
+  paddle2: { x: number; y: number; dy: number; width: number; height: number; colour: string };
   ball: {
     x: number;
     y: number;

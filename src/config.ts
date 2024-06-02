@@ -2,7 +2,7 @@ import { Player } from "./types";
 
 export const green = "rgb(0 102 51)";
 export const purple = "rgb(84 0 139)";
-export const BALL_COLOUR = "white";
+export const BALL_COLOUR = "yellow";
 export const PLAYER_COLOURS = { [Player.Player1]: "red", [Player.Player2]: "dodgerblue" };
 
 export const COURT = { width: 1200, height: 800 };

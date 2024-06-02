@@ -1,7 +1,7 @@
 import React, { useReducer, useRef } from "react";
 import GameCanvas from "./GameCanvas";
 import { initialState, reducer } from "../libs/score";
-import { BALL, COURT, INITIAL_SPEED, PADDLE } from "../config";
+import { BALL, COURT, INITIAL_SPEED, PADDLE, PLAYER_COLOURS } from "../config";
 import "./App.css";
 import PlayerScore from "./PlayerScore";
 import EventAnnouncement from "./EventAnnouncement";
@@ -22,8 +22,22 @@ const App: React.FC<{
   matchConfig: MatchState["matchConfig"];
 }> = ({ connected = true, selectDevice, getPlayerActions, matchConfig }) => {
   const gameStateRef = useRef<MutableGameState>({
-    paddle1: { x: 0, y: COURT.height / 2 - PADDLE.height / 2, dy: 0, width: PADDLE.width, height: PADDLE.height },
-    paddle2: { x: COURT.width - PADDLE.width, y: COURT.height / 2 - PADDLE.height / 2, dy: 0, width: PADDLE.width, height: PADDLE.height },
+    paddle1: {
+      x: 0,
+      y: COURT.height / 2 - PADDLE.height / 2,
+      dy: 0,
+      width: PADDLE.width,
+      height: PADDLE.height,
+      colour: PLAYER_COLOURS[Player.Player1],
+    },
+    paddle2: {
+      x: COURT.width - PADDLE.width,
+      y: COURT.height / 2 - PADDLE.height / 2,
+      dy: 0,
+      width: PADDLE.width,
+      height: PADDLE.height,
+      colour: PLAYER_COLOURS[Player.Player2],
+    },
     ball: {
       x: PADDLE.width + BALL.radius,
       y: 150,
