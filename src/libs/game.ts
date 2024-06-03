@@ -1,5 +1,15 @@
-import { BALL_COLOUR, COURT, INITIAL_SPEED, PADDLE_CONTACT_SPEED_BOOST_DIVISOR, PADDLE_SPEED_DEVISOR, SPEED_INCREMENT } from "../config";
-import { MutableGameState, Player } from "../types";
+import {
+  BALL_COLOUR,
+  COURT,
+  INITIAL_SPEED,
+  PADDLE,
+  PADDLE_CONTACT_SPEED_BOOST_DIVISOR,
+  PADDLE_SPEED_DEVISOR,
+  PLAYER_COLOURS,
+  SERVING_HEIGHT_MULTIPLIER,
+  SPEED_INCREMENT,
+} from "../config";
+import { MutableGameState, Player, PlayerPositions } from "../types";
 
 export const draw = (gameState: MutableGameState, canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) => {
   context.clearRect(0, 0, canvas.width, canvas.height);
@@ -35,22 +45,21 @@ export const updateGameState = (
   gameState: MutableGameState,
   leftPlayerActions: PlayerActions,
   rightPlayerActions: PlayerActions,
-  servingPlayer: Player,
-  positionsReversed: boolean,
   deltaTime: number,
   fireEvent: (str: GameEventType) => void
 ) => {
   // Update ball position
-  const { ball, paddle1, paddle2, stats } = gameState;
+  const { ball, paddle1, paddle2, stats, server, positionsReversed } = gameState;
 
   if (ball.scoreMode) {
     if (ball.scoreModeTimeout < 50) {
       ball.scoreModeTimeout += deltaTime;
     } else {
       fireEvent(GameEventType.ResetBall);
+      resetBall(gameState);
     }
   } else if (ball.serveMode) {
-    if ((servingPlayer === Player.Player1 && !positionsReversed) || (servingPlayer === Player.Player2 && positionsReversed)) {
+    if ((server === Player.Player1 && !positionsReversed) || (server === Player.Player2 && positionsReversed)) {
       ball.dy = (paddle1.y + paddle1.height / 2 - ball.y) / PADDLE_SPEED_DEVISOR;
       ball.x = paddle1.width + ball.radius;
       if (leftPlayerActions.buttonPressed) {
@@ -58,6 +67,9 @@ export const updateGameState = (
         ball.dx = INITIAL_SPEED;
         ball.serveMode = false;
         fireEvent(GameEventType.Serve);
+        stats.rallyLength += 1;
+        stats.serveSpeed = Math.abs(ball.dy) + Math.abs(ball.dx);
+        stats.server = server;
       }
     } else {
       ball.dy = (paddle2.y + paddle2.height / 2 - ball.y) / PADDLE_SPEED_DEVISOR;
@@ -67,6 +79,9 @@ export const updateGameState = (
         ball.dx = -INITIAL_SPEED;
         ball.serveMode = false;
         fireEvent(GameEventType.Serve);
+        stats.rallyLength += 1;
+        stats.serveSpeed = Math.abs(ball.dy) + Math.abs(ball.dx);
+        stats.server = server;
       }
     }
     ball.y += ball.dy * deltaTime;
@@ -128,8 +143,9 @@ export const updateGameState = (
   if (paddle2.y + paddle2.height > COURT.height) paddle2.y = COURT.height - paddle2.height;
 };
 
-export const resetBall = (gameState: MutableGameState, left: boolean) => {
-  const { ball, stats, paddle1, paddle2 } = gameState;
+export const resetBall = (gameState: MutableGameState) => {
+  const { ball, stats, paddle1, paddle2, positionsReversed, server } = gameState;
+  const left = (server === Player.Player1 && !positionsReversed) || (server === Player.Player2 && positionsReversed);
   ball.y = left ? paddle1.height / 2 + paddle1.y : paddle2.height / 2 + paddle2.y;
   ball.x = left ? paddle1.width + ball.radius : COURT.width - paddle2.width - ball.radius;
   ball.speed = INITIAL_SPEED;
@@ -137,6 +153,31 @@ export const resetBall = (gameState: MutableGameState, left: boolean) => {
   ball.scoreMode = false;
   ball.scoreModeTimeout = 0;
   stats.rallyLength = 0;
+};
+
+export const applyMetaGameState = (gameState: MutableGameState, servingPlayer: Player, playerPositions: PlayerPositions) => {
+  const positionsReversed = playerPositions === PlayerPositions.Reversed;
+
+  gameState.server = servingPlayer;
+  gameState.positionsReversed = positionsReversed;
+
+  // Set paddle heights
+  if ((servingPlayer === Player.Player1 && !positionsReversed) || (servingPlayer === Player.Player2 && positionsReversed)) {
+    gameState.paddle1.height = PADDLE.height * SERVING_HEIGHT_MULTIPLIER;
+    gameState.paddle2.height = PADDLE.height;
+  } else {
+    gameState.paddle1.height = PADDLE.height;
+    gameState.paddle2.height = PADDLE.height * SERVING_HEIGHT_MULTIPLIER;
+  }
+
+  // Set paddle colours
+  if (positionsReversed) {
+    gameState.paddle1.colour = PLAYER_COLOURS[Player.Player2];
+    gameState.paddle2.colour = PLAYER_COLOURS[Player.Player1];
+  } else {
+    gameState.paddle1.colour = PLAYER_COLOURS[Player.Player1];
+    gameState.paddle2.colour = PLAYER_COLOURS[Player.Player2];
+  }
 };
 
 const getBounceAngle = (paddleY: number, paddleHeight: number, ballY: number) => {

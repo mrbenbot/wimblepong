@@ -19,20 +19,22 @@ Input Mode
  */
 
 const MenuComponent: React.FC = () => {
-  const [selectedOption, setSelectedOption] = useState<"mouse" | "dj" | "dj/computer" | "gamepad" | null>(null);
+  const [selectedOption, setSelectedOption] = useState<"computer/model" | "mouse/model" | "dj" | "dj/computer" | "gamepad" | null>(null);
   const [matchConfig, setMatchConfig] = useState<MatchState["matchConfig"]>({ numberOfSets: 3, setLength: 6 });
 
   return (
     <div>
       <h1>Select an Option</h1>
       <div>
-        <button onClick={() => setSelectedOption("mouse")}>Mouse vs Computer</button>
+        <button onClick={() => setSelectedOption("computer/model")}>Computer vs Model</button>
+        <button onClick={() => setSelectedOption("mouse/model")}>Mouse vs Model</button>
         <button onClick={() => setSelectedOption("dj")}>DJ vs DJ</button>
         <button onClick={() => setSelectedOption("dj/computer")}>DJ vs Computer</button>
         <button onClick={() => setSelectedOption("gamepad")}>Gamepad vs Gamepad</button>
       </div>
       <div>
-        {selectedOption === "mouse" && <MouseControlApp matchConfig={matchConfig} />}
+        {selectedOption === "computer/model" && <MouseControlApp matchConfig={matchConfig} mouseControl={false} />}
+        {selectedOption === "mouse/model" && <MouseControlApp matchConfig={matchConfig} mouseControl />}
         {selectedOption === "dj/computer" && <DJHeroApp numberOfControllers={1} matchConfig={matchConfig} />}
         {selectedOption === "dj" && <DJHeroApp numberOfControllers={2} matchConfig={matchConfig} />}
         {selectedOption === "gamepad" && <GamepadApp matchConfig={matchConfig} />}

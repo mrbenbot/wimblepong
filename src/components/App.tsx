@@ -22,6 +22,8 @@ const App: React.FC<{
   matchConfig: MatchState["matchConfig"];
 }> = ({ connected = true, selectDevice, getPlayerActions, matchConfig }) => {
   const gameStateRef = useRef<MutableGameState>({
+    server: Player.Player1,
+    positionsReversed: false,
     paddle1: {
       x: 0,
       y: COURT.height / 2 - PADDLE.height / 2,
