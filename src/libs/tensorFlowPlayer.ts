@@ -21,7 +21,6 @@ export const getModelPlayerActions: GetPlayerActionsFunction = (player, gameStat
     gameState[player].x,
     gameState[player].y,
     gameState.ball.serveMode ? 1 : 0,
-    player === "Player1" ? 1 : 0, // get rid!
     gameState.server === player ? 1 : 0,
   ];
 
@@ -31,7 +30,7 @@ export const getModelPlayerActions: GetPlayerActionsFunction = (player, gameStat
   const buttonPressed = tf.sigmoid(prediction[0]).dataSync()[0];
   const paddleDirection = prediction[1].dataSync()[0];
 
-  // console.log(buttonPressed, paddleDirection);
+  console.log(buttonPressed, paddleDirection);
 
   return { paddleDirection: paddleDirection, buttonPressed: buttonPressed > 0.5 };
 };

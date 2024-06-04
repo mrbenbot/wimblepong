@@ -16,14 +16,14 @@ export default function MouseControlApp({ matchConfig, mouseControl = true }: { 
   }, []);
 
   const getPlayerActionsRouter = useCallback<GetPlayerActionsFunction>(
-    (player, state, canvas, positionsReversed) => {
+    (player, state, canvas) => {
       if (player === Player.Player2) {
-        return getModelPlayerActions(player, state, canvas, positionsReversed);
+        return getModelPlayerActions(player, state, canvas);
       }
       if (player === Player.Player1 && !mouseControl) {
-        return getComputerActions(player, state, canvas, positionsReversed);
+        return getComputerActions(player, state, canvas);
       }
-      return getPlayerActions(player, state, canvas, positionsReversed);
+      return getPlayerActions(player, state, canvas);
     },
     [getPlayerActions, mouseControl]
   );
