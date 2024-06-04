@@ -1,4 +1,4 @@
-import { MAX_COMPUTER_PADDLE_SPEED } from "../config";
+import { COURT, MAX_COMPUTER_PADDLE_SPEED } from "../config";
 import { GetPlayerActionsFunction, Player } from "../types";
 import { boundedValue } from "./numbers";
 
@@ -6,8 +6,8 @@ export const getComputerPlayerActionsFunction: () => GetPlayerActionsFunction = 
   let serveDelay = 50;
   let serveDelayCounter = 0;
   let direction = 15;
-  return (player, state, canvas, positionsReversed) => {
-    const isLeft = player === Player.Player1 ? !positionsReversed : positionsReversed;
+  return (player, state) => {
+    const isLeft = (player === Player.Player1 && !state.positionsReversed) || (player === Player.Player2 && state.positionsReversed);
     if (state.ball.scoreMode) {
       serveDelayCounter = 0;
       direction = 30 * Math.random();
@@ -15,9 +15,9 @@ export const getComputerPlayerActionsFunction: () => GetPlayerActionsFunction = 
       direction = Math.random() > 0.5 ? direction : -direction;
       return { buttonPressed: false, paddleDirection: 0 };
     }
+    const paddle = state[player];
     if (state.ball.serveMode) {
-      const paddle = isLeft ? state.paddle1 : state.paddle2;
-      if (paddle.y <= 0 || paddle.y + paddle.height >= canvas.height) {
+      if (paddle.y <= 0 || paddle.y + paddle.height >= COURT.height) {
         direction = -direction;
       }
       if (serveDelayCounter++ > serveDelay) {
@@ -30,7 +30,7 @@ export const getComputerPlayerActionsFunction: () => GetPlayerActionsFunction = 
       return {
         buttonPressed: false,
         paddleDirection: boundedValue(
-          state.paddle1.y - state.ball.y + state.paddle1.height / 2,
+          paddle.y - state.ball.y + paddle.height / 2 + (Math.random() - 0.5) * 2,
           -MAX_COMPUTER_PADDLE_SPEED,
           MAX_COMPUTER_PADDLE_SPEED
         ),
@@ -39,7 +39,7 @@ export const getComputerPlayerActionsFunction: () => GetPlayerActionsFunction = 
     return {
       buttonPressed: false,
       paddleDirection: -boundedValue(
-        state.paddle2.y - state.ball.y + state.paddle2.height / 2,
+        paddle.y - state.ball.y + paddle.height / 2 + (Math.random() - 0.5) * 2,
         -MAX_COMPUTER_PADDLE_SPEED,
         MAX_COMPUTER_PADDLE_SPEED
       ),

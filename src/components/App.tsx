@@ -24,7 +24,7 @@ const App: React.FC<{
   const gameStateRef = useRef<MutableGameState>({
     server: Player.Player1,
     positionsReversed: false,
-    paddle1: {
+    [Player.Player1]: {
       x: 0,
       y: COURT.height / 2 - PADDLE.height / 2,
       dy: 0,
@@ -32,7 +32,7 @@ const App: React.FC<{
       height: PADDLE.height,
       colour: PLAYER_COLOURS[Player.Player1],
     },
-    paddle2: {
+    [Player.Player2]: {
       x: COURT.width - PADDLE.width,
       y: COURT.height / 2 - PADDLE.height / 2,
       dy: 0,

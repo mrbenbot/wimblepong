@@ -117,8 +117,8 @@ export interface DataRef {
 export interface MutableGameState {
   server: Player;
   positionsReversed: boolean;
-  paddle1: { x: number; y: number; dy: number; width: number; height: number; colour: string };
-  paddle2: { x: number; y: number; dy: number; width: number; height: number; colour: string };
+  [Player.Player1]: { x: number; y: number; dy: number; width: number; height: number; colour: string };
+  [Player.Player2]: { x: number; y: number; dy: number; width: number; height: number; colour: string };
   ball: {
     x: number;
     y: number;
@@ -140,8 +140,7 @@ export interface MutableGameState {
 export type GetPlayerActionsFunction = (
   player: Player,
   state: MutableGameState,
-  canvas: HTMLCanvasElement,
-  positionsReversed: boolean
+  canvas: HTMLCanvasElement
 ) => {
   buttonPressed: boolean;
   paddleDirection: number;

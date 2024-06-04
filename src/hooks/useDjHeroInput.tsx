@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { DataRef, MutableGameState, Player } from "../types";
+import { DataRef, GetPlayerActionsFunction, Player } from "../types";
 
 function arraysEqual(a: Uint8Array | null, b: Uint8Array) {
   if (!a || a.length !== b.length) return false;
@@ -122,7 +122,7 @@ const useDJHeroInput = (numberOfControllers: number = 2) => {
     };
   }, [dataRef, numberOfControllers]);
 
-  const getPlayerActions = (player: Player, _state: MutableGameState, _canvas: HTMLCanvasElement, _leftPlayer: boolean) => {
+  const getPlayerActions: GetPlayerActionsFunction = (player: Player, _state, _canvas) => {
     const { lastData } = dataRef.current[player];
     if (lastData) {
       return {

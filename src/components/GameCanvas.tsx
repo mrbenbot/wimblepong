@@ -65,10 +65,12 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchSt
 
     const update = (deltaTime: number) => {
       // getPlayerActions using current state
-      const leftPlayerActions = getPlayerActions(leftPlayer, gameStateRef.current, canvas, gameStateRef.current.positionsReversed);
-      const rightPlayerActions = getPlayerActions(rightPlayer, gameStateRef.current, canvas, gameStateRef.current.positionsReversed);
+      const actions = {
+        [Player.Player1]: getPlayerActions(Player.Player1, gameStateRef.current, canvas),
+        [Player.Player2]: getPlayerActions(Player.Player2, gameStateRef.current, canvas),
+      };
       // Update game state based on actions
-      updateGameState(gameStateRef.current, leftPlayerActions, rightPlayerActions, deltaTime, handleGameEvent);
+      updateGameState(gameStateRef.current, actions, deltaTime, handleGameEvent);
     };
 
     let loopId: null | number = null;
@@ -90,7 +92,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchSt
         cancelAnimationFrame(loopId);
       }
     };
-  }, [gameStateRef, getPlayerActions, handleGameEvent, leftPlayer, paused, playerPositions, rightPlayer, servingPlayer]);
+  }, [gameStateRef, getPlayerActions, handleGameEvent, paused, playerPositions, servingPlayer]);
 
   return (
     <div className="game-canvas-container">

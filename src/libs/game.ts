@@ -5,7 +5,6 @@ import {
   PADDLE,
   PADDLE_CONTACT_SPEED_BOOST_DIVISOR,
   PADDLE_SPEED_DEVISOR,
-  PLAYER_COLOURS,
   SERVING_HEIGHT_MULTIPLIER,
   SPEED_INCREMENT,
 } from "../config";
@@ -15,10 +14,10 @@ export const draw = (gameState: MutableGameState, canvas: HTMLCanvasElement, con
   context.clearRect(0, 0, canvas.width, canvas.height);
 
   // Draw paddles
-  context.fillStyle = gameState.paddle1.colour;
-  context.fillRect(gameState.paddle1.x, gameState.paddle1.y, gameState.paddle1.width, gameState.paddle1.height);
-  context.fillStyle = gameState.paddle2.colour;
-  context.fillRect(gameState.paddle2.x, gameState.paddle2.y, gameState.paddle2.width, gameState.paddle2.height);
+  context.fillStyle = gameState[Player.Player1].colour;
+  context.fillRect(gameState[Player.Player1].x, gameState[Player.Player1].y, gameState[Player.Player1].width, gameState[Player.Player1].height);
+  context.fillStyle = gameState[Player.Player2].colour;
+  context.fillRect(gameState[Player.Player2].x, gameState[Player.Player2].y, gameState[Player.Player2].width, gameState[Player.Player2].height);
 
   // Draw ball
   context.fillStyle = BALL_COLOUR;
@@ -43,13 +42,16 @@ export enum GameEventType {
 
 export const updateGameState = (
   gameState: MutableGameState,
-  leftPlayerActions: PlayerActions,
-  rightPlayerActions: PlayerActions,
+  actions: { [Player.Player1]: PlayerActions; [Player.Player2]: PlayerActions },
   deltaTime: number,
   fireEvent: (str: GameEventType) => void
 ) => {
   // Update ball position
-  const { ball, paddle1, paddle2, stats, server, positionsReversed } = gameState;
+  const { ball, stats, server, positionsReversed } = gameState;
+
+  const [paddleLeft, paddleRight] = positionsReversed
+    ? [gameState[Player.Player2], gameState[Player.Player1]]
+    : [gameState[Player.Player1], gameState[Player.Player2]];
 
   if (ball.scoreMode) {
     if (ball.scoreModeTimeout < 50) {
@@ -59,30 +61,22 @@ export const updateGameState = (
       resetBall(gameState);
     }
   } else if (ball.serveMode) {
-    if ((server === Player.Player1 && !positionsReversed) || (server === Player.Player2 && positionsReversed)) {
-      ball.dy = (paddle1.y + paddle1.height / 2 - ball.y) / PADDLE_SPEED_DEVISOR;
-      ball.x = paddle1.width + ball.radius;
-      if (leftPlayerActions.buttonPressed) {
-        ball.speed = INITIAL_SPEED;
-        ball.dx = INITIAL_SPEED;
-        ball.serveMode = false;
-        fireEvent(GameEventType.Serve);
-        stats.rallyLength += 1;
-        stats.serveSpeed = Math.abs(ball.dy) + Math.abs(ball.dx);
-        stats.server = server;
-      }
+    const servingFromLeft = (server === Player.Player1 && !positionsReversed) || (server === Player.Player2 && positionsReversed);
+    if (servingFromLeft) {
+      ball.dy = (paddleLeft.y + paddleLeft.height / 2 - ball.y) / PADDLE_SPEED_DEVISOR;
+      ball.x = paddleLeft.width + ball.radius;
     } else {
-      ball.dy = (paddle2.y + paddle2.height / 2 - ball.y) / PADDLE_SPEED_DEVISOR;
-      ball.x = COURT.width - paddle2.width - ball.radius;
-      if (rightPlayerActions.buttonPressed) {
-        ball.speed = INITIAL_SPEED;
-        ball.dx = -INITIAL_SPEED;
-        ball.serveMode = false;
-        fireEvent(GameEventType.Serve);
-        stats.rallyLength += 1;
-        stats.serveSpeed = Math.abs(ball.dy) + Math.abs(ball.dx);
-        stats.server = server;
-      }
+      ball.dy = (paddleRight.y + paddleRight.height / 2 - ball.y) / PADDLE_SPEED_DEVISOR;
+      ball.x = COURT.width - paddleRight.width - ball.radius;
+    }
+    if (actions[server].buttonPressed) {
+      ball.speed = INITIAL_SPEED;
+      ball.dx = servingFromLeft ? INITIAL_SPEED : -INITIAL_SPEED; // for when serve does happen
+      ball.serveMode = false;
+      fireEvent(GameEventType.Serve);
+      stats.rallyLength += 1;
+      stats.serveSpeed = Math.abs(ball.dy) + Math.abs(ball.dx);
+      stats.server = server;
     }
     ball.y += ball.dy * deltaTime;
   } else {
@@ -101,19 +95,27 @@ export const updateGameState = (
     }
 
     // Update ball collision detection and response
-    if (ball.x - ball.radius < paddle1.x + paddle1.width && ball.y + ball.radius > paddle1.y && ball.y - ball.radius < paddle1.y + paddle1.height) {
-      const bounceAngle = getBounceAngle(paddle1.y, paddle1.height, ball.y);
-      ball.dx = (ball.speed + Math.abs(paddle1.dy) / PADDLE_CONTACT_SPEED_BOOST_DIVISOR) * Math.cos(bounceAngle);
-      ball.dy = (ball.speed + Math.abs(paddle1.dy) / PADDLE_CONTACT_SPEED_BOOST_DIVISOR) * -Math.sin(bounceAngle);
-      ball.x = paddle1.x + paddle1.width + ball.radius; // Adjust ball position to avoid sticking
+    if (
+      ball.x - ball.radius < paddleLeft.x + paddleLeft.width &&
+      ball.y + ball.radius > paddleLeft.y &&
+      ball.y - ball.radius < paddleLeft.y + paddleLeft.height
+    ) {
+      const bounceAngle = getBounceAngle(paddleLeft.y, paddleLeft.height, ball.y);
+      ball.dx = (ball.speed + Math.abs(paddleLeft.dy) / PADDLE_CONTACT_SPEED_BOOST_DIVISOR) * Math.cos(bounceAngle);
+      ball.dy = (ball.speed + Math.abs(paddleLeft.dy) / PADDLE_CONTACT_SPEED_BOOST_DIVISOR) * -Math.sin(bounceAngle);
+      ball.x = paddleLeft.x + paddleLeft.width + ball.radius; // Adjust ball position to avoid sticking
       ball.speed += SPEED_INCREMENT;
       stats.rallyLength += 1;
       fireEvent(GameEventType.HitPaddle);
-    } else if (ball.x + ball.radius > paddle2.x && ball.y + ball.radius > paddle2.y && ball.y - ball.radius < paddle2.y + paddle2.height) {
-      const bounceAngle = getBounceAngle(paddle2.y, paddle2.height, ball.y);
-      ball.dx = -(ball.speed + Math.abs(paddle2.dy) / PADDLE_CONTACT_SPEED_BOOST_DIVISOR) * Math.cos(bounceAngle);
-      ball.dy = (ball.speed + Math.abs(paddle2.dy) / PADDLE_CONTACT_SPEED_BOOST_DIVISOR) * -Math.sin(bounceAngle);
-      ball.x = paddle2.x - ball.radius; // Adjust ball position to avoid sticking
+    } else if (
+      ball.x + ball.radius > paddleRight.x &&
+      ball.y + ball.radius > paddleRight.y &&
+      ball.y - ball.radius < paddleRight.y + paddleRight.height
+    ) {
+      const bounceAngle = getBounceAngle(paddleRight.y, paddleRight.height, ball.y);
+      ball.dx = -(ball.speed + Math.abs(paddleRight.dy) / PADDLE_CONTACT_SPEED_BOOST_DIVISOR) * Math.cos(bounceAngle);
+      ball.dy = (ball.speed + Math.abs(paddleRight.dy) / PADDLE_CONTACT_SPEED_BOOST_DIVISOR) * -Math.sin(bounceAngle);
+      ball.x = paddleRight.x - ball.radius; // Adjust ball position to avoid sticking
       ball.speed += SPEED_INCREMENT;
       stats.rallyLength += 1;
       fireEvent(GameEventType.HitPaddle);
@@ -128,26 +130,30 @@ export const updateGameState = (
       ball.scoreMode = true;
     }
   }
-
-  paddle1.dy = -leftPlayerActions.paddleDirection;
-  paddle1.y += paddle1.dy * deltaTime;
-
-  paddle2.dy = rightPlayerActions.paddleDirection;
-  paddle2.y += paddle2.dy * deltaTime;
+  if (positionsReversed) {
+    gameState[Player.Player1].dy = actions[Player.Player1].paddleDirection;
+    gameState[Player.Player2].dy = -actions[Player.Player2].paddleDirection;
+  } else {
+    gameState[Player.Player1].dy = -actions[Player.Player1].paddleDirection;
+    gameState[Player.Player2].dy = actions[Player.Player2].paddleDirection;
+  }
+  paddleLeft.y += paddleLeft.dy * deltaTime;
+  paddleRight.y += paddleRight.dy * deltaTime;
 
   // Ensure paddles stay within screen bounds
-  if (paddle1.y < 0) paddle1.y = 0;
-  if (paddle1.y + paddle1.height > COURT.height) paddle1.y = COURT.height - paddle1.height;
+  if (paddleLeft.y < 0) paddleLeft.y = 0;
+  if (paddleLeft.y + paddleLeft.height > COURT.height) paddleLeft.y = COURT.height - paddleLeft.height;
 
-  if (paddle2.y < 0) paddle2.y = 0;
-  if (paddle2.y + paddle2.height > COURT.height) paddle2.y = COURT.height - paddle2.height;
+  if (paddleRight.y < 0) paddleRight.y = 0;
+  if (paddleRight.y + paddleRight.height > COURT.height) paddleRight.y = COURT.height - paddleRight.height;
 };
 
 export const resetBall = (gameState: MutableGameState) => {
-  const { ball, stats, paddle1, paddle2, positionsReversed, server } = gameState;
+  const { ball, stats, positionsReversed, server } = gameState;
+  const servingPaddle = gameState[server];
   const left = (server === Player.Player1 && !positionsReversed) || (server === Player.Player2 && positionsReversed);
-  ball.y = left ? paddle1.height / 2 + paddle1.y : paddle2.height / 2 + paddle2.y;
-  ball.x = left ? paddle1.width + ball.radius : COURT.width - paddle2.width - ball.radius;
+  ball.y = servingPaddle.height / 2 + servingPaddle.y;
+  ball.x = left ? servingPaddle.width + ball.radius : COURT.width - servingPaddle.width - ball.radius;
   ball.speed = INITIAL_SPEED;
   ball.serveMode = true;
   ball.scoreMode = false;
@@ -162,21 +168,21 @@ export const applyMetaGameState = (gameState: MutableGameState, servingPlayer: P
   gameState.positionsReversed = positionsReversed;
 
   // Set paddle heights
-  if ((servingPlayer === Player.Player1 && !positionsReversed) || (servingPlayer === Player.Player2 && positionsReversed)) {
-    gameState.paddle1.height = PADDLE.height * SERVING_HEIGHT_MULTIPLIER;
-    gameState.paddle2.height = PADDLE.height;
+  if (servingPlayer === Player.Player1) {
+    gameState[Player.Player1].height = PADDLE.height * SERVING_HEIGHT_MULTIPLIER;
+    gameState[Player.Player2].height = PADDLE.height;
   } else {
-    gameState.paddle1.height = PADDLE.height;
-    gameState.paddle2.height = PADDLE.height * SERVING_HEIGHT_MULTIPLIER;
+    gameState[Player.Player1].height = PADDLE.height;
+    gameState[Player.Player2].height = PADDLE.height * SERVING_HEIGHT_MULTIPLIER;
   }
 
   // Set paddle colours
   if (positionsReversed) {
-    gameState.paddle1.colour = PLAYER_COLOURS[Player.Player2];
-    gameState.paddle2.colour = PLAYER_COLOURS[Player.Player1];
+    gameState[Player.Player1].x = COURT.width - PADDLE.width;
+    gameState[Player.Player2].x = 0;
   } else {
-    gameState.paddle1.colour = PLAYER_COLOURS[Player.Player1];
-    gameState.paddle2.colour = PLAYER_COLOURS[Player.Player2];
+    gameState[Player.Player1].x = 0;
+    gameState[Player.Player2].x = COURT.width - PADDLE.width;
   }
 };
 

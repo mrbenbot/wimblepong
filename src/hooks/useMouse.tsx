@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { GetPlayerActionsFunction } from "../types";
+import { GetPlayerActionsFunction, Player } from "../types";
 import { MAX_MOUSE_PADDLE_SPEED } from "../config";
 
 const useMouseInput = () => {
@@ -42,22 +42,19 @@ const useMouseInput = () => {
     };
   }, [dataRef]);
 
-  const getPlayerActions: GetPlayerActionsFunction = (_player, _state, canvas, positionsReversed) => {
+  const getPlayerActions: GetPlayerActionsFunction = (player, state, canvas) => {
     const { buttonPressed, mouseY } = dataRef.current;
     const rects = canvas.getBoundingClientRect();
-    if (positionsReversed) {
+    const paddle = state[player];
+    if ((state.positionsReversed && player === Player.Player1) || (state.positionsReversed && player === Player.Player1)) {
       return {
         buttonPressed,
-        paddleDirection: -boundedValue(
-          _state.paddle2.y - mouseY + rects.top + _state.paddle2.height,
-          -MAX_MOUSE_PADDLE_SPEED,
-          MAX_MOUSE_PADDLE_SPEED
-        ),
+        paddleDirection: -boundedValue(paddle.y - mouseY + rects.top + paddle.height, -MAX_MOUSE_PADDLE_SPEED, MAX_MOUSE_PADDLE_SPEED),
       };
     }
     return {
       buttonPressed,
-      paddleDirection: boundedValue(_state.paddle1.y - mouseY + rects.top + _state.paddle1.height, -MAX_MOUSE_PADDLE_SPEED, MAX_MOUSE_PADDLE_SPEED),
+      paddleDirection: boundedValue(paddle.y - mouseY + rects.top + paddle.height, -MAX_MOUSE_PADDLE_SPEED, MAX_MOUSE_PADDLE_SPEED),
     };
   };
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { GetPlayerActionsFunction, MutableGameState, Player } from "../types";
+import { GetPlayerActionsFunction, Player } from "../types";
 import { GAMEPAD_AXIS_MULTIPLIER } from "../config";
 
 const players = { [Player.Player1]: 0, [Player.Player2]: 1 };
@@ -27,7 +27,7 @@ const useGamepad = () => {
     };
   }, []);
 
-  const getPlayerActions: GetPlayerActionsFunction = (player: Player, _state: MutableGameState, _canvas: HTMLCanvasElement) => {
+  const getPlayerActions: GetPlayerActionsFunction = (player: Player, _state, _canvas) => {
     const gamepad = navigator.getGamepads()[players[player]];
     if (gamepad) {
       if (!bothReceiving) {
