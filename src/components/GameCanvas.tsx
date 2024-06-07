@@ -78,6 +78,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchSt
       const deltaTime = (timestamp - deltaTimeRef.current) / DELTA_TIME_DIVISOR;
       deltaTimeRef.current = timestamp;
       update(deltaTime);
+      // update(1.5);
       draw(gameStateRef.current, canvas, context);
       loopId = requestAnimationFrame(gameLoop);
     };

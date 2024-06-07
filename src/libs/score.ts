@@ -3,11 +3,11 @@ import { AnnouncementEvent, AnnouncementEventType, MatchState, Player, PlayerPos
 
 export const initialState: MatchState = {
   sets: [],
-  games: { Player1: 0, Player2: 0 },
+  games: { Player1: 2, Player2: 0 },
   tiebreak: { Player1: 0, Player2: 0 },
   rallies: [],
   servingPlayer: Player.Player1,
-  playerPositions: PlayerPositions.Initial,
+  playerPositions: PlayerPositions.Reversed,
   gameState: {
     Player1: Score.Love,
     Player2: Score.Love,
