@@ -3,18 +3,18 @@ import { AnnouncementEvent, AnnouncementEventType, MatchState, Player, PlayerPos
 
 export const initialState: MatchState = {
   sets: [],
-  games: { Player1: 2, Player2: 0 },
+  games: { Player1: 0, Player2: 0 },
   tiebreak: { Player1: 0, Player2: 0 },
   rallies: [],
   servingPlayer: Player.Player1,
-  playerPositions: PlayerPositions.Reversed,
+  playerPositions: PlayerPositions.Initial,
   gameState: {
     Player1: Score.Love,
     Player2: Score.Love,
   },
   matchConfig: {
     numberOfSets: 3,
-    setLength: 1,
+    setLength: 6,
   },
   events: [],
   pointType: PointType.Normal,
@@ -25,7 +25,7 @@ export type Action =
   | { type: "CLEAR_EVENTS" };
 
 export function reducer(state: MatchState, action: Action): MatchState {
-  // console.log("REDUCER CALLED", action, state);
+  console.log("REDUCER CALLED", action, state);
   if (state.matchWinner) {
     return state; // No changes if there's already a match winner
   }
@@ -135,7 +135,7 @@ export function reducer(state: MatchState, action: Action): MatchState {
           };
           const isWinner = checkIsWinner(newState, player, opponent);
           const winEvent: WinGameEvent = { type: AnnouncementEventType.WinGame, winType: isWinner ? "match" : "set", player };
-          return switchEndsIfNeeded(addRallyEvents(addPointState({ ...newState, matchWinner: player, events: [winEvent] })));
+          return switchEndsIfNeeded(addRallyEvents(addPointState({ ...newState, matchWinner: isWinner ? player : undefined, events: [winEvent] })));
         }
         // win games within set
         const newState = {

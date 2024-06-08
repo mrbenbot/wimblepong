@@ -38,6 +38,7 @@ describe("Tennis Match Reducer", () => {
       expect(updatedState.games.Player1).toBe(0);
       expect(updatedState.games.Player2).toBe(0);
       expect(updatedState.sets.length).toBe(1);
+      expect(updatedState.matchWinner).toBe(undefined);
       expect(updatedState.sets[0]).toEqual({ Player1: 6, Player2: 0 });
     });
 

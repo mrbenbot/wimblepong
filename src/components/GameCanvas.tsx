@@ -27,6 +27,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchSt
 
   const handleGameEvent = useCallback(
     (event: GameEventType) => {
+      console.log(event);
       switch (event) {
         case GameEventType.ScorePointLeft:
           dispatch({ type: "POINT_SCORED", player: rightPlayer, stats: { ...gameStateRef.current.stats } });
