@@ -26,7 +26,7 @@ function createModel() {
 }
 
 // Assign weights to the model
-async function assignWeights(model, weights) {
+async function assignWeights(model: tf.LayersModel, weights: Record<string, number[]>) {
   model
     .getLayer("dense1_policy")
     .setWeights([tf.tensor(weights["mlp_extractor.policy_net.0.weight"]).transpose(), tf.tensor(weights["mlp_extractor.policy_net.0.bias"])]);
