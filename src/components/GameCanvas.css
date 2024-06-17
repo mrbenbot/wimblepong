@@ -1,6 +1,6 @@
 .game-canvas-container {
   position: relative;
 }
-canvas {
+.game-canvas {
   border: 3px solid white;
 }

@@ -97,9 +97,9 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchSt
   }, [gameStateRef, getPlayerActions, handleGameEvent, paused, playerPositions, servingPlayer]);
 
   return (
-    <div className="game-canvas-container">
+    <div className={`game-canvas-container`}>
       <GameScore leftPlayer={leftPlayer} rightPlayer={rightPlayer} matchState={matchState} />
-      <canvas ref={canvasRef} width={COURT.width} height={COURT.height} />
+      <canvas className={`game-canvas`} ref={canvasRef} width={COURT.width} height={COURT.height} />
     </div>
   );
 };

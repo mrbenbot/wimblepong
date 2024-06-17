@@ -97,7 +97,7 @@ export const getModelPlayerActions: GetPlayerActionsFunction = (player, gameStat
     gameState.server === player ? 1 : 0,
   ];
 
-  const inputTensor = tf.tensor([features]); // Expand dimensions to match the expected input shape [1, 9]
+  const inputTensor = tf.tensor([features]); // Expand dimensions to match the expected input shape [1, 8]
   const normalizedObs = preprocessObservation(inputTensor);
   const prediction = model.predict(normalizedObs) as tf.Tensor<tf.Rank>[];
   const paddleDirection = prediction[0].dataSync()[1];

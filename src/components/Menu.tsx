@@ -19,7 +19,9 @@ Input Mode
  */
 
 const MenuComponent: React.FC = () => {
-  const [selectedOption, setSelectedOption] = useState<"computer/model" | "mouse/model" | "dj" | "dj/computer" | "gamepad" | null>(null);
+  const [selectedOption, setSelectedOption] = useState<"computer/model" | "mouse/model" | "dj" | "dj/computer" | "gamepad" | "mouse/computer" | null>(
+    null
+  );
   const [matchConfig, setMatchConfig] = useState<MatchState["matchConfig"]>({ numberOfSets: 3, setLength: 6 });
 
   return (
@@ -28,6 +30,7 @@ const MenuComponent: React.FC = () => {
       <div>
         <button onClick={() => setSelectedOption("computer/model")}>Computer vs Model</button>
         <button onClick={() => setSelectedOption("mouse/model")}>Mouse vs Model</button>
+        {/* <button onClick={() => setSelectedOption("mouse/computer")}>Mouse vs Computer</button> */}
         <button onClick={() => setSelectedOption("dj")}>DJ vs DJ</button>
         <button onClick={() => setSelectedOption("dj/computer")}>DJ vs Computer</button>
         <button onClick={() => setSelectedOption("gamepad")}>Gamepad vs Gamepad</button>
@@ -35,6 +38,7 @@ const MenuComponent: React.FC = () => {
       <div>
         {selectedOption === "computer/model" && <MouseControlApp matchConfig={matchConfig} mouseControl={false} />}
         {selectedOption === "mouse/model" && <MouseControlApp matchConfig={matchConfig} mouseControl />}
+        {/* {selectedOption === "mouse/computer" && <MouseControlApp matchConfig={matchConfig} mouseControl />} */}
         {selectedOption === "dj/computer" && <DJHeroApp numberOfControllers={1} matchConfig={matchConfig} />}
         {selectedOption === "dj" && <DJHeroApp numberOfControllers={2} matchConfig={matchConfig} />}
         {selectedOption === "gamepad" && <GamepadApp matchConfig={matchConfig} />}
