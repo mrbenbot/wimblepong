@@ -14,7 +14,7 @@
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background-color: rgb(0 102 51);
+  background-color: rgb(0, 0, 0);
 }
 
 .game-announcements-wrapper {

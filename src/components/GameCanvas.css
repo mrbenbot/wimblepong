@@ -3,4 +3,9 @@
 }
 .game-canvas {
   border: 3px solid white;
+  background: linear-gradient(to bottom, rgb(0, 102, 51), rgb(0, 102, 51) 50%, rgba(0, 102, 51, 0.8) 50%, rgba(0, 102, 51, 0.8));
+  /* The rectangle in which to repeat. 
+   It can be fully wide in this case */
+  background-size: 100% calc(800px / 6);
+  z-index: -1;
 }

@@ -4,6 +4,7 @@ import {
   INITIAL_SPEED,
   PADDLE,
   PADDLE_CONTACT_SPEED_BOOST_DIVISOR,
+  PADDLE_GAP,
   PADDLE_SPEED_DEVISOR,
   SERVING_HEIGHT_MULTIPLIER,
   SPEED_INCREMENT,
@@ -64,10 +65,10 @@ export const updateGameState = (
     const servingFromLeft = (server === Player.Player1 && !positionsReversed) || (server === Player.Player2 && positionsReversed);
     if (servingFromLeft) {
       ball.dy = (paddleLeft.y + paddleLeft.height / 2 - ball.y) / PADDLE_SPEED_DEVISOR;
-      ball.x = paddleLeft.width + ball.radius;
+      // ball.x = paddleLeft.width + ball.radius + PADDLE_GAP;
     } else {
       ball.dy = (paddleRight.y + paddleRight.height / 2 - ball.y) / PADDLE_SPEED_DEVISOR;
-      ball.x = COURT.width - paddleRight.width - ball.radius;
+      // ball.x = COURT.width - paddleRight.width - ball.radius - PADDLE_GAP;
     }
     if (actions[server].buttonPressed) {
       ball.speed = INITIAL_SPEED;
@@ -153,7 +154,7 @@ export const resetBall = (gameState: MutableGameState) => {
   const servingPaddle = gameState[server];
   const left = (server === Player.Player1 && !positionsReversed) || (server === Player.Player2 && positionsReversed);
   ball.y = servingPaddle.height / 2 + servingPaddle.y;
-  ball.x = left ? servingPaddle.width + ball.radius : COURT.width - servingPaddle.width - ball.radius;
+  ball.x = left ? servingPaddle.width + ball.radius + PADDLE_GAP : COURT.width - servingPaddle.width - ball.radius - PADDLE_GAP;
   ball.speed = INITIAL_SPEED;
   ball.serveMode = true;
   ball.scoreMode = false;
@@ -178,11 +179,11 @@ export const applyMetaGameState = (gameState: MutableGameState, servingPlayer: P
 
   // Set paddle colours
   if (positionsReversed) {
-    gameState[Player.Player1].x = COURT.width - PADDLE.width;
-    gameState[Player.Player2].x = 0;
+    gameState[Player.Player1].x = COURT.width - PADDLE.width - PADDLE_GAP;
+    gameState[Player.Player2].x = PADDLE_GAP;
   } else {
-    gameState[Player.Player1].x = 0;
-    gameState[Player.Player2].x = COURT.width - PADDLE.width;
+    gameState[Player.Player1].x = PADDLE_GAP;
+    gameState[Player.Player2].x = COURT.width - PADDLE.width - PADDLE_GAP;
   }
 };
 

@@ -2,6 +2,7 @@
   opacity: 0;
   transition: opacity 0.5s ease-in-out;
   width: 300px;
+  z-index: 1;
 }
 
 .announcement-container.fade-in {

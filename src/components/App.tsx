@@ -1,7 +1,7 @@
 import React, { useReducer, useRef } from "react";
 import GameCanvas from "./GameCanvas";
 import { initialState, reducer } from "../libs/score";
-import { BALL, COURT, INITIAL_SPEED, PADDLE, PLAYER_COLOURS } from "../config";
+import { BALL, COURT, INITIAL_SPEED, PADDLE, PADDLE_GAP, PLAYER_COLOURS } from "../config";
 import "./App.css";
 import PlayerScore from "./PlayerScore";
 import EventAnnouncement from "./EventAnnouncement";
@@ -25,7 +25,7 @@ const App: React.FC<{
     server: Player.Player1,
     positionsReversed: false,
     [Player.Player1]: {
-      x: 0,
+      x: PADDLE_GAP,
       y: COURT.height / 2 - PADDLE.height / 2,
       dy: 0,
       width: PADDLE.width,
@@ -33,7 +33,7 @@ const App: React.FC<{
       colour: PLAYER_COLOURS[Player.Player1],
     },
     [Player.Player2]: {
-      x: COURT.width - PADDLE.width,
+      x: COURT.width - PADDLE.width - PADDLE_GAP,
       y: COURT.height / 2 - PADDLE.height / 2,
       dy: 0,
       width: PADDLE.width,
@@ -41,7 +41,7 @@ const App: React.FC<{
       colour: PLAYER_COLOURS[Player.Player2],
     },
     ball: {
-      x: PADDLE.width + BALL.radius,
+      x: PADDLE.width + BALL.radius + PADDLE_GAP,
       y: 150,
       dx: 0,
       dy: 0,

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback } from "react";
+import React, { useRef, useCallback, useLayoutEffect } from "react";
 import { Action } from "../libs/score";
 import { COURT, DELTA_TIME_DIVISOR } from "../config";
 import "./GameCanvas.css";
@@ -31,11 +31,11 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchSt
       switch (event) {
         case GameEventType.ScorePointLeft:
           dispatch({ type: "POINT_SCORED", player: rightPlayer, stats: { ...gameStateRef.current.stats } });
-          playNote(gameStateRef.current.positionsReversed ? NoteType.WinPoint : NoteType.LoosePoint);
+          playNote(gameStateRef.current.server == rightPlayer ? NoteType.WinPointServer : NoteType.WinPointReceiver);
           break;
         case GameEventType.ScorePointRight:
           dispatch({ type: "POINT_SCORED", player: leftPlayer, stats: { ...gameStateRef.current.stats } });
-          playNote(!gameStateRef.current.positionsReversed ? NoteType.WinPoint : NoteType.LoosePoint);
+          playNote(gameStateRef.current.server == leftPlayer ? NoteType.WinPointServer : NoteType.WinPointReceiver);
           break;
         case GameEventType.HitPaddle:
           playNote(NoteType.Paddle);
@@ -54,7 +54,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchSt
     [dispatch, playNote, gameStateRef, leftPlayer, rightPlayer]
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const context = canvas.getContext("2d");

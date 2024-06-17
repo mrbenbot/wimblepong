@@ -44,7 +44,8 @@ const theme = themeA.concat(themeA).concat(themeB).concat(themeC);
 
 export enum NoteType {
   Paddle = "PADDLE",
-  WinPoint = "WIN_POINT",
+  WinPointServer = "WIN_POINT_SERVER",
+  WinPointReceiver = "WIN_POINT_RECEIVER",
   LoosePoint = "LOOSE_POINT",
   WallContact = "WALL_CONTACT",
 }
@@ -99,17 +100,19 @@ const useSynthesizer = () => {
   }, [_playNote]);
 
   const playMelody = useCallback(
-    async (noteDurations: { note: string; duration: number }[]) => {
-      for (const { note, duration } of noteDurations) {
+    async (noteDurations: { note: string; duration: number; rest?: number }[]) => {
+      for (const { note, duration, rest } of noteDurations) {
         _playNote(noteFrequencies[note], duration);
         await new Promise((res) => setTimeout(res, duration * 1000));
+        if (rest) {
+          await new Promise((res) => setTimeout(res, rest * 1000));
+        }
       }
     },
     [_playNote]
   );
 
   const playWallNoise = useCallback(() => {
-    themeNoteCounterRef.current++;
     _playNote(100, 0.01);
   }, [_playNote]);
 
@@ -120,12 +123,19 @@ const useSynthesizer = () => {
           return playNextThemeNote();
         case NoteType.WallContact:
           return playWallNoise();
-        case NoteType.WinPoint:
+        case NoteType.WinPointServer:
           return playMelody([
             { note: "C4", duration: 0.05 },
             { note: "E4", duration: 0.05 },
             { note: "G4", duration: 0.05 },
             { note: "C5", duration: 0.2 },
+          ]);
+        case NoteType.WinPointReceiver:
+          return playMelody([
+            { note: "E4", duration: 0.05 },
+            { note: "G#4", duration: 0.05 },
+            { note: "B4", duration: 0.05 },
+            { note: "E5", duration: 0.2 },
           ]);
         case NoteType.LoosePoint:
           return _playNote(50, 0.4);

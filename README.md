@@ -11,6 +11,8 @@
   - ability to reset / play again
   - input player names
   - sounds shouldn't increment on wall hit
+  - sounds should not be biased in two player mode
+    - maybe biased towards server?
 - style
   - paint a net on the screen?
   - stripes on the grass
@@ -34,6 +36,7 @@
   - use css to flip screen and transform observations so that each "player" is given the equivalent input
   - configurability of playing options
   - code split out tensorflow js
+  - sounds should be controlled as a side effect of the reducer?
 
 ## Computer Player
 
