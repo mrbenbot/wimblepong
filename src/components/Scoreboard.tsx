@@ -12,12 +12,14 @@ const Scoreboard = ({ matchState }: { matchState: MatchState }) => {
   const { sets, games, tiebreak, servingPlayer, gameState, matchConfig } = matchState;
 
   const isTieBreak =
-    games.Player1 === matchConfig.setLength && games.Player2 === matchConfig.setLength && sets.length + 1 !== matchState.matchConfig.numberOfSets;
+    games[Player.Player1] === matchConfig.setLength &&
+    games[Player.Player2] === matchConfig.setLength &&
+    sets.length + 1 !== matchState.matchConfig.numberOfSets;
 
   return (
     <div className="scoreboard">
       <div className="row">
-        <div className="cell number-cell">{sets.map((set) => set.Player1).join(" ")}</div>
+        <div className="cell number-cell">{sets.map((set) => set[Player.Player1]).join(" ")}</div>
         <div className="cell" style={{ color: PLAYER_COLOURS[Player.Player1], textDecoration: servingPlayer === Player.Player1 ? "underline" : " " }}>
           Player 1
         </div>
@@ -28,7 +30,7 @@ const Scoreboard = ({ matchState }: { matchState: MatchState }) => {
         </div>
       </div>
       <div className="row">
-        <div className="cell number-cell">{sets.map((set) => set.Player2).join(" ")}</div>
+        <div className="cell number-cell">{sets.map((set) => set[Player.Player2]).join(" ")}</div>
         <div className="cell" style={{ color: PLAYER_COLOURS[Player.Player2], textDecoration: servingPlayer === Player.Player2 ? "underline" : " " }}>
           Player 2
         </div>

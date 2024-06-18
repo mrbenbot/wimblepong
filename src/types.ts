@@ -18,8 +18,8 @@ export enum PlayerPositions {
 }
 
 export const enum Player {
-  Player1 = "Player1",
-  Player2 = "Player2",
+  Player1,
+  Player2,
 }
 
 export enum PointType {
@@ -74,8 +74,8 @@ export interface WinGameEvent {
 export type AnnouncementEvent = LongRallyEvent | AceEvent | WinStreakEvent | SwitchEndsEvent | WinGameEvent | DeuceCountEvent;
 
 export interface GameState {
-  Player1: Score;
-  Player2: Score;
+  [Player.Player1]: Score;
+  [Player.Player2]: Score;
 }
 
 export interface MatchState {

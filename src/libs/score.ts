@@ -3,14 +3,14 @@ import { AnnouncementEvent, AnnouncementEventType, MatchState, Player, PlayerPos
 
 export const initialState: MatchState = {
   sets: [],
-  games: { Player1: 0, Player2: 0 },
-  tiebreak: { Player1: 0, Player2: 0 },
+  games: { [Player.Player1]: 0, [Player.Player2]: 0 },
+  tiebreak: { [Player.Player1]: 0, [Player.Player2]: 0 },
   rallies: [],
   servingPlayer: Player.Player1,
   playerPositions: PlayerPositions.Initial,
   gameState: {
-    Player1: Score.Love,
-    Player2: Score.Love,
+    [Player.Player1]: Score.Love,
+    [Player.Player2]: Score.Love,
   },
   matchConfig: {
     numberOfSets: 3,
@@ -43,13 +43,13 @@ export function reducer(state: MatchState, action: Action): MatchState {
             ...state,
             events: [],
             sets: [...state.sets, finalSetScore],
-            tiebreak: { Player1: 0, Player2: 0 },
-            games: { Player1: 0, Player2: 0 },
+            tiebreak: { [Player.Player1]: 0, [Player.Player2]: 0 },
+            games: { [Player.Player1]: 0, [Player.Player2]: 0 },
             rallies: [...state.rallies, { winner: player, pointType: state.pointType, stats }],
             servingPlayer: totalGamesPlayed % 2 === 0 ? Player.Player1 : Player.Player2,
             gameState: {
-              Player1: Score.Love,
-              Player2: Score.Love,
+              [Player.Player1]: Score.Love,
+              [Player.Player2]: Score.Love,
             },
           };
           const isWinner = checkIsWinner(newState, player, opponent);
@@ -57,7 +57,7 @@ export function reducer(state: MatchState, action: Action): MatchState {
           return switchEndsIfNeeded(addRallyEvents(addPointState({ ...newState, matchWinner: isWinner ? player : undefined, events: [winEvent] })));
         }
         // handle tie break point score
-        const pointsPlayed = state.tiebreak.Player1 + state.tiebreak.Player2 + 1;
+        const pointsPlayed = state.tiebreak[Player.Player1] + state.tiebreak[Player.Player2] + 1;
         const shouldChangeEnds = pointsPlayed % 6 === 0;
         const shouldChangeServer = (pointsPlayed - 1) % 2 === 0;
         return addRallyEvents(
@@ -122,12 +122,12 @@ export function reducer(state: MatchState, action: Action): MatchState {
           const newState = {
             ...state,
             sets: newSets,
-            games: { Player1: 0, Player2: 0 },
+            games: { [Player.Player1]: 0, [Player.Player2]: 0 },
             rallies: [...state.rallies, { winner: player, pointType: state.pointType, stats }],
             servingPlayer: state.servingPlayer === Player.Player1 ? Player.Player2 : Player.Player1,
             gameState: {
-              Player1: Score.Love,
-              Player2: Score.Love,
+              [Player.Player1]: Score.Love,
+              [Player.Player2]: Score.Love,
             },
             events: [],
           };
@@ -140,8 +140,8 @@ export function reducer(state: MatchState, action: Action): MatchState {
           ...state,
           games: newGames,
           gameState: {
-            Player1: Score.Love,
-            Player2: Score.Love,
+            [Player.Player1]: Score.Love,
+            [Player.Player2]: Score.Love,
           },
           rallies: [...state.rallies, { winner: player, pointType: state.pointType, stats }],
           servingPlayer: state.servingPlayer === Player.Player1 ? Player.Player2 : Player.Player1,
@@ -184,7 +184,10 @@ function switchEnd(currentEnd: PlayerPositions): PlayerPositions {
 }
 
 function switchEndsIfNeeded(state: MatchState): MatchState {
-  const totalGamesPlayed = state.sets.reduce((acc, { Player1, Player2 }) => acc + Player1 + Player2, state.games.Player1 + state.games.Player2);
+  const totalGamesPlayed = state.sets.reduce(
+    (acc, { [Player.Player1]: player1, [Player.Player2]: player2 }) => acc + player1 + player2,
+    state.games[Player.Player1] + state.games[Player.Player2]
+  );
   const shouldSwitchEnd = (totalGamesPlayed - 1) % 2 == 0;
   if (shouldSwitchEnd) {
     return { ...state, playerPositions: switchEnd(state.playerPositions), events: [...state.events, { type: AnnouncementEventType.SwitchEnds }] };

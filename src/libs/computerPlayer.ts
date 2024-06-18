@@ -7,7 +7,6 @@ export const getComputerPlayerActionsFunction: () => GetPlayerActionsFunction = 
   let serveDelayCounter = 0;
   let direction = 15;
   return (player, state) => {
-    const isLeft = (player === Player.Player1 && !state.positionsReversed) || (player === Player.Player2 && state.positionsReversed);
     if (state.ball.scoreMode) {
       serveDelayCounter = 0;
       direction = 30 * Math.random();
@@ -26,6 +25,7 @@ export const getComputerPlayerActionsFunction: () => GetPlayerActionsFunction = 
         return { buttonPressed: false, paddleDirection: direction };
       }
     }
+    const isLeft = (player === Player.Player1 && !state.positionsReversed) || (player === Player.Player2 && state.positionsReversed);
     if (isLeft) {
       return {
         buttonPressed: false,

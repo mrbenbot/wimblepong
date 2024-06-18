@@ -23,7 +23,9 @@ const GameScore = ({ leftPlayer, rightPlayer, matchState }: { leftPlayer: Player
   const leftScore = gameState[leftPlayer];
   const rightScore = gameState[rightPlayer];
   const isTieBreak =
-    games.Player1 === matchConfig.setLength && games.Player2 === matchConfig.setLength && sets.length + 1 !== matchState.matchConfig.numberOfSets;
+    games[Player.Player1] === matchConfig.setLength &&
+    games[Player.Player2] === matchConfig.setLength &&
+    sets.length + 1 !== matchState.matchConfig.numberOfSets;
 
   return (
     <div className="game-score-container">
