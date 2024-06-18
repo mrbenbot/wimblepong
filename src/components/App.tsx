@@ -18,9 +18,10 @@ const getLeftRightPlayer = (playerPositions: PlayerPositions) => {
 const App: React.FC<{
   connected?: boolean;
   selectDevice?: () => Promise<void>;
-  getPlayerActions: GetPlayerActionsFunction;
+  getPlayer1Actions: GetPlayerActionsFunction;
+  getPlayer2Actions: GetPlayerActionsFunction;
   matchConfig: MatchState["matchConfig"];
-}> = ({ connected = true, selectDevice, getPlayerActions, matchConfig }) => {
+}> = ({ connected = true, selectDevice, getPlayer1Actions, getPlayer2Actions, matchConfig }) => {
   const gameStateRef = useRef<MutableGameState>({
     server: Player.Player1,
     positionsReversed: false,
@@ -95,7 +96,8 @@ const App: React.FC<{
             paused={!connected}
             leftPlayer={leftPlayer}
             rightPlayer={rightPlayer}
-            getPlayerActions={getPlayerActions}
+            getPlayer1Actions={getPlayer1Actions}
+            getPlayer2Actions={getPlayer2Actions}
           />
           <PlayerScore matchState={matchState} player={rightPlayer} />
           <footer className="footer">

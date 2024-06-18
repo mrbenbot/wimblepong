@@ -102,7 +102,5 @@ export const getModelPlayerActions: GetPlayerActionsFunction = (player, gameStat
   const prediction = model.predict(normalizedObs) as tf.Tensor<tf.Rank>[];
   const paddleDirection = prediction[0].dataSync()[1];
 
-  // console.log(buttonPressed, paddleDirection);
-
   return { paddleDirection: paddleDirection, buttonPressed: true };
 };

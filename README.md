@@ -27,7 +27,6 @@
   - space dystopia theme
   - make everything big and readable on TV screen
 - implementation
-  - reactify computer player
   - refactor sounds to react to dispatch events?
   - use css to flip screen and transform observations so that each "player" is given the equivalent input
   - configurability of playing options

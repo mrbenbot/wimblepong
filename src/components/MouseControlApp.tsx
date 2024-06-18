@@ -1,36 +1,14 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import App from "./App";
 import useMouseInput from "../hooks/useMouse";
-import { GetPlayerActionsFunction, MatchState, Player } from "../types";
-import { getModelPlayerActions, loadModel } from "../libs/tensorFlowPlayer";
+import { MatchState } from "../types";
 import { getComputerPlayerActionsFunction } from "../libs/computerPlayer";
+import useMachineOpponent from "../hooks/useMachineOpponent";
 
-const getComputerActions = getComputerPlayerActionsFunction();
-
-export default function MouseControlApp({ matchConfig, mouseControl = true }: { matchConfig: MatchState["matchConfig"]; mouseControl: boolean }) {
+export default function MouseControlApp({ matchConfig }: { matchConfig: MatchState["matchConfig"]; mouseControl: boolean }) {
   const { getPlayerActions } = useMouseInput();
+  const getComputerPlayer = useCallback(async () => getComputerPlayerActionsFunction(), []);
+  const { getComputerActions } = useMachineOpponent(getComputerPlayer);
 
-  useEffect(() => {
-    console.log("loading model");
-    loadModel();
-  }, []);
-
-  const getPlayerActionsRouter = useCallback<GetPlayerActionsFunction>(
-    (player, state, canvas) => {
-      if (player === Player.Player2) {
-        return getModelPlayerActions(player, state, canvas);
-      }
-      if (player === Player.Player1 && !mouseControl) {
-        return getComputerActions(player, state, canvas);
-      }
-      return getPlayerActions(player, state, canvas);
-    },
-    [getPlayerActions, mouseControl]
-  );
-
-  return (
-    <>
-      <App getPlayerActions={getPlayerActionsRouter} matchConfig={matchConfig} />
-    </>
-  );
+  return <App getPlayer1Actions={getPlayerActions} getPlayer2Actions={getComputerActions} matchConfig={matchConfig} />;
 }

@@ -14,6 +14,7 @@ export const INITIAL_SPEED = 10;
 export const DELTA_TIME_DIVISOR = 21;
 export const PADDLE_CONTACT_SPEED_BOOST_DIVISOR = 4;
 export const PADDLE_GAP = 10;
+export const SCORE_PAUSE_TIMEOUT = 75;
 
 // web hid
 export const PADDLE_SPEED_DEVISOR = 15;

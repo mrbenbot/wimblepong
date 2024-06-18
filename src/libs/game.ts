@@ -6,6 +6,7 @@ import {
   PADDLE_CONTACT_SPEED_BOOST_DIVISOR,
   PADDLE_GAP,
   PADDLE_SPEED_DEVISOR,
+  SCORE_PAUSE_TIMEOUT,
   SERVING_HEIGHT_MULTIPLIER,
   SPEED_INCREMENT,
 } from "../config";
@@ -52,13 +53,15 @@ export const updateGameState = (
 ) => {
   // Update ball position
   const { ball, stats, server, positionsReversed } = gameState;
-
-  const [paddleLeft, paddleRight] = positionsReversed
-    ? [gameState[Player.Player2], gameState[Player.Player1]]
-    : [gameState[Player.Player1], gameState[Player.Player2]];
+  let paddleLeft = gameState[Player.Player1],
+    paddleRight = gameState[Player.Player2];
+  if (positionsReversed) {
+    paddleLeft = gameState[Player.Player2];
+    paddleRight = gameState[Player.Player1];
+  }
 
   if (ball.scoreMode) {
-    if (ball.scoreModeTimeout < 50) {
+    if (ball.scoreModeTimeout < SCORE_PAUSE_TIMEOUT) {
       ball.scoreModeTimeout += deltaTime;
     } else {
       fireEvent(GameEventType.ResetBall);
@@ -68,10 +71,8 @@ export const updateGameState = (
     const servingFromLeft = (server === Player.Player1 && !positionsReversed) || (server === Player.Player2 && positionsReversed);
     if (servingFromLeft) {
       ball.dy = (paddleLeft.y + paddleLeft.height / 2 - ball.y) / PADDLE_SPEED_DEVISOR;
-      // ball.x = paddleLeft.width + ball.radius + PADDLE_GAP;
     } else {
       ball.dy = (paddleRight.y + paddleRight.height / 2 - ball.y) / PADDLE_SPEED_DEVISOR;
-      // ball.x = COURT.width - paddleRight.width - ball.radius - PADDLE_GAP;
     }
     if (actions[server].buttonPressed) {
       ball.speed = INITIAL_SPEED;

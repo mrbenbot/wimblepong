@@ -17,7 +17,7 @@ export enum PlayerPositions {
   Reversed = "REVERSED",
 }
 
-export enum Player {
+export const enum Player {
   Player1 = "Player1",
   Player2 = "Player2",
 }

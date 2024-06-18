@@ -25,7 +25,6 @@ export type Action =
   | { type: "CLEAR_EVENTS" };
 
 export function reducer(state: MatchState, action: Action): MatchState {
-  console.log("REDUCER CALLED", action, state);
   if (state.matchWinner) {
     return state; // No changes if there's already a match winner
   }
@@ -34,7 +33,6 @@ export function reducer(state: MatchState, action: Action): MatchState {
     case "POINT_SCORED": {
       const { player, stats } = action;
       const opponent = player === Player.Player1 ? Player.Player2 : Player.Player1;
-      console.log(state, action);
       if (isTiebreak(state)) {
         if (isTiebreakSetPoint(state, player, opponent)) {
           // Handle tiebreak win

@@ -14,11 +14,20 @@ interface GameCanvasProps {
   paused: boolean;
   leftPlayer: Player;
   rightPlayer: Player;
-
-  getPlayerActions: GetPlayerActionsFunction;
+  getPlayer1Actions: GetPlayerActionsFunction;
+  getPlayer2Actions: GetPlayerActionsFunction;
 }
 
-const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchState, leftPlayer, rightPlayer, paused, getPlayerActions }) => {
+const GameCanvas: React.FC<GameCanvasProps> = ({
+  gameStateRef,
+  dispatch,
+  matchState,
+  leftPlayer,
+  rightPlayer,
+  paused,
+  getPlayer1Actions,
+  getPlayer2Actions,
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const deltaTimeRef = useRef(0);
   const playNote = useSynthesizer();
@@ -67,8 +76,8 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchSt
     const update = (deltaTime: number) => {
       // getPlayerActions using current state
       const actions = {
-        [Player.Player1]: getPlayerActions(Player.Player1, gameStateRef.current, canvas),
-        [Player.Player2]: getPlayerActions(Player.Player2, gameStateRef.current, canvas),
+        [Player.Player1]: getPlayer1Actions(Player.Player1, gameStateRef.current, canvas),
+        [Player.Player2]: getPlayer2Actions(Player.Player2, gameStateRef.current, canvas),
       };
       // Update game state based on actions
       updateGameState(gameStateRef.current, actions, deltaTime, handleGameEvent);
@@ -94,7 +103,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ gameStateRef, dispatch, matchSt
         cancelAnimationFrame(loopId);
       }
     };
-  }, [gameStateRef, getPlayerActions, handleGameEvent, paused, playerPositions, servingPlayer]);
+  }, [gameStateRef, getPlayer1Actions, getPlayer2Actions, handleGameEvent, paused, playerPositions, servingPlayer]);
 
   return (
     <div className={`game-canvas-container`}>
