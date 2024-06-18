@@ -13,6 +13,8 @@ import { MutableGameState, Player, PlayerPositions } from "../types";
 
 export const draw = (gameState: MutableGameState, canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) => {
   context.clearRect(0, 0, canvas.width, canvas.height);
+  context.shadowColor = "#000000de";
+  context.shadowBlur = 15;
 
   // Draw paddles
   context.fillStyle = gameState[Player.Player1].colour;
@@ -20,6 +22,7 @@ export const draw = (gameState: MutableGameState, canvas: HTMLCanvasElement, con
   context.fillStyle = gameState[Player.Player2].colour;
   context.fillRect(gameState[Player.Player2].x, gameState[Player.Player2].y, gameState[Player.Player2].width, gameState[Player.Player2].height);
 
+  context.shadowColor = "transparent";
   // Draw ball
   context.fillStyle = BALL_COLOUR;
   context.beginPath();

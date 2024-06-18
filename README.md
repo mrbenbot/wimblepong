@@ -10,14 +10,10 @@
   - pause
   - ability to reset / play again
   - input player names
-  - sounds shouldn't increment on wall hit
   - sounds should not be biased in two player mode
     - maybe biased towards server?
 - style
   - paint a net on the screen?
-  - stripes on the grass
-  - 3d paddle
-  - shadow?
   - responsive css
   - fast balls should leave marks on the screen?
   - events should have their own style and possibly positioning
@@ -40,5 +36,20 @@
 
 ## Computer Player
 
-- create python env for open ai gym
+- update gym env
 - allow upload of model in front end
+
+# Menu
+
+- options
+  - Human vs Human
+    - dj vs dj
+    - keyboard vs keyboard?
+  - Human vs Machine
+    - mouse vs ai paddle
+    - mouse vs rule bound paddle
+    - dj vs ai paddle
+    - dj vs rule bound paddle
+  - Machine vs Machine
+    - ai vs rule bound
+    - ai vs ai

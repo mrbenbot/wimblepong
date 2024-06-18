@@ -4,10 +4,11 @@
   justify-content: center;
   align-items: center;
   gap: 50px;
-  top: 100px;
+  top: 106px;
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
 .score {
   font-size: 4em;
   font-family: "Courier New", Courier, monospace;

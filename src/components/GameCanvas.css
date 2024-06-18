@@ -1,5 +1,6 @@
 .game-canvas-container {
   position: relative;
+  height: 100%;
 }
 .game-canvas {
   border: 3px solid white;
@@ -8,4 +9,12 @@
    It can be fully wide in this case */
   background-size: 100% calc(800px / 6);
   z-index: -1;
+}
+
+.game-canvas-container::after {
+  content: "";
+  position: absolute;
+  height: 800px;
+  left: 50%;
+  border-left: 5px dashed rgba(255, 255, 255, 0.432);
 }
