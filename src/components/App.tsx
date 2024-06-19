@@ -88,7 +88,7 @@ const App: React.FC<{
         <main className="second-container">
           <header className="header">
             <Scoreboard matchState={matchState} />
-            <ScoreCircles matchState={matchState} />
+            {/* <ScoreCircles matchState={matchState} /> */}
           </header>
           <PlayerScore matchState={matchState} player={leftPlayer} />
           <GameCanvas

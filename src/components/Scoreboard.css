@@ -1,13 +1,10 @@
 .scoreboard {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
+  padding: 0;
   background-color: rgba(255, 255, 255, 0.757);
   color: #000000;
   font-family: Arial, sans-serif;
   text-align: center;
-  /* padding: 10px; */
-  border-radius: 5px;
+  right: 0;
 }
 
 .title {
@@ -25,13 +22,19 @@
 }
 
 .cell {
-  flex: 1;
   text-align: center;
   text-wrap: nowrap;
 }
 
 .number-cell {
   text-align: center;
+  width: 15px;
+}
+.game-cell {
+  text-align: center;
+  width: 25px;
+}
+.player-cell {
   padding-left: 5px;
   padding-right: 5px;
 }

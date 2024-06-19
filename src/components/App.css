@@ -27,16 +27,15 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  /* gap: ; */
 }
 
 .second-container {
   position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
   gap: 10px; /* Adjust gap size as needed */
   position: relative;
-  padding-top: 3em;
   top: 0;
   left: 0;
   width: 100%;
@@ -46,6 +45,9 @@
 
 .second-container > .header {
   grid-column: 1 / -1; /* Span the entire first row */
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
 }
 
 .second-container > .player-score,
