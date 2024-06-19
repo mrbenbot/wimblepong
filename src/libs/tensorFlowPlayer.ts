@@ -51,21 +51,18 @@ export async function getTensorFlowPlayer(): Promise<GetPlayerActionsFunction> {
   // Main function to load weights and create model
   async function loadModel() {
     const weights = await loadWeights();
-    model = createModel();
+    const model = createModel();
     await assignWeights(model, weights);
 
     const normalizationParams = await fetch("/normalization_params.json").then((response) => response.json());
 
-    mean = tf.tensor(normalizationParams.mean);
-    std = tf.tensor(normalizationParams.std);
+    const mean = tf.tensor(normalizationParams.mean);
+    const std = tf.tensor(normalizationParams.std);
 
     console.log("Model loaded successfully");
+    return { model, mean, std };
   }
-  await loadModel();
-
-  let model: LayersModel | null = null;
-  let mean: Tensor<Rank> | null = null;
-  let std: Tensor<Rank> | null = null;
+  const { model, mean, std } = await loadModel();
 
   function preprocessObservation(obs: Tensor<Rank>) {
     if (!mean || !std) return obs;
