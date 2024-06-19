@@ -1,12 +1,14 @@
 import { useCallback } from "react";
 import App from "./App";
 import useMouseInput from "../hooks/useMouse";
-import { MatchState } from "../types";
 import { getComputerPlayerActionsFunction } from "../libs/computerPlayer";
 import useMachineOpponent from "../hooks/useMachineOpponent";
 import { getTensorFlowPlayer } from "../libs/tensorFlowPlayer";
+import { useLocation, useParams } from "react-router-dom";
 
-export default function MouseControlApp({ matchConfig, opponentType }: { matchConfig: MatchState["matchConfig"]; opponentType: "ai" | "auto" }) {
+export default function MouseControlApp() {
+  const location = useLocation();
+  const { opponentType } = useParams<{ opponentType: "ai" | "auto" }>();
   const { getPlayerActions } = useMouseInput();
 
   const getComputerPlayer = useCallback(async () => {
@@ -19,5 +21,5 @@ export default function MouseControlApp({ matchConfig, opponentType }: { matchCo
 
   const { getComputerActions } = useMachineOpponent(getComputerPlayer);
 
-  return <App getPlayer1Actions={getPlayerActions} getPlayer2Actions={getComputerActions} matchConfig={matchConfig} />;
+  return <App getPlayer1Actions={getPlayerActions} getPlayer2Actions={getComputerActions} matchConfig={location.state.matchConfig} />;
 }

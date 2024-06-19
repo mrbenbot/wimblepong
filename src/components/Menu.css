@@ -1,0 +1,9 @@
+.selected {
+  background-color: aliceblue;
+  color: black;
+}
+
+.play-button {
+  background-color: rgb(101, 255, 119);
+  color: black;
+}

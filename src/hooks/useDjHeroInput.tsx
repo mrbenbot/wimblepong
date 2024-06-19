@@ -37,9 +37,13 @@ const useDJHeroInput = (numberOfControllers: number = 2) => {
       return;
     }
     console.log("got device:", newDevice);
-    await newDevice.open();
+    try {
+      await newDevice.open();
+    } catch (err) {
+      console.log(err);
+    }
     const newDevices = [...new Set([...devices, newDevice])];
-    newDevice.addEventListener("inputreport", handleInputReport(players[newDevices.length === 1 ? 1 : 0]));
+    newDevice.addEventListener("inputreport", handleInputReport(players[newDevices.length === 2 ? 1 : 0]));
     setDeviceConnectionStatus(connectionStatuses[newDevices.length]);
     setDevices(newDevices);
   };
@@ -80,6 +84,7 @@ const useDJHeroInput = (numberOfControllers: number = 2) => {
         const existingDevices = await navigator.hid.getDevices();
         console.log("received: ", existingDevices);
         if (existingDevices.length > numberOfControllers) {
+          console.log("two many controllers");
           setDeviceConnectionStatus(DeviceConnectionStatus.Unknown);
           return;
         }
@@ -88,14 +93,13 @@ const useDJHeroInput = (numberOfControllers: number = 2) => {
           if (!device.opened) {
             if (mounted) {
               console.log("opening device", i);
-              device.open();
+              device.open().catch((err) => console.log(err));
               device.addEventListener("inputreport", handleInputReport(players[i]));
             }
           }
         });
 
         setDeviceConnectionStatus(connectionStatuses[existingDevices.length]);
-
         setDevices(existingDevices);
       }
     };
@@ -139,6 +143,7 @@ const useDJHeroInput = (numberOfControllers: number = 2) => {
 
   return {
     connected: deviceConnectionStatus === connectionStatuses[numberOfControllers] && bothReceiving,
+    devices,
     selectDevice,
     getPlayerActions,
   };
@@ -149,7 +154,7 @@ export function getPaddleDirection(data: Uint8Array) {
 }
 
 export function getButtonPushed(data: Uint8Array) {
-  // 7 green 9 red 12 blue 11 black
+  // 7 green 9 red 11 black 12 blue
   return data[11] === 255;
 }
 

@@ -1,10 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import MenuComponent from "./components/Menu.tsx";
+import { RouterProvider } from "react-router-dom";
+import { router } from "./routes";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <MenuComponent />
+    <RouterProvider router={router} />
   </React.StrictMode>
 );

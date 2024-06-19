@@ -1,33 +1,34 @@
 import React, { useState } from "react";
-import MouseControlApp from "./MouseControlApp";
-import DJHeroApp from "./DJHeroApp";
-import GamepadApp from "./GamepadApp";
 import { MatchState } from "../types";
+import { useNavigate } from "react-router-dom";
+import "./Menu.css";
+
+const playOptions = [
+  { path: "/mouse/ai", title: "Mouse vs Model" },
+  { path: "/mouse/auto", title: "Mouse vs Computer" },
+  { path: "/dj/dj", title: "DJ vs DJ" },
+  { path: "/dj/auto", title: "DJ vs Computer" },
+  { path: "/dj/ai", title: "DJ vs Model" },
+];
 
 const MenuComponent: React.FC = () => {
-  const [selectedOption, setSelectedOption] = useState<"computer/model" | "mouse/model" | "dj" | "dj/computer" | "gamepad" | "mouse/computer" | null>(
-    null
-  );
+  const navigate = useNavigate();
   const [matchConfig, setMatchConfig] = useState<MatchState["matchConfig"]>({ numberOfSets: 3, setLength: 6 });
+  const [path, setPath] = useState("/mouse/auto");
+
+  const handleNavigation = (path: string) => {
+    navigate(path, { state: { matchConfig } });
+  };
 
   return (
     <div>
       <h1>Select an Option</h1>
       <div>
-        {/* <button onClick={() => setSelectedOption("computer/model")}>Computer vs Model</button> */}
-        <button onClick={() => setSelectedOption("mouse/model")}>Mouse vs Model</button>
-        <button onClick={() => setSelectedOption("mouse/computer")}>Mouse vs Computer</button>
-        <button onClick={() => setSelectedOption("dj")}>DJ vs DJ</button>
-        <button onClick={() => setSelectedOption("dj/computer")}>DJ vs Computer</button>
-        <button onClick={() => setSelectedOption("gamepad")}>Gamepad vs Gamepad</button>
-      </div>
-      <div>
-        {/* {selectedOption === "computer/model" && <MouseControlApp matchConfig={matchConfig} mouseControl={false} />} */}
-        {selectedOption === "mouse/model" && <MouseControlApp matchConfig={matchConfig} opponentType="ai" />}
-        {selectedOption === "mouse/computer" && <MouseControlApp matchConfig={matchConfig} opponentType="auto" />}
-        {selectedOption === "dj/computer" && <DJHeroApp numberOfControllers={1} matchConfig={matchConfig} />}
-        {selectedOption === "dj" && <DJHeroApp numberOfControllers={2} matchConfig={matchConfig} />}
-        {selectedOption === "gamepad" && <GamepadApp matchConfig={matchConfig} />}
+        {playOptions.map((option) => (
+          <button onClick={() => setPath(option.path)} key={option.path} className={path === option.path ? "selected" : ""}>
+            {option.title}
+          </button>
+        ))}
       </div>
       <br />
       <label>
@@ -49,6 +50,10 @@ const MenuComponent: React.FC = () => {
         </select>{" "}
         Sets
       </label>
+      <br />
+      <button onClick={() => handleNavigation(path)} className="play-button">
+        PLAY
+      </button>
     </div>
   );
 };
