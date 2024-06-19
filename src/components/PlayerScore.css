@@ -2,7 +2,6 @@
   width: 210px;
   font-size: 2rem;
   display: grid;
-  grid-template-columns: 200px;
   grid-template-rows: 70px 50px 50px 50px;
 }
 .serving {

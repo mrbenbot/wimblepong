@@ -7,8 +7,8 @@ import PlayerScore from "./PlayerScore";
 import EventAnnouncement from "./EventAnnouncement";
 import { GetPlayerActionsFunction, MatchState, MutableGameState, Player, PlayerPositions } from "../types";
 import Scoreboard from "./Scoreboard";
-import ScoreCircles from "./ScoreCircles";
 import { hexToRgb } from "../libs/numbers";
+import useFullscreen from "../hooks/useFullScreen";
 
 const getLeftRightPlayer = (playerPositions: PlayerPositions) => {
   if (playerPositions === PlayerPositions.Reversed) {
@@ -59,22 +59,7 @@ const App: React.FC<{
   const { leftPlayer, rightPlayer } = getLeftRightPlayer(matchState.playerPositions);
   const containerDivRef = useRef(null);
 
-  const handleFullscreen = () => {
-    if (containerDivRef.current !== null) {
-      const methods = [
-        "requestFullscreen",
-        "webkitRequestFullscreen", // Chrome, Safari, and Opera
-      ];
-
-      for (const method of methods) {
-        if (method in containerDivRef.current) {
-          const func = containerDivRef.current[method] as () => Promise<void>;
-          func.call(containerDivRef.current);
-          break;
-        }
-      }
-    }
-  };
+  const [isFullScreen, toggleFullScreen] = useFullscreen();
 
   return (
     <>
@@ -88,7 +73,6 @@ const App: React.FC<{
         <main className="second-container">
           <header className="header">
             <Scoreboard matchState={matchState} />
-            {/* <ScoreCircles matchState={matchState} /> */}
           </header>
           <PlayerScore matchState={matchState} player={leftPlayer} />
           <GameCanvas
@@ -107,9 +91,11 @@ const App: React.FC<{
               Best of {matchState.matchConfig.numberOfSets} sets. Set length {matchState.matchConfig.setLength} games.
             </p>
             <div>
-              <button onClick={handleFullscreen} className="full-screen-button">
-                enter full screen
-              </button>
+              {!isFullScreen && (
+                <button onClick={toggleFullScreen} className="full-screen-button">
+                  enter full screen
+                </button>
+              )}
             </div>
           </footer>
         </main>
