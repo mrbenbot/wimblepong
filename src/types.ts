@@ -117,8 +117,8 @@ export interface DataRef {
 export interface MutableGameState {
   server: Player;
   positionsReversed: boolean;
-  [Player.Player1]: { x: number; y: number; dy: number; width: number; height: number; colour: string };
-  [Player.Player2]: { x: number; y: number; dy: number; width: number; height: number; colour: string };
+  [Player.Player1]: { x: number; y: number; dy: number; width: number; height: number; colour: { r: number; g: number; b: number } };
+  [Player.Player2]: { x: number; y: number; dy: number; width: number; height: number; colour: { r: number; g: number; b: number } };
   ball: {
     x: number;
     y: number;

@@ -1,9 +1,11 @@
+import { hexToRgb } from "./libs/numbers";
 import { Player } from "./types";
 
 export const green = "rgb(0 102 51)";
 export const purple = "rgb(84 0 139)";
-export const BALL_COLOUR = "yellow";
-export const PLAYER_COLOURS = { [Player.Player1]: "red", [Player.Player2]: "dodgerblue" };
+export const BALL_COLOUR = "#FFFF00";
+export const BALL_COLOUR_RGB = hexToRgb(BALL_COLOUR);
+export const PLAYER_COLOURS = { [Player.Player1]: "#FF0000", [Player.Player2]: "#1e90ff" };
 
 export const COURT = { width: 1200, height: 800 };
 export const PADDLE = { width: 15, height: 90 };

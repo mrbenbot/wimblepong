@@ -5,7 +5,8 @@ import "./GameCanvas.css";
 import { GetPlayerActionsFunction, MatchState, MutableGameState, Player } from "../types";
 import GameScore from "./GameScore";
 import useSynthesizer, { NoteType } from "../hooks/playNote";
-import { GameEventType, applyMetaGameState, draw, updateGameState } from "../libs/game";
+import { GameEventType, applyMetaGameState, updateGameState } from "../libs/game";
+import { initDrawingContext } from "../libs/webgl";
 
 interface GameCanvasProps {
   gameStateRef: React.MutableRefObject<MutableGameState>;
@@ -64,12 +65,12 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
   );
 
   useLayoutEffect(() => {
+    console.log("render");
+    if (paused) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const context = canvas.getContext("2d");
-    if (!context) return;
-    if (paused) return;
-    console.log("render");
+    const draw = initDrawingContext(canvas);
+    if (!draw) return;
 
     applyMetaGameState(gameStateRef.current, servingPlayer, playerPositions);
 
@@ -88,8 +89,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
       const deltaTime = (timestamp - deltaTimeRef.current) / DELTA_TIME_DIVISOR;
       deltaTimeRef.current = timestamp;
       update(deltaTime);
-      // update(1.5);
-      draw(gameStateRef.current, canvas, context);
+      draw(gameStateRef.current);
       loopId = requestAnimationFrame(gameLoop);
     };
 

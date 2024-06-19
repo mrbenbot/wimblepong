@@ -7,6 +7,8 @@ import PlayerScore from "./PlayerScore";
 import EventAnnouncement from "./EventAnnouncement";
 import { GetPlayerActionsFunction, MatchState, MutableGameState, Player, PlayerPositions } from "../types";
 import Scoreboard from "./Scoreboard";
+import ScoreCircles from "./ScoreCircles";
+import { hexToRgb } from "../libs/numbers";
 
 const getLeftRightPlayer = (playerPositions: PlayerPositions) => {
   if (playerPositions === PlayerPositions.Reversed) {
@@ -31,7 +33,7 @@ const App: React.FC<{
       dy: 0,
       width: PADDLE.width,
       height: PADDLE.height,
-      colour: PLAYER_COLOURS[Player.Player1],
+      colour: hexToRgb(PLAYER_COLOURS[Player.Player1]),
     },
     [Player.Player2]: {
       x: COURT.width - PADDLE.width - PADDLE_GAP,
@@ -39,7 +41,7 @@ const App: React.FC<{
       dy: 0,
       width: PADDLE.width,
       height: PADDLE.height,
-      colour: PLAYER_COLOURS[Player.Player2],
+      colour: hexToRgb(PLAYER_COLOURS[Player.Player2]),
     },
     ball: {
       x: PADDLE.width + BALL.radius + PADDLE_GAP,
@@ -87,6 +89,7 @@ const App: React.FC<{
         <main className="second-container">
           <header className="header">
             <Scoreboard matchState={matchState} />
+            <ScoreCircles matchState={matchState} />
           </header>
           <PlayerScore matchState={matchState} player={leftPlayer} />
           <GameCanvas

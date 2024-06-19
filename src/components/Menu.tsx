@@ -1,22 +1,8 @@
-// MenuComponent.tsx
 import React, { useState } from "react";
 import MouseControlApp from "./MouseControlApp";
 import DJHeroApp from "./DJHeroApp";
 import GamepadApp from "./GamepadApp";
 import { MatchState } from "../types";
-
-/*
-Set Length -> 1 - 6
-Match Length -> 1,3,5
-Input Mode
-  - Mouse vs Computer ✅
-  - Gamepad vs Computer 
-  - Gamepad vs Gamepad
-  - HID vs Computer ✅
-  - HID vs HID ✅
-  - Computer (Model) vs Computer
-  - Computer (Model) vs Computer (Model)
- */
 
 const MenuComponent: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState<"computer/model" | "mouse/model" | "dj" | "dj/computer" | "gamepad" | "mouse/computer" | null>(
@@ -28,17 +14,17 @@ const MenuComponent: React.FC = () => {
     <div>
       <h1>Select an Option</h1>
       <div>
-        <button onClick={() => setSelectedOption("computer/model")}>Computer vs Model</button>
+        {/* <button onClick={() => setSelectedOption("computer/model")}>Computer vs Model</button> */}
         <button onClick={() => setSelectedOption("mouse/model")}>Mouse vs Model</button>
-        {/* <button onClick={() => setSelectedOption("mouse/computer")}>Mouse vs Computer</button> */}
+        <button onClick={() => setSelectedOption("mouse/computer")}>Mouse vs Computer</button>
         <button onClick={() => setSelectedOption("dj")}>DJ vs DJ</button>
         <button onClick={() => setSelectedOption("dj/computer")}>DJ vs Computer</button>
         <button onClick={() => setSelectedOption("gamepad")}>Gamepad vs Gamepad</button>
       </div>
       <div>
-        {selectedOption === "computer/model" && <MouseControlApp matchConfig={matchConfig} mouseControl={false} />}
-        {selectedOption === "mouse/model" && <MouseControlApp matchConfig={matchConfig} mouseControl />}
-        {/* {selectedOption === "mouse/computer" && <MouseControlApp matchConfig={matchConfig} mouseControl />} */}
+        {/* {selectedOption === "computer/model" && <MouseControlApp matchConfig={matchConfig} mouseControl={false} />} */}
+        {selectedOption === "mouse/model" && <MouseControlApp matchConfig={matchConfig} opponentType="ai" />}
+        {selectedOption === "mouse/computer" && <MouseControlApp matchConfig={matchConfig} opponentType="auto" />}
         {selectedOption === "dj/computer" && <DJHeroApp numberOfControllers={1} matchConfig={matchConfig} />}
         {selectedOption === "dj" && <DJHeroApp numberOfControllers={2} matchConfig={matchConfig} />}
         {selectedOption === "gamepad" && <GamepadApp matchConfig={matchConfig} />}

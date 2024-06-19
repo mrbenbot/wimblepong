@@ -1,5 +1,4 @@
 import {
-  BALL_COLOUR,
   COURT,
   INITIAL_SPEED,
   PADDLE,
@@ -11,25 +10,6 @@ import {
   SPEED_INCREMENT,
 } from "../config";
 import { MutableGameState, Player, PlayerPositions } from "../types";
-
-export const draw = (gameState: MutableGameState, canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) => {
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  context.shadowColor = "#000000de";
-  context.shadowBlur = 15;
-
-  // Draw paddles
-  context.fillStyle = gameState[Player.Player1].colour;
-  context.fillRect(gameState[Player.Player1].x, gameState[Player.Player1].y, gameState[Player.Player1].width, gameState[Player.Player1].height);
-  context.fillStyle = gameState[Player.Player2].colour;
-  context.fillRect(gameState[Player.Player2].x, gameState[Player.Player2].y, gameState[Player.Player2].width, gameState[Player.Player2].height);
-
-  context.shadowColor = "transparent";
-  // Draw ball
-  context.fillStyle = BALL_COLOUR;
-  context.beginPath();
-  context.arc(gameState.ball.x, gameState.ball.y, gameState.ball.radius, 0, Math.PI * 2);
-  context.fill();
-};
 
 interface PlayerActions {
   buttonPressed: boolean;
