@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export default function LandingPage() {
   return (
-    <div style={{ maxWidth: 800, textAlign: "justify" }}>
+    <div style={{ maxWidth: 1000, textAlign: "justify", fontSize: "1.5em" }}>
       <h2>The year is 2124...</h2>
       <p>
         and the world you once knew has transformed beyond recognition. It all began in the early 21st century with the rapid advancement of
