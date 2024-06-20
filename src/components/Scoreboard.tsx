@@ -16,6 +16,8 @@ const Scoreboard = ({ matchState }: { matchState: MatchState }) => {
     games[Player.Player2] === matchConfig.setLength &&
     sets.length + 1 !== matchState.matchConfig.numberOfSets;
 
+  const longestNameLength = Math.max(matchConfig.names[Player.Player1].length, matchConfig.names[Player.Player2].length);
+
   return (
     <div className="scoreboard">
       <div className="row">
@@ -24,9 +26,14 @@ const Scoreboard = ({ matchState }: { matchState: MatchState }) => {
         ))}
         <div
           className="cell player-cell"
-          style={{ color: PLAYER_COLOURS[Player.Player1], textDecoration: servingPlayer === Player.Player1 ? "underline" : " " }}
+          style={{
+            color: PLAYER_COLOURS[Player.Player1],
+            textDecoration: servingPlayer === Player.Player1 ? "underline" : " ",
+            width: longestNameLength * 10,
+            textAlign: "left",
+          }}
         >
-          Player 1
+          {matchConfig.names[Player.Player1]}
         </div>
         <div className="cell number-cell">{sets.filter((set) => set[Player.Player1] > set[Player.Player2]).length}</div>
         <div className="cell number-cell">{games[Player.Player1]}</div>
@@ -40,9 +47,14 @@ const Scoreboard = ({ matchState }: { matchState: MatchState }) => {
         ))}
         <div
           className="cell player-cell"
-          style={{ color: PLAYER_COLOURS[Player.Player2], textDecoration: servingPlayer === Player.Player2 ? "underline" : " " }}
+          style={{
+            color: PLAYER_COLOURS[Player.Player2],
+            textDecoration: servingPlayer === Player.Player2 ? "underline" : " ",
+            textAlign: "left",
+            width: longestNameLength * 10,
+          }}
         >
-          Player 2
+          {matchConfig.names[Player.Player2]}
         </div>
         <div className="cell number-cell">{sets.filter((set) => set[Player.Player2] > set[Player.Player1]).length}</div>
         <div className="cell number-cell">{games[Player.Player2]}</div>

@@ -15,6 +15,7 @@ export const initialState: MatchState = {
   matchConfig: {
     numberOfSets: 3,
     setLength: 6,
+    names: { [Player.Player1]: "Player1", [Player.Player2]: "Player2" },
   },
   events: [],
   pointType: PointType.Normal,

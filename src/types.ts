@@ -99,8 +99,7 @@ export interface MatchState {
   matchConfig: {
     numberOfSets: number;
     setLength: number;
-    newGame?: boolean;
-    names?: { [Player.Player1]: string; [Player.Player2]: string };
+    names: { [Player.Player1]: string; [Player.Player2]: string };
   };
   events: AnnouncementEvent[];
   pointType: PointType;

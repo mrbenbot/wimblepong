@@ -1,13 +1,13 @@
 .player-score {
   width: 210px;
   font-size: 2rem;
-  display: grid;
-  grid-template-rows: 70px 50px 50px 50px;
+  display: flex;
+  justify-content: start;
+  flex-direction: column;
 }
 .serving {
-  height: 20px;
+  height: 50px;
 }
-
 .games,
 .sets {
   display: flex;
@@ -16,4 +16,7 @@
 
 .score-number {
   font-family: "Courier New", Courier, monospace;
+}
+.display-item {
+  margin: 0;
 }

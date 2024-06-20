@@ -38,7 +38,21 @@ const App = ({ connected = true, getPlayer1Actions, getPlayer2Actions, matchConf
 
         <main className="second-container">
           <header className="header">
-            <Scoreboard matchState={matchState} />
+            <div>
+              <p className="match-info">
+                Best of {matchState.matchConfig.numberOfSets} sets. Set length {matchState.matchConfig.setLength} games.
+              </p>
+            </div>
+            <div>
+              <Scoreboard matchState={matchState} />
+            </div>
+            <div>
+              {!isFullScreen && (
+                <button onClick={toggleFullScreen} className="full-screen-button">
+                  enter full screen
+                </button>
+              )}
+            </div>
           </header>
           <PlayerScore matchState={matchState} player={leftPlayer} />
           <GameCanvas
@@ -52,18 +66,7 @@ const App = ({ connected = true, getPlayer1Actions, getPlayer2Actions, matchConf
             getPlayer2Actions={getPlayer2Actions}
           />
           <PlayerScore matchState={matchState} player={rightPlayer} />
-          <footer className="footer">
-            <p className="match-info">
-              Best of {matchState.matchConfig.numberOfSets} sets. Set length {matchState.matchConfig.setLength} games.
-            </p>
-            <div>
-              {!isFullScreen && (
-                <button onClick={toggleFullScreen} className="full-screen-button">
-                  enter full screen
-                </button>
-              )}
-            </div>
-          </footer>
+          <footer className="footer"></footer>
         </main>
       </div>
     </>

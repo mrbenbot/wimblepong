@@ -2,6 +2,11 @@ import { describe, it, expect } from "vitest";
 import { Action, addPointState, getDeuceCount, getWinStreak, reducer } from "./score"; // Adjust the import path as needed
 import { AnnouncementEventType, MatchState, Player, PlayerPositions, PointType, Score } from "../types";
 
+const defaultMatchConfig = {
+  numberOfSets: 3,
+  setLength: 6,
+  names: { [Player.Player1]: "Player1", [Player.Player2]: "Player2" },
+};
 describe("Tennis Match Reducer", () => {
   const initialState: MatchState = {
     sets: [],
@@ -15,10 +20,7 @@ describe("Tennis Match Reducer", () => {
       [Player.Player2]: Score.Love,
     },
     events: [],
-    matchConfig: {
-      numberOfSets: 3,
-      setLength: 6,
-    },
+    matchConfig: defaultMatchConfig,
     pointType: PointType.Normal,
   };
 
@@ -88,9 +90,8 @@ describe("Tennis Match Reducer", () => {
     ])("should score tie break point if $matchConfig.setLength games all not in final set", ({ sets, matchConfig }) => {
       const state: MatchState = {
         ...initialState,
-
         sets,
-        matchConfig,
+        matchConfig: { ...defaultMatchConfig, ...matchConfig },
         games: { [Player.Player1]: matchConfig.setLength, [Player.Player2]: matchConfig.setLength },
       };
       const action: Action = { type: "POINT_SCORED", player: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } };
@@ -277,7 +278,7 @@ describe("Tennis Match Reducer", () => {
           sets: [{ [Player.Player1]: 6, [Player.Player2]: 0 }],
           games: { [Player.Player1]: 5, [Player.Player2]: 3 },
           gameState: { [Player.Player1]: Score.Forty, [Player.Player2]: Score.Thirty },
-          matchConfig: { numberOfSets: 3, setLength: 6 },
+          matchConfig: { ...defaultMatchConfig, numberOfSets: 3, setLength: 6 },
         },
         actionSettings: { player: Player.Player1 },
         winner: Player.Player1,
@@ -288,7 +289,7 @@ describe("Tennis Match Reducer", () => {
           sets: [{ [Player.Player1]: 0, [Player.Player2]: 6 }],
           games: { [Player.Player1]: 4, [Player.Player2]: 5 },
           gameState: { [Player.Player1]: Score.Forty, [Player.Player2]: Score.Advantage },
-          matchConfig: { numberOfSets: 3, setLength: 6 },
+          matchConfig: { ...defaultMatchConfig, numberOfSets: 3, setLength: 6 },
         },
         actionSettings: { player: Player.Player2 },
         winner: Player.Player2,
@@ -302,7 +303,7 @@ describe("Tennis Match Reducer", () => {
           ],
           games: { [Player.Player1]: 5, [Player.Player2]: 3 },
           gameState: { [Player.Player1]: Score.Forty, [Player.Player2]: Score.Thirty },
-          matchConfig: { numberOfSets: 5, setLength: 6 },
+          matchConfig: { ...defaultMatchConfig, numberOfSets: 5, setLength: 6 },
         },
         actionSettings: { player: Player.Player1 },
         winner: Player.Player1,
@@ -316,7 +317,7 @@ describe("Tennis Match Reducer", () => {
           ],
           games: { [Player.Player1]: 4, [Player.Player2]: 5 },
           gameState: { [Player.Player1]: Score.Forty, [Player.Player2]: Score.Advantage },
-          matchConfig: { numberOfSets: 5, setLength: 6 },
+          matchConfig: { ...defaultMatchConfig, numberOfSets: 5, setLength: 6 },
         },
         actionSettings: { player: Player.Player2 },
         winner: Player.Player2,
@@ -330,7 +331,7 @@ describe("Tennis Match Reducer", () => {
           ],
           games: { [Player.Player1]: 5, [Player.Player2]: 4 },
           gameState: { [Player.Player1]: Score.Advantage, [Player.Player2]: Score.Forty },
-          matchConfig: { numberOfSets: 3, setLength: 6 },
+          matchConfig: { ...defaultMatchConfig, numberOfSets: 3, setLength: 6 },
         },
         actionSettings: { player: Player.Player1 },
         winner: Player.Player1,
@@ -344,7 +345,7 @@ describe("Tennis Match Reducer", () => {
           ],
           games: { [Player.Player1]: 4, [Player.Player2]: 5 },
           gameState: { [Player.Player1]: Score.Forty, [Player.Player2]: Score.Advantage },
-          matchConfig: { numberOfSets: 3, setLength: 6 },
+          matchConfig: { ...defaultMatchConfig, numberOfSets: 3, setLength: 6 },
         },
         actionSettings: { player: Player.Player2 },
         winner: Player.Player2,
@@ -358,7 +359,7 @@ describe("Tennis Match Reducer", () => {
           ],
           games: { [Player.Player1]: 2, [Player.Player2]: 3 },
           gameState: { [Player.Player1]: Score.Forty, [Player.Player2]: Score.Advantage },
-          matchConfig: { numberOfSets: 3, setLength: 4 },
+          matchConfig: { ...defaultMatchConfig, numberOfSets: 3, setLength: 4 },
         },
         actionSettings: { player: Player.Player2 },
         winner: Player.Player2,
@@ -458,10 +459,7 @@ describe("addPointState", () => {
       [Player.Player1]: Score.Love,
       [Player.Player2]: Score.Love,
     },
-    matchConfig: {
-      numberOfSets: 3,
-      setLength: 6,
-    },
+    matchConfig: defaultMatchConfig,
     events: [],
     pointType: PointType.Normal,
   };
@@ -567,19 +565,22 @@ describe("addPointState", () => {
     expect(updatedState.pointType).toBe(PointType.SetPoint);
   });
 
-  it.each([{ setLength: 4, numberOfSets: 3 }])("should set point type to SET_POINT in set length $setLength", (matchConfig) => {
-    const state = {
-      ...initialState,
-      games: { [Player.Player1]: 3, [Player.Player2]: 2 },
-      gameState: {
-        [Player.Player1]: Score.Forty,
-        [Player.Player2]: Score.Thirty,
-      },
-      matchConfig,
-    };
-    const updatedState = addPointState(state);
-    expect(updatedState.pointType).toBe(PointType.SetPoint);
-  });
+  it.each([{ ...defaultMatchConfig, setLength: 4, numberOfSets: 3 }])(
+    "should set point type to SET_POINT in set length $setLength",
+    (matchConfig) => {
+      const state = {
+        ...initialState,
+        games: { [Player.Player1]: 3, [Player.Player2]: 2 },
+        gameState: {
+          [Player.Player1]: Score.Forty,
+          [Player.Player2]: Score.Thirty,
+        },
+        matchConfig,
+      };
+      const updatedState = addPointState(state);
+      expect(updatedState.pointType).toBe(PointType.SetPoint);
+    }
+  );
 
   it("should set point type to MATCH_POINT", () => {
     const state: MatchState = {
@@ -593,10 +594,7 @@ describe("addPointState", () => {
         [Player.Player1]: Score.Forty,
         [Player.Player2]: Score.Thirty,
       },
-      matchConfig: {
-        numberOfSets: 3,
-        setLength: 6,
-      },
+      matchConfig: { ...defaultMatchConfig, numberOfSets: 3, setLength: 6 },
     };
     const updatedState = addPointState(state);
     expect(updatedState.pointType).toBe(PointType.MatchPoint);
@@ -629,10 +627,7 @@ describe("addPointState", () => {
       games: { [Player.Player1]: 6, [Player.Player2]: 6 },
       tiebreak: { [Player.Player1]: 6, [Player.Player2]: 5 },
       servingPlayer: Player.Player1,
-      matchConfig: {
-        numberOfSets: 3,
-        setLength: 6,
-      },
+      matchConfig: { ...defaultMatchConfig, numberOfSets: 3, setLength: 6 },
     };
     const updatedState = addPointState(state);
     expect(updatedState.pointType).toBe(PointType.MatchPoint);
@@ -645,10 +640,7 @@ describe("addPointState", () => {
       sets: [{ [Player.Player1]: 6, [Player.Player2]: 4 }],
       games: { [Player.Player1]: 6, [Player.Player2]: 6 },
       tiebreak: { [Player.Player1]: 6, [Player.Player2]: 5 },
-      matchConfig: {
-        numberOfSets: 3,
-        setLength: 6,
-      },
+      matchConfig: { ...defaultMatchConfig, numberOfSets: 3, setLength: 6 },
     };
     const updatedState = addPointState(state);
     expect(updatedState.pointType).toBe(PointType.MatchPoint);
@@ -661,10 +653,7 @@ describe("addPointState", () => {
       sets: [{ [Player.Player1]: 4, [Player.Player2]: 2 }],
       games: { [Player.Player1]: 4, [Player.Player2]: 4 },
       tiebreak: { [Player.Player1]: 6, [Player.Player2]: 5 },
-      matchConfig: {
-        numberOfSets: 3,
-        setLength: 4,
-      },
+      matchConfig: { ...defaultMatchConfig, numberOfSets: 3, setLength: 4 },
     };
     const updatedState = addPointState(state);
     expect(updatedState.pointType).toBe(PointType.MatchPoint);
@@ -696,10 +685,7 @@ describe("getDeuceCount", () => {
       [Player.Player2]: Score.Love,
     },
     events: [],
-    matchConfig: {
-      numberOfSets: 3,
-      setLength: 6,
-    },
+    matchConfig: { ...defaultMatchConfig, numberOfSets: 3, setLength: 6 },
     pointType: PointType.Normal,
   };
 

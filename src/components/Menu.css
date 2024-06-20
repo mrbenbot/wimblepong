@@ -7,3 +7,11 @@
   background-color: rgb(101, 255, 119);
   color: black;
 }
+
+.menu {
+  font-size: 1.5em;
+}
+
+.input {
+  font-size: 1.5rem;
+}
