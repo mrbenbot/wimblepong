@@ -63,8 +63,8 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
     if (paused) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const draw = initDrawingContext(canvas);
-    if (!draw) return;
+    const { draw, cleanup } = initDrawingContext(canvas) ?? {};
+    if (!draw || !cleanup) return;
 
     const gameState = gameStateRef.current;
 
@@ -102,6 +102,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
         console.log("stopping game loop");
         cancelAnimationFrame(loopId);
       }
+      cleanup();
     };
   }, [gameStateRef, getPlayer1Actions, getPlayer2Actions, handleGameEvent, paused, playerPositions, servingPlayer]);
 

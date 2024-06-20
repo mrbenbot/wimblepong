@@ -125,31 +125,42 @@ export function initDrawingContext(canvas: HTMLCanvasElement) {
 
   gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height);
 
-  return (gameState: MutableGameState) => {
-    gl.bindVertexArray(vao);
+  return {
+    draw: (gameState: MutableGameState) => {
+      gl.bindVertexArray(vao);
 
-    [Player.Player1, Player.Player2].forEach((player) => {
-      const {
-        x,
-        y,
-        width,
-        height,
-        colour: { r, g, b },
-      } = gameState[player];
-      gl.uniform4f(colorLocation, r, g, b, 1);
-      drawRectangle(positions, x, y, width, height, 0);
-      gl.bufferData(gl.ARRAY_BUFFER, positions, gl.DYNAMIC_DRAW);
-      gl.drawArrays(gl.TRIANGLES, 0, 6);
-    });
+      [Player.Player1, Player.Player2].forEach((player) => {
+        const {
+          x,
+          y,
+          width,
+          height,
+          colour: { r, g, b },
+        } = gameState[player];
+        gl.uniform4f(colorLocation, r, g, b, 1);
+        drawRectangle(positions, x, y, width, height, 0);
+        gl.bufferData(gl.ARRAY_BUFFER, positions, gl.DYNAMIC_DRAW);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+      });
 
-    const { x: ballX, y: ballY, radius } = gameState.ball;
-    const { r: br, g: bg, b: bb } = BALL_COLOUR_RGB;
+      const { x: ballX, y: ballY, radius } = gameState.ball;
+      const { r: br, g: bg, b: bb } = BALL_COLOUR_RGB;
 
-    gl.uniform4f(colorLocation, br, bg, bb, 1);
-    createCircleVertices(ballX, ballY, radius, numSegments, circleVertices);
-    gl.bufferData(gl.ARRAY_BUFFER, circleVertices, gl.DYNAMIC_DRAW);
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, numSegments + 2); // +2 for center and closing vertex
+      gl.uniform4f(colorLocation, br, bg, bb, 1);
+      createCircleVertices(ballX, ballY, radius, numSegments, circleVertices);
+      gl.bufferData(gl.ARRAY_BUFFER, circleVertices, gl.DYNAMIC_DRAW);
+      gl.drawArrays(gl.TRIANGLE_FAN, 0, numSegments + 2); // +2 for center and closing vertex
 
-    gl.bindVertexArray(null);
+      gl.bindVertexArray(null);
+    },
+    cleanup: () => {
+      gl.deleteBuffer(positionBuffer);
+      const shaders = gl.getAttachedShaders(program);
+      if (shaders) {
+        shaders.forEach((shader) => gl.deleteShader(shader));
+      }
+      gl.deleteProgram(program);
+      gl.deleteVertexArray(vao);
+    },
   };
 }
