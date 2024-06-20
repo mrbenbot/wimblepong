@@ -1,6 +1,7 @@
 import { useRef, useEffect, useCallback } from "react";
 
 export const noteFrequencies: { [key: string]: number } = {
+  silence: 0,
   A3: 220.0,
   "A#3": 233.08,
   Bb3: 233.08,
@@ -191,12 +192,16 @@ const useSynthesizer = () => {
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
     oscillator.type = "square";
-
     oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
     gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
     console.log(`Playing frequency: ${frequency} Hz`);
     oscillator.start();
     oscillator.stop(audioContext.currentTime + duration);
+    // Clean up
+    oscillator.onended = () => {
+      oscillator.disconnect();
+      gainNode.disconnect();
+    };
   }, []);
 
   const playNextThemeNote = useCallback(() => {

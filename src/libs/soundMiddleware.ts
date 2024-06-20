@@ -65,7 +65,7 @@ const eventSounds: Partial<Record<AnnouncementEventType, (event: AnnouncementEve
 function buildSoundsFromEvents(events: MatchState["events"]) {
   const hasWonGame = events.filter((event) => event.type === "WIN_GAME").length > 0;
   const melody = events.reduce((sounds, event) => {
-    return [...sounds, ...(eventSounds?.[event.type]?.(event, hasWonGame) ?? []), { note: "_", duration: 0, rest: 0.3 }];
+    return [...sounds, ...(eventSounds?.[event.type]?.(event, hasWonGame) ?? []), { note: "silence", duration: 0, rest: 0.3 }];
   }, [] as Melody);
   return melody;
 }
