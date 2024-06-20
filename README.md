@@ -10,6 +10,7 @@
   - input player names
   - sounds should not be biased in two player mode
     - maybe biased towards server?
+  - save score to localstorage
 - style
   - responsive css
   - events should have their own style and possibly positioning
