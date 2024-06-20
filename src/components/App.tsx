@@ -1,69 +1,35 @@
-import React, { useReducer, useRef } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import GameCanvas from "./GameCanvas";
-import { initialState, reducer } from "../libs/score";
-import { BALL, COURT, INITIAL_SPEED, PADDLE, PADDLE_GAP, PLAYER_COLOURS } from "../config";
+import { getLeftRightPlayer, initialState, reducer } from "../libs/score";
 import "./App.css";
 import PlayerScore from "./PlayerScore";
 import EventAnnouncement from "./EventAnnouncement";
-import { GetPlayerActionsFunction, MatchState, MutableGameState, Player, PlayerPositions } from "../types";
+import { GetPlayerActionsFunction, MatchState, MutableGameState } from "../types";
 import Scoreboard from "./Scoreboard";
-import { hexToRgb } from "../libs/numbers";
 import useFullscreen from "../hooks/useFullScreen";
+import { loadState, saveState } from "../libs/localStorage";
+import { initialGameState } from "../libs/game";
 
-const getLeftRightPlayer = (playerPositions: PlayerPositions) => {
-  if (playerPositions === PlayerPositions.Reversed) {
-    return { leftPlayer: Player.Player2, rightPlayer: Player.Player1 };
-  }
-  return { leftPlayer: Player.Player1, rightPlayer: Player.Player2 };
-};
-
-const App: React.FC<{
+interface AppProps {
   connected?: boolean;
   getPlayer1Actions: GetPlayerActionsFunction;
   getPlayer2Actions: GetPlayerActionsFunction;
   matchConfig: MatchState["matchConfig"];
-}> = ({ connected = true, getPlayer1Actions, getPlayer2Actions, matchConfig }) => {
-  const gameStateRef = useRef<MutableGameState>({
-    server: Player.Player1,
-    positionsReversed: false,
-    [Player.Player1]: {
-      x: PADDLE_GAP,
-      y: COURT.height / 2 - PADDLE.height / 2,
-      dy: 0,
-      width: PADDLE.width,
-      height: PADDLE.height,
-      colour: hexToRgb(PLAYER_COLOURS[Player.Player1]),
-    },
-    [Player.Player2]: {
-      x: COURT.width - PADDLE.width - PADDLE_GAP,
-      y: COURT.height / 2 - PADDLE.height / 2,
-      dy: 0,
-      width: PADDLE.width,
-      height: PADDLE.height,
-      colour: hexToRgb(PLAYER_COLOURS[Player.Player2]),
-    },
-    ball: {
-      x: PADDLE.width + BALL.radius + PADDLE_GAP,
-      y: 150,
-      dx: 0,
-      dy: 0,
-      radius: BALL.radius,
-      speed: INITIAL_SPEED,
-      serveMode: true,
-      scoreModeTimeout: 0,
-      scoreMode: false,
-    },
-    stats: { rallyLength: 0, serveSpeed: 0, server: Player.Player1 },
-  });
-  const [matchState, dispatch] = useReducer(reducer, { ...initialState, matchConfig });
-  const { leftPlayer, rightPlayer } = getLeftRightPlayer(matchState.playerPositions);
-  const containerDivRef = useRef(null);
+}
 
+const App = ({ connected = true, getPlayer1Actions, getPlayer2Actions, matchConfig }: AppProps) => {
+  const gameStateRef = useRef<MutableGameState>(initialGameState);
+  const [matchState, dispatch] = useReducer(reducer, { ...initialState, matchConfig }, (initial) => loadState() || initial);
   const [isFullScreen, toggleFullScreen] = useFullscreen();
 
+  useEffect(() => {
+    saveState(matchState);
+  }, [matchState]);
+
+  const { leftPlayer, rightPlayer } = getLeftRightPlayer(matchState.playerPositions);
   return (
     <>
-      <div ref={containerDivRef} className="main-container">
+      <div className="main-container">
         <div className="game-announcements-wrapper">
           {matchState.events.map((event, i) => (
             <EventAnnouncement key={JSON.stringify(event) + i} event={event} />

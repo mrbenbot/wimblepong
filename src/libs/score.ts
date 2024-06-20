@@ -343,3 +343,10 @@ function isTiebreakSetPoint(state: MatchState, player: Player, opponent: Player)
 function isDeuce(state: MatchState): boolean {
   return state.gameState[Player.Player1] === Score.Forty && state.gameState[Player.Player2] === Score.Forty;
 }
+
+export function getLeftRightPlayer(playerPositions: PlayerPositions) {
+  if (playerPositions === PlayerPositions.Reversed) {
+    return { leftPlayer: Player.Player2, rightPlayer: Player.Player1 };
+  }
+  return { leftPlayer: Player.Player1, rightPlayer: Player.Player2 };
+}

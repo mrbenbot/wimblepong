@@ -1,15 +1,18 @@
 import {
+  BALL,
   COURT,
   INITIAL_SPEED,
   PADDLE,
   PADDLE_CONTACT_SPEED_BOOST_DIVISOR,
   PADDLE_GAP,
   PADDLE_SPEED_DEVISOR,
+  PLAYER_COLOURS,
   SCORE_PAUSE_TIMEOUT,
   SERVING_HEIGHT_MULTIPLIER,
   SPEED_INCREMENT,
 } from "../config";
 import { MutableGameState, Player, PlayerPositions } from "../types";
+import { hexToRgb } from "./numbers";
 
 interface PlayerActions {
   buttonPressed: boolean;
@@ -24,6 +27,39 @@ export enum GameEventType {
   ScorePointRight = "SCORE_POINT_RIGHT",
   WallContact = "WALL_CONTACT",
 }
+
+export const initialGameState: MutableGameState = {
+  server: Player.Player1,
+  positionsReversed: false,
+  [Player.Player1]: {
+    x: PADDLE_GAP,
+    y: COURT.height / 2 - PADDLE.height / 2,
+    dy: 0,
+    width: PADDLE.width,
+    height: PADDLE.height,
+    colour: hexToRgb(PLAYER_COLOURS[Player.Player1]),
+  },
+  [Player.Player2]: {
+    x: COURT.width - PADDLE.width - PADDLE_GAP,
+    y: COURT.height / 2 - PADDLE.height / 2,
+    dy: 0,
+    width: PADDLE.width,
+    height: PADDLE.height,
+    colour: hexToRgb(PLAYER_COLOURS[Player.Player2]),
+  },
+  ball: {
+    x: PADDLE.width + BALL.radius + PADDLE_GAP,
+    y: 150,
+    dx: 0,
+    dy: 0,
+    radius: BALL.radius,
+    speed: INITIAL_SPEED,
+    serveMode: true,
+    scoreModeTimeout: 0,
+    scoreMode: false,
+  },
+  stats: { rallyLength: 0, serveSpeed: 0, server: Player.Player1 },
+};
 
 export const updateGameState = (
   gameState: MutableGameState,

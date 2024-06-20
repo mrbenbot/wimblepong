@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { MatchState } from "../types";
 import { useNavigate } from "react-router-dom";
 import "./Menu.css";
+import { clearState } from "../libs/localStorage";
 
 const playOptions = [
   { path: "/mouse/ai", title: "Mouse vs Model" },
@@ -17,6 +18,7 @@ const MenuComponent: React.FC = () => {
   const [path, setPath] = useState("/mouse/auto");
 
   const handleNavigation = (path: string) => {
+    clearState();
     navigate(path, { state: { matchConfig } });
   };
 
