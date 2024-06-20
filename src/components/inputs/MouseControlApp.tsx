@@ -1,9 +1,9 @@
 import { useCallback } from "react";
-import App from "./App";
-import useMouseInput from "../hooks/useMouse";
-import { getComputerPlayerActionsFunction } from "../libs/computerPlayer";
-import useMachineOpponent from "../hooks/useMachineOpponent";
-import { getTensorFlowPlayer } from "../libs/tensorFlowPlayer";
+import App from "../game/App";
+import useMouseInput from "../../hooks/useMouse";
+import { getComputerPlayerActionsFunction } from "../../libs/computerPlayer";
+import useMachineOpponent from "../../hooks/useMachineOpponent";
+import { getTensorFlowPlayer } from "../../libs/tensorFlowPlayer";
 import { useLocation, useParams } from "react-router-dom";
 
 export default function MouseControlApp() {

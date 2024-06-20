@@ -1,7 +1,7 @@
-import App from "./App";
-import useDJHeroInput from "../hooks/useDjHeroInput";
-import { getComputerPlayerActionsFunction } from "../libs/computerPlayer";
-import useMachineOpponent from "../hooks/useMachineOpponent";
+import App from "../game/App";
+import useDJHeroInput from "../../hooks/useDjHeroInput";
+import { getComputerPlayerActionsFunction } from "../../libs/computerPlayer";
+import useMachineOpponent from "../../hooks/useMachineOpponent";
 import { useCallback } from "react";
 import { useLocation, useParams } from "react-router-dom";
 

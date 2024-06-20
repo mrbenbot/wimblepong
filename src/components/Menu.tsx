@@ -10,6 +10,7 @@ const playOptions = [
   { path: "/dj/dj", title: "DJ vs DJ" },
   { path: "/dj/auto", title: "DJ vs Computer" },
   { path: "/dj/ai", title: "DJ vs Model" },
+  { path: "/gamepad", title: "Gamepad vs Computer" },
 ];
 
 const MenuComponent: React.FC = () => {

@@ -1,6 +1,6 @@
 import "./Scoreboard.css";
-import { PLAYER_COLOURS } from "../config";
-import { MatchState, Player, Score } from "../types";
+import { PLAYER_COLOURS } from "../../config";
+import { MatchState, Player, Score } from "../../types";
 
 const scoreMap: {
   [key in Score]?: string;

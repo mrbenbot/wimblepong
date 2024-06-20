@@ -1,12 +1,12 @@
 import React, { useRef, useCallback, useLayoutEffect } from "react";
-import { Action } from "../libs/score";
-import { COURT, DELTA_TIME_DIVISOR } from "../config";
+import { Action } from "../../libs/score";
+import { COURT, DELTA_TIME_DIVISOR } from "../../config";
 import "./GameCanvas.css";
-import { GetPlayerActionsFunction, MatchState, MutableGameState, Player } from "../types";
+import { GetPlayerActionsFunction, MatchState, MutableGameState, Player } from "../../types";
 import GameScore from "./GameScore";
-import useSynthesizer, { NoteType } from "../hooks/playNote";
-import { GameEventType, applyMetaGameState, resetBall, updateGameState } from "../libs/game";
-import { initDrawingContext } from "../libs/webgl";
+import useSynthesizer, { NoteType } from "../../hooks/playNote";
+import { GameEventType, applyMetaGameState, resetBall, updateGameState } from "../../libs/game";
+import { initDrawingContext } from "../../libs/webgl";
 
 interface GameCanvasProps {
   gameStateRef: React.MutableRefObject<MutableGameState>;

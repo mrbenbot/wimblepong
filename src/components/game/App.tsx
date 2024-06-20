@@ -1,14 +1,14 @@
 import { useEffect, useReducer, useRef } from "react";
 import GameCanvas from "./GameCanvas";
-import { getLeftRightPlayer, initialState, reducer } from "../libs/score";
-import "./App.css";
+import { getLeftRightPlayer, initialState, reducer } from "../../libs/score";
 import PlayerScore from "./PlayerScore";
 import EventAnnouncement from "./EventAnnouncement";
-import { GetPlayerActionsFunction, MatchState, MutableGameState } from "../types";
+import { GetPlayerActionsFunction, MatchState, MutableGameState } from "../../types";
 import Scoreboard from "./Scoreboard";
-import useFullscreen from "../hooks/useFullScreen";
-import { loadState, saveState } from "../libs/localStorage";
-import { initialGameState } from "../libs/game";
+import useFullscreen from "../../hooks/useFullScreen";
+import { loadState, saveState } from "../../libs/localStorage";
+import { initialGameState } from "../../libs/game";
+import "./App.css";
 
 interface AppProps {
   connected?: boolean;

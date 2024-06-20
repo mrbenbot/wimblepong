@@ -1,8 +1,9 @@
 import { createBrowserRouter } from "react-router-dom";
 import MenuComponent from "./components/Menu";
 import LandingPage from "./components/LandingPage";
-import MouseControlApp from "./components/MouseControlApp";
-import DJHeroApp from "./components/DJHeroApp";
+import MouseControlApp from "./components/inputs/MouseControlApp";
+import DJHeroApp from "./components/inputs/DJHeroApp";
+import GamepadApp from "./components/inputs/GamepadApp";
 
 export const router = createBrowserRouter([
   {
@@ -16,5 +17,5 @@ export const router = createBrowserRouter([
   { path: "/", element: <MenuComponent /> },
   { path: "/mouse/:opponentType", element: <MouseControlApp /> },
   { path: "/dj/:opponentType", element: <DJHeroApp /> },
-  //   { path: "/gamepad", element: <GamepadApp /> },
+  { path: "/gamepad", element: <GamepadApp /> },
 ]);
