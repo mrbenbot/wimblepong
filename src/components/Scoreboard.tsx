@@ -29,7 +29,7 @@ const Scoreboard = ({ matchState }: { matchState: MatchState }) => {
           style={{
             color: PLAYER_COLOURS[Player.Player1],
             textDecoration: servingPlayer === Player.Player1 ? "underline" : " ",
-            width: longestNameLength * 10,
+            width: `calc(0.6em * ${longestNameLength})`,
             textAlign: "left",
           }}
         >
@@ -51,7 +51,7 @@ const Scoreboard = ({ matchState }: { matchState: MatchState }) => {
             color: PLAYER_COLOURS[Player.Player2],
             textDecoration: servingPlayer === Player.Player2 ? "underline" : " ",
             textAlign: "left",
-            width: longestNameLength * 10,
+            width: `calc(0.6em * ${longestNameLength})`,
           }}
         >
           {matchConfig.names[Player.Player2]}

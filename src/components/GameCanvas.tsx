@@ -5,7 +5,7 @@ import "./GameCanvas.css";
 import { GetPlayerActionsFunction, MatchState, MutableGameState, Player } from "../types";
 import GameScore from "./GameScore";
 import useSynthesizer, { NoteType } from "../hooks/playNote";
-import { GameEventType, applyMetaGameState, updateGameState } from "../libs/game";
+import { GameEventType, applyMetaGameState, resetBall, updateGameState } from "../libs/game";
 import { initDrawingContext } from "../libs/webgl";
 
 interface GameCanvasProps {
@@ -65,23 +65,26 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
   );
 
   useLayoutEffect(() => {
-    console.log("render");
     if (paused) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const draw = initDrawingContext(canvas);
     if (!draw) return;
 
-    applyMetaGameState(gameStateRef.current, servingPlayer, playerPositions);
+    const gameState = gameStateRef.current;
+
+    console.log("applying meta game state");
+    applyMetaGameState(gameState, servingPlayer, playerPositions);
+    resetBall(gameState);
 
     const update = (deltaTime: number) => {
       // getPlayerActions using current state
       const actions = {
-        [Player.Player1]: getPlayer1Actions(Player.Player1, gameStateRef.current, canvas),
-        [Player.Player2]: getPlayer2Actions(Player.Player2, gameStateRef.current, canvas),
+        [Player.Player1]: getPlayer1Actions(Player.Player1, gameState, canvas),
+        [Player.Player2]: getPlayer2Actions(Player.Player2, gameState, canvas),
       };
       // Update game state based on actions
-      updateGameState(gameStateRef.current, actions, deltaTime, handleGameEvent);
+      updateGameState(gameState, actions, deltaTime, handleGameEvent);
     };
 
     let loopId: null | number = null;
@@ -89,17 +92,19 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
       const deltaTime = (timestamp - deltaTimeRef.current) / DELTA_TIME_DIVISOR;
       deltaTimeRef.current = timestamp;
       update(deltaTime);
-      draw(gameStateRef.current);
+      draw(gameState);
       loopId = requestAnimationFrame(gameLoop);
     };
 
     // set deltaTimeRef so that initial delta time is not crazy big
     deltaTimeRef.current = performance.now();
+    console.log("starting game loop");
     loopId = requestAnimationFrame(gameLoop);
 
     return () => {
       // Cleanup on unmount
       if (loopId !== null) {
+        console.log("stopping game loop");
         cancelAnimationFrame(loopId);
       }
     };

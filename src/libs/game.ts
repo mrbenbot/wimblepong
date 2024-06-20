@@ -197,7 +197,7 @@ export const applyMetaGameState = (gameState: MutableGameState, servingPlayer: P
     gameState[Player.Player2].height = PADDLE.height * SERVING_HEIGHT_MULTIPLIER;
   }
 
-  // Set paddle colours
+  // Set paddles
   if (positionsReversed) {
     gameState[Player.Player1].x = COURT.width - PADDLE.width - PADDLE_GAP;
     gameState[Player.Player2].x = PADDLE_GAP;
