@@ -14,8 +14,7 @@ export const router = createBrowserRouter([
     path: "/menu",
     element: <MenuComponent />,
   },
-  { path: "/", element: <MenuComponent /> },
   { path: "/mouse/:opponentType", element: <MouseControlApp /> },
   { path: "/dj/:opponentType", element: <DJHeroApp /> },
-  { path: "/gamepad", element: <GamepadApp /> },
+  { path: "/gamepad/:opponentType", element: <GamepadApp /> },
 ]);

@@ -7,10 +7,12 @@ import { clearState } from "../libs/localStorage";
 const playOptions = [
   { path: "/mouse/ai", title: "Mouse vs Model" },
   { path: "/mouse/auto", title: "Mouse vs Computer" },
-  { path: "/dj/dj", title: "DJ vs DJ" },
-  { path: "/dj/auto", title: "DJ vs Computer" },
-  { path: "/dj/ai", title: "DJ vs Model" },
-  { path: "/gamepad", title: "Gamepad vs Computer" },
+  // { path: "/dj/dj", title: "DJ vs DJ" },
+  // { path: "/dj/auto", title: "DJ vs Computer" },
+  // { path: "/dj/ai", title: "DJ vs Model" },
+  { path: "/gamepad/gamepad", title: "Gamepad vs Gamepad" },
+  { path: "/gamepad/auto", title: "Gamepad vs Computer" },
+  // { path: "/gamepad/ai", title: "Gamepad vs Computer" },
 ];
 
 const MenuComponent: React.FC = () => {
@@ -42,7 +44,7 @@ const MenuComponent: React.FC = () => {
 
   return (
     <div className="menu">
-      <h1>Select an Option</h1>
+      <h1>Game Setup</h1>
       <div>
         {playOptions.map((option) => (
           <button onClick={() => setPath(option.path)} key={option.path} className={path === option.path ? "selected" : ""}>
@@ -52,40 +54,48 @@ const MenuComponent: React.FC = () => {
       </div>
       <br />
       <label>
-        Player 1 Name: <input className="input" type="text" value={matchConfig.names[Player.Player1]} onChange={handleNameChange(Player.Player1)} />
+        <span>Player 1 Name:</span>
+        <input className="input" type="text" value={matchConfig.names[Player.Player1]} onChange={handleNameChange(Player.Player1)} />
       </label>
       <br />
       <label>
-        Player 2 Name: <input className="input" type="text" value={matchConfig.names[Player.Player2]} onChange={handleNameChange(Player.Player2)} />
+        <span>Player 2 Name:</span>
+        <input className="input" type="text" value={matchConfig.names[Player.Player2]} onChange={handleNameChange(Player.Player2)} />
       </label>
       <br />
       <br />
       <label>
-        Set Length: First to{" "}
-        <select
-          className="input"
-          onChange={(e) => setMatchConfig({ ...matchConfig, setLength: Number(e.target.value) })}
-          value={matchConfig.setLength}
-        >
-          {[1, 2, 3, 4, 5, 6].map((length) => (
-            <option key={length}>{length}</option>
-          ))}
-        </select>{" "}
-        Games
+        <span>Set Length:</span>{" "}
+        <span>
+          First to{" "}
+          <select
+            className="input"
+            onChange={(e) => setMatchConfig({ ...matchConfig, setLength: Number(e.target.value) })}
+            value={matchConfig.setLength}
+          >
+            {[1, 2, 3, 4, 5, 6].map((length) => (
+              <option key={length}>{length}</option>
+            ))}
+          </select>{" "}
+          Games
+        </span>
       </label>
       <br />
       <label>
-        Match Length: Best of{" "}
-        <select
-          className="input"
-          onChange={(e) => setMatchConfig({ ...matchConfig, numberOfSets: Number(e.target.value) })}
-          value={matchConfig.numberOfSets}
-        >
-          {[1, 3, 5].map((length) => (
-            <option key={length}>{length}</option>
-          ))}
-        </select>{" "}
-        Sets
+        <span>Match Length:</span>{" "}
+        <span>
+          Best of{" "}
+          <select
+            className="input"
+            onChange={(e) => setMatchConfig({ ...matchConfig, numberOfSets: Number(e.target.value) })}
+            value={matchConfig.numberOfSets}
+          >
+            {[1, 3, 5].map((length) => (
+              <option key={length}>{length}</option>
+            ))}
+          </select>{" "}
+          Sets
+        </span>
       </label>
       <br />
       <br />
