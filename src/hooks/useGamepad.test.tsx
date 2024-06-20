@@ -30,7 +30,7 @@ describe("useGamepad", () => {
   });
 
   function TestComponent({ callback }: { callback: (hookValue: ReturnType<typeof useGamepad>) => void }) {
-    const hookValue = useGamepad();
+    const hookValue = useGamepad(2);
     useEffect(() => {
       callback(hookValue);
     }, [hookValue, callback]);
