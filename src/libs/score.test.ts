@@ -6,6 +6,7 @@ const defaultMatchConfig = {
   numberOfSets: 3,
   setLength: 6,
   names: { [Player.Player1]: "Player1", [Player.Player2]: "Player2" },
+  soundOn: true,
 };
 describe("Tennis Match Reducer", () => {
   const initialState: MatchState = {

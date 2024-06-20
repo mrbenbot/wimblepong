@@ -16,6 +16,7 @@ export const initialState: MatchState = {
     numberOfSets: 3,
     setLength: 6,
     names: { [Player.Player1]: "Player1", [Player.Player2]: "Player2" },
+    soundOn: true,
   },
   events: [],
   pointType: PointType.Normal,
@@ -23,7 +24,10 @@ export const initialState: MatchState = {
 
 export type Action =
   | { type: "POINT_SCORED"; player: Player; stats: { rallyLength: number; serveSpeed: number; server: Player } }
-  | { type: "CLEAR_EVENTS" };
+  | { type: "CLEAR_EVENTS" }
+  | { type: "HIT_PADDLE" }
+  | { type: "WALL_CONTACT" }
+  | { type: "SERVE" };
 
 export function reducer(state: MatchState, action: Action): MatchState {
   if (state.matchWinner) {
@@ -163,7 +167,7 @@ export function reducer(state: MatchState, action: Action): MatchState {
         })
       );
     }
-    case "CLEAR_EVENTS": {
+    case "SERVE": {
       return { ...state, events: [] };
     }
 

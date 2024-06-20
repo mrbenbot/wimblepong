@@ -18,6 +18,9 @@
 .input {
   font-size: 1.5rem;
 }
+.input[type="checkbox"] {
+  width: 1.5rem;
+}
 
 label {
   width: min(450px, 100vw);

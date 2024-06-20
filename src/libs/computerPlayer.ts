@@ -10,7 +10,7 @@ export const getComputerPlayerActionsFunction: () => GetPlayerActionsFunction = 
     if (state.ball.scoreMode) {
       serveDelayCounter = 0;
       direction = 30 * Math.random();
-      serveDelay = 100 * Math.random();
+      serveDelay = 100 * Math.random() + 100;
       direction = Math.random() > 0.5 ? direction : -direction;
       return { buttonPressed: false, paddleDirection: 0 };
     }

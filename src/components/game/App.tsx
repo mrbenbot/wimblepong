@@ -9,6 +9,8 @@ import useFullscreen from "../../hooks/useFullScreen";
 import { loadState, saveState } from "../../libs/localStorage";
 import { initialGameState } from "../../libs/game";
 import "./App.css";
+import useSynthesizer from "../../hooks/useSynthesizer";
+import soundMiddleware from "../../libs/soundMiddleware";
 
 interface AppProps {
   connected?: boolean;
@@ -19,7 +21,12 @@ interface AppProps {
 
 const App = ({ connected = true, getPlayer1Actions, getPlayer2Actions, matchConfig }: AppProps) => {
   const gameStateRef = useRef<MutableGameState>(initialGameState);
-  const [matchState, dispatch] = useReducer(reducer, { ...initialState, matchConfig }, (initial) => loadState() || initial);
+  const playNote = useSynthesizer();
+  const [matchState, dispatch] = useReducer(
+    soundMiddleware(playNote)(reducer),
+    { ...initialState, matchConfig },
+    (initial) => loadState() || initial
+  );
   const [isFullScreen, toggleFullScreen] = useFullscreen();
 
   useEffect(() => {

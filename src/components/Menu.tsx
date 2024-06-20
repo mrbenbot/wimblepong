@@ -24,6 +24,7 @@ const MenuComponent: React.FC = () => {
       [Player.Player1]: "Player1",
       [Player.Player2]: "Player2",
     },
+    soundOn: true,
   });
   const [path, setPath] = useState("/mouse/auto");
 
@@ -98,6 +99,15 @@ const MenuComponent: React.FC = () => {
         </span>
       </label>
       <br />
+      <label>
+        <span>Sound On:</span>
+        <input
+          className="input"
+          type="checkbox"
+          checked={matchConfig.soundOn}
+          onChange={() => setMatchConfig({ ...matchConfig, soundOn: !matchConfig.soundOn })}
+        />
+      </label>
       <br />
       <button onClick={() => handleNavigation(path)} className="play-button">
         PLAY

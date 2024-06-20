@@ -4,7 +4,6 @@ import { COURT, DELTA_TIME_DIVISOR } from "../../config";
 import "./GameCanvas.css";
 import { GetPlayerActionsFunction, MatchState, MutableGameState, Player } from "../../types";
 import GameScore from "./GameScore";
-import useSynthesizer, { NoteType } from "../../hooks/playNote";
 import { GameEventType, applyMetaGameState, resetBall, updateGameState } from "../../libs/game";
 import { initDrawingContext } from "../../libs/webgl";
 
@@ -31,7 +30,6 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const deltaTimeRef = useRef(0);
-  const playNote = useSynthesizer();
 
   const { servingPlayer, playerPositions } = matchState;
 
@@ -41,27 +39,24 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
       switch (event) {
         case GameEventType.ScorePointLeft:
           dispatch({ type: "POINT_SCORED", player: rightPlayer, stats: { ...gameStateRef.current.stats } });
-          playNote(gameStateRef.current.server == rightPlayer ? NoteType.WinPointServer : NoteType.WinPointReceiver);
           break;
         case GameEventType.ScorePointRight:
           dispatch({ type: "POINT_SCORED", player: leftPlayer, stats: { ...gameStateRef.current.stats } });
-          playNote(gameStateRef.current.server == leftPlayer ? NoteType.WinPointServer : NoteType.WinPointReceiver);
           break;
         case GameEventType.HitPaddle:
-          playNote(NoteType.Paddle);
+          dispatch({ type: "HIT_PADDLE" });
           break;
         case GameEventType.WallContact:
-          playNote(NoteType.WallContact);
+          dispatch({ type: "WALL_CONTACT" });
           break;
         case GameEventType.Serve:
-          dispatch({ type: "CLEAR_EVENTS" });
-          playNote(NoteType.Paddle);
+          dispatch({ type: "SERVE" });
           break;
         default:
           return;
       }
     },
-    [dispatch, playNote, gameStateRef, leftPlayer, rightPlayer]
+    [dispatch, gameStateRef, leftPlayer, rightPlayer]
   );
 
   useLayoutEffect(() => {
