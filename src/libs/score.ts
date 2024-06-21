@@ -18,7 +18,7 @@ export const initialState: MatchState = {
     names: { [Player.Player1]: "Player1", [Player.Player2]: "Player2" },
     soundOn: true,
   },
-  events: [],
+  events: [{ type: AnnouncementEventType.Ace, speed: "60" }],
   pointType: PointType.Normal,
 };
 
@@ -242,7 +242,7 @@ function addRallyEvents(state: MatchState): MatchState {
   }
 
   if (latestLength === 1) {
-    events.push({ type: AnnouncementEventType.Ace, speed: serveSpeed.toFixed(3) });
+    events.push({ type: AnnouncementEventType.Ace, speed: serveSpeed.toFixed(2) });
   }
 
   const previousRallies = state.rallies.slice(0, -1);

@@ -6,7 +6,9 @@ import { AceEvent, AnnouncementEvent, AnnouncementEventType, DeuceCountEvent, Lo
 const LongRallyEventComponent: React.FC<LongRallyEvent> = ({ length }) => (
   <div className="announcement long-rally">
     <h2>Long Rally!</h2>
-    <p>Rally Length: {length} shots</p>
+    <p>
+      <span style={{ fontSize: "1.5em" }}>{length}</span> shots
+    </p>
   </div>
 );
 
@@ -14,7 +16,9 @@ const LongRallyEventComponent: React.FC<LongRallyEvent> = ({ length }) => (
 const AceEventComponent: React.FC<AceEvent> = ({ speed }) => (
   <div className="announcement ace">
     <h2>Ace!</h2>
-    <p>{speed}pps</p>
+    <p>
+      <span style={{ fontSize: "1.5em" }}>{speed}</span>mph
+    </p>
   </div>
 );
 
@@ -40,7 +44,6 @@ const DeuceCountEventComponent: React.FC<DeuceCountEvent> = ({ count }) => (
 const SwitchEndsEventComponent = () => (
   <div className="announcement switch-ends">
     <h2>Switch Ends!</h2>
-    <p>Players switch sides of the court</p>
   </div>
 );
 
