@@ -58,7 +58,11 @@ export function reducer(state: MatchState, action: Action): MatchState {
             },
           };
           const isWinner = checkIsWinner(newState, player, opponent);
-          const winEvent: WinGameEvent = { type: AnnouncementEventType.WinGame, winType: isWinner ? "match" : "set", player };
+          const winEvent: WinGameEvent = {
+            type: AnnouncementEventType.WinGame,
+            winType: isWinner ? "match" : "set",
+            playerName: state.matchConfig.names[player],
+          };
           return switchEndsIfNeeded(addRallyEvents(addPointState({ ...newState, matchWinner: isWinner ? player : undefined, events: [winEvent] })));
         }
         // handle tie break point score
@@ -137,7 +141,11 @@ export function reducer(state: MatchState, action: Action): MatchState {
             events: [],
           };
           const isWinner = checkIsWinner(newState, player, opponent);
-          const winEvent: WinGameEvent = { type: AnnouncementEventType.WinGame, winType: isWinner ? "match" : "set", player };
+          const winEvent: WinGameEvent = {
+            type: AnnouncementEventType.WinGame,
+            winType: isWinner ? "match" : "set",
+            playerName: state.matchConfig.names[player],
+          };
           return switchEndsIfNeeded(addRallyEvents(addPointState({ ...newState, matchWinner: isWinner ? player : undefined, events: [winEvent] })));
         }
         // win games within set
@@ -150,7 +158,7 @@ export function reducer(state: MatchState, action: Action): MatchState {
           },
           rallies: [...state.rallies, { winner: player, pointType: state.pointType, stats }],
           servingPlayer: state.servingPlayer === Player.Player1 ? Player.Player2 : Player.Player1,
-          events: [{ type: AnnouncementEventType.WinGame, winType: "game", player: player } as WinGameEvent],
+          events: [{ type: AnnouncementEventType.WinGame, winType: "game", playerName: state.matchConfig.names[player] } as WinGameEvent],
         };
         return switchEndsIfNeeded(addRallyEvents(addPointState({ ...newState })));
       }
@@ -228,9 +236,9 @@ function addRallyEvents(state: MatchState): MatchState {
   }
 
   // win streak
-  const winStreak = getWinStreak(state.rallies);
-  if (winStreak > 0 && winStreak % 5 === 0) {
-    events.push({ type: AnnouncementEventType.WinStreak, streak: winStreak });
+  const { streak, player } = getWinStreak(state.rallies);
+  if (player && streak > 0 && streak % 5 === 0) {
+    events.push({ type: AnnouncementEventType.WinStreak, streak, playerName: state.matchConfig.names[player] });
   }
 
   if (latestLength === 1) {
@@ -262,7 +270,7 @@ export function getDeuceCount(state: MatchState): number {
 }
 
 export function getWinStreak(rallies: MatchState["rallies"]) {
-  if (rallies.length < 1) return 0;
+  if (rallies.length < 1) return { streak: 0 };
   const { winner } = rallies[rallies.length - 1];
   let streak = 0;
   for (let i = rallies.length - 1; i >= 0; i--) {
@@ -271,7 +279,7 @@ export function getWinStreak(rallies: MatchState["rallies"]) {
     }
     streak++;
   }
-  return streak;
+  return { streak, player: winner };
 }
 
 export function addPointState(state: MatchState): MatchState {

@@ -56,6 +56,7 @@ export interface AceEvent {
 export interface WinStreakEvent {
   type: AnnouncementEventType.WinStreak;
   streak: number;
+  playerName: string;
 }
 
 export interface SwitchEndsEvent {
@@ -70,7 +71,7 @@ export interface DeuceCountEvent {
 export interface WinGameEvent {
   type: AnnouncementEventType.WinGame;
   winType: "game" | "set" | "match";
-  player: Player;
+  playerName: string;
 }
 
 export type AnnouncementEvent = LongRallyEvent | AceEvent | WinStreakEvent | SwitchEndsEvent | WinGameEvent | DeuceCountEvent;

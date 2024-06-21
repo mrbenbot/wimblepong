@@ -14,15 +14,15 @@ const LongRallyEventComponent: React.FC<LongRallyEvent> = ({ length }) => (
 const AceEventComponent: React.FC<AceEvent> = ({ speed }) => (
   <div className="announcement ace">
     <h2>Ace!</h2>
-    <p>Serve Speed: {speed}</p>
+    <p>{speed}pps</p>
   </div>
 );
 
 // WinStreakEvent Component
-const WinStreakEventComponent: React.FC<WinStreakEvent> = ({ streak }) => (
+const WinStreakEventComponent: React.FC<WinStreakEvent> = ({ streak, playerName }) => (
   <div className="announcement win-streak">
-    <h2>Winning Streak!</h2>
-    <p>{streak} points in a row</p>
+    <h2>Winning Streak - {playerName}</h2>
+    <p>{streak} points in a row!</p>
   </div>
 );
 
@@ -51,10 +51,10 @@ const winTypeText = {
 };
 
 // WinGameEvent Component
-const WinGameEventComponent: React.FC<WinGameEvent> = ({ winType, player }) => (
+const WinGameEventComponent: React.FC<WinGameEvent> = ({ winType, playerName }) => (
   <div className="announcement win-game">
     <h2>{winTypeText[winType]}</h2>
-    <p>to {player}</p>
+    <p>to {playerName}</p>
   </div>
 );
 

@@ -7,10 +7,8 @@
 - function
   - keep path of ball
 - style
-  - responsive css
   - events should have their own style and possibly positioning
     - win streak should have the player name / color
-  - space dystopia theme
   - make everything big and readable on TV screen
     - events
 

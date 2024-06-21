@@ -379,7 +379,9 @@ describe("Tennis Match Reducer", () => {
         };
         const newState = reducer(state, action);
         expect(newState.matchWinner).toBe(winner);
-        expect(newState.events).toEqual(expect.arrayContaining([{ type: AnnouncementEventType.WinGame, winType: "match", player: winner }]));
+        expect(newState.events).toEqual(
+          expect.arrayContaining([{ type: AnnouncementEventType.WinGame, winType: "match", playerName: state.matchConfig.names[winner] }])
+        );
       }
     );
 
@@ -415,17 +417,17 @@ describe("Tennis Match Reducer", () => {
 
 describe("getWinStreak", () => {
   it.each([
-    { rallies: [], expected: 0 },
+    { rallies: [], expected: { streak: 0 } },
     {
       rallies: [{ winner: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } }],
-      expected: 1,
+      expected: { player: Player.Player1, streak: 1 },
     },
     {
       rallies: [
         { winner: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } },
         { winner: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } },
       ],
-      expected: 2,
+      expected: { player: Player.Player1, streak: 2 },
     },
     {
       rallies: [
@@ -433,7 +435,7 @@ describe("getWinStreak", () => {
         { winner: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } },
         { winner: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } },
       ],
-      expected: 3,
+      expected: { player: Player.Player1, streak: 3 },
     },
     {
       rallies: [
@@ -441,10 +443,10 @@ describe("getWinStreak", () => {
         { winner: Player.Player2, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } },
         { winner: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } },
       ],
-      expected: 1,
+      expected: { player: Player.Player1, streak: 1 },
     },
   ])("win streak should be $expected", ({ rallies, expected }) => {
-    expect(getWinStreak(rallies as MatchState["rallies"])).toBe(expected);
+    expect(getWinStreak(rallies as MatchState["rallies"])).toEqual(expected);
   });
 });
 
