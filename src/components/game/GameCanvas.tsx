@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useLayoutEffect } from "react";
+import React, { useRef, useCallback, useLayoutEffect, useEffect } from "react";
 import { Action } from "../../libs/score";
 import { COURT, DELTA_TIME_DIVISOR } from "../../config";
 import "./GameCanvas.css";
@@ -29,13 +29,13 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
   getPlayer2Actions,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const webGlRef = useRef<ReturnType<typeof initDrawingContext> | null>(null);
   const deltaTimeRef = useRef(0);
 
   const { servingPlayer, playerPositions } = matchState;
 
   const handleGameEvent = useCallback(
     (event: GameEventType) => {
-      console.log(event);
       switch (event) {
         case GameEventType.ScorePointLeft:
           dispatch({ type: "POINT_SCORED", player: rightPlayer, stats: { ...gameStateRef.current.stats } });
@@ -59,13 +59,22 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
     [dispatch, gameStateRef, leftPlayer, rightPlayer]
   );
 
-  useLayoutEffect(() => {
-    if (paused) return;
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const { draw, cleanup } = initDrawingContext(canvas) ?? {};
-    if (!draw || !cleanup) return;
+    const drawingContext = initDrawingContext(canvas);
+    console.log("init drawing context");
+    webGlRef.current = drawingContext;
+    return () => {
+      drawingContext?.cleanup();
+    };
+  }, []);
 
+  useLayoutEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const { draw } = webGlRef.current ?? {};
+    if (!draw) return;
     const gameState = gameStateRef.current;
 
     console.log("applying meta game state");
@@ -102,7 +111,6 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
         console.log("stopping game loop");
         cancelAnimationFrame(loopId);
       }
-      cleanup();
     };
   }, [gameStateRef, getPlayer1Actions, getPlayer2Actions, handleGameEvent, paused, playerPositions, servingPlayer]);
 

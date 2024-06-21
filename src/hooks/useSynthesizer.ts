@@ -194,7 +194,6 @@ const useSynthesizer = () => {
     oscillator.type = "square";
     oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
     gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
-    console.log(`Playing frequency: ${frequency} Hz`);
     oscillator.start();
     oscillator.stop(audioContext.currentTime + duration);
     // Clean up
