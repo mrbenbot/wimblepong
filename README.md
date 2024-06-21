@@ -7,27 +7,16 @@
 - function
   - keep path of ball
   - ability to reset / play again
-  - input player names
-  - sounds should not be biased in two player mode
-    - maybe biased towards server?
 - style
   - responsive css
   - events should have their own style and possibly positioning
     - win streak should have the player name / color
-  - full screen button should not show in full screen mode
-  - style the scoreboard like BBC wimbledon
-  - circle based score board
   - winner should be displayed clearly
   - stats
   - confetti?
-  - visual representation of score (circles?)
   - space dystopia theme
   - make everything big and readable on TV screen
-- implementation
-  - refactor sounds to react to dispatch events?
-  - use css to flip screen and transform observations so that each "player" is given the equivalent input
-  - configurability of playing options
-  - sounds should be controlled as a side effect of the reducer?
+    - events
 
 ## Computer Player
 
