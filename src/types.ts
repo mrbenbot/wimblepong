@@ -27,8 +27,10 @@ export enum PointType {
   Deuce = "DEUCE",
   GamePoint = "GAME_POINT",
   BreakPoint = "BREAK_POINT",
+  BreakSetPoint = "BREAK_SET_POINT",
   SetPoint = "SET_POINT",
   MatchPoint = "MATCH_POINT",
+  BreakMatchPoint = "BREAK_MATCH_POINT",
   Tiebreak = "TIEBREAK",
 }
 

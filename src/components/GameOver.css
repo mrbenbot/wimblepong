@@ -1,0 +1,102 @@
+/* GameOver.css */
+
+.match-statistics {
+  text-align: center;
+  font-size: 2em;
+  margin: 20px;
+}
+.stat-heading {
+  margin-bottom: 0;
+  margin-top: 0;
+}
+.stat-header,
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+}
+
+.stat-header {
+  font-weight: bold;
+}
+
+.stat-title {
+  flex: 2;
+  text-align: center;
+  width: 15em;
+}
+
+.stat-value:first-child {
+  text-align: left;
+}
+
+.stat-value:last-child {
+  text-align: right;
+}
+
+.stat-value {
+  flex: 1;
+  text-align: center;
+}
+
+.common-stats {
+  margin-top: 20px;
+  padding: 20px;
+  border-top: 1px solid #ccc;
+}
+.common-stat {
+  display: flex;
+  justify-content: space-evenly;
+  /* padding-left: 3em; */
+  /* padding-right: 3em; */
+}
+.button-container {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+@keyframes celebratoryBounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  40% {
+    transform: translateY(-10px) rotate(20deg);
+  }
+  60% {
+    transform: translateY(-5px) rotate(-15deg);
+  }
+}
+
+.celebratory-bounce {
+  display: inline-block;
+  animation: celebratoryBounce 2s infinite;
+}
+
+@keyframes celebratoryColors {
+  0% {
+    color: red;
+  }
+  20% {
+    color: orange;
+  }
+  40% {
+    color: yellow;
+  }
+  60% {
+    color: rgb(0, 220, 0);
+  }
+  80% {
+    color: rgb(0, 187, 244);
+  }
+  100% {
+    color: rgb(248, 0, 248);
+  }
+}
+
+.celebratory-colors {
+  animation: celebratoryColors 3s infinite;
+}

@@ -187,7 +187,7 @@ describe("Tennis Match Reducer", () => {
       state = reducer(state, { type: "POINT_SCORED", player: Player.Player2, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
       expect(state.tiebreak[Player.Player1]).toBe(5);
       expect(state.tiebreak[Player.Player2]).toBe(6);
-      expect(state.pointType).toBe(PointType.SetPoint);
+      expect(state.pointType).toBe(PointType.BreakSetPoint);
       expect(state.servingPlayer).toBe(Player.Player1); // Serve changes after two more points
       expect(state.playerPositions).toBe(PlayerPositions.Reversed); // End stays the same
 
@@ -202,7 +202,7 @@ describe("Tennis Match Reducer", () => {
       state = reducer(state, { type: "POINT_SCORED", player: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
       expect(state.tiebreak[Player.Player1]).toBe(7);
       expect(state.tiebreak[Player.Player2]).toBe(6);
-      expect(state.pointType).toBe(PointType.SetPoint);
+      expect(state.pointType).toBe(PointType.BreakSetPoint);
       expect(state.servingPlayer).toBe(Player.Player2); // Serve changes after two more points
       expect(state.playerPositions).toBe(PlayerPositions.Initial); // End stays the same
 
@@ -634,7 +634,7 @@ describe("addPointState", () => {
     expect(updatedState.pointType).toBe(PointType.MatchPoint);
   });
 
-  it("should handle tiebreak and set point type to MATCH_POINT", () => {
+  it("should handle tiebreak and set point type to BREAK_MATCH_POINT", () => {
     const state: MatchState = {
       ...initialState,
       servingPlayer: Player.Player2,
@@ -644,7 +644,7 @@ describe("addPointState", () => {
       matchConfig: { ...defaultMatchConfig, numberOfSets: 3, setLength: 6 },
     };
     const updatedState = addPointState(state);
-    expect(updatedState.pointType).toBe(PointType.MatchPoint);
+    expect(updatedState.pointType).toBe(PointType.BreakMatchPoint);
   });
 
   it("should handle tiebreak and set point type to MATCH_POINT in set length of 4", () => {
@@ -657,7 +657,7 @@ describe("addPointState", () => {
       matchConfig: { ...defaultMatchConfig, numberOfSets: 3, setLength: 4 },
     };
     const updatedState = addPointState(state);
-    expect(updatedState.pointType).toBe(PointType.MatchPoint);
+    expect(updatedState.pointType).toBe(PointType.BreakMatchPoint);
   });
 
   it("should return NORMAL point type when no specific conditions are met", () => {

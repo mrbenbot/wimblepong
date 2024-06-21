@@ -21,8 +21,10 @@ const Scoreboard = ({ matchState }: { matchState: MatchState }) => {
   return (
     <div className="scoreboard">
       <div className="row">
-        {sets.map((set) => (
-          <div className="cell number-cell">{set[Player.Player1]}</div>
+        {sets.map((set, i) => (
+          <div className="cell number-cell" key={i}>
+            {set[Player.Player1]}
+          </div>
         ))}
         <div
           className="cell player-cell"
@@ -42,8 +44,10 @@ const Scoreboard = ({ matchState }: { matchState: MatchState }) => {
         </div>
       </div>
       <div className="row">
-        {sets.map((set) => (
-          <div className="cell number-cell">{set[Player.Player2]}</div>
+        {sets.map((set, i) => (
+          <div className="cell number-cell" key={i}>
+            {set[Player.Player2]}
+          </div>
         ))}
         <div
           className="cell player-cell"

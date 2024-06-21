@@ -285,14 +285,14 @@ export function addPointState(state: MatchState): MatchState {
       if (setsWonByPlayer === Math.floor(matchConfig.numberOfSets / 2) && tiebreak[player] >= 6 && tiebreak[player] - tiebreak[opponent] >= 1) {
         return {
           ...state,
-          pointType: PointType.MatchPoint,
+          pointType: servingPlayer === player ? PointType.MatchPoint : PointType.BreakMatchPoint,
         };
       }
       // Determine if it is a set point during tiebreak
       if (isTiebreakSetPoint(state, player, opponent)) {
         return {
           ...state,
-          pointType: PointType.SetPoint,
+          pointType: servingPlayer === player ? PointType.SetPoint : PointType.BreakSetPoint,
         };
       }
     }
@@ -309,9 +309,15 @@ export function addPointState(state: MatchState): MatchState {
       const isSetPoint = games[player] >= matchConfig.setLength - 1 && games[player] - games[opponent] > 0;
       if (isSetPoint) {
         const isMatchPoint = setsWonByPlayer === Math.floor(matchConfig.numberOfSets / 2);
+        if (isMatchPoint) {
+          return {
+            ...state,
+            pointType: servingPlayer === player ? PointType.MatchPoint : PointType.BreakMatchPoint,
+          };
+        }
         return {
           ...state,
-          pointType: isMatchPoint ? PointType.MatchPoint : PointType.SetPoint,
+          pointType: servingPlayer === player ? PointType.SetPoint : PointType.BreakSetPoint,
         };
       }
       return {

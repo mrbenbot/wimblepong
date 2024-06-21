@@ -15,7 +15,9 @@ const pointMap: {
   [PointType.BreakPoint]: "Break Point",
   [PointType.GamePoint]: "Game Point",
   [PointType.SetPoint]: "Set Point",
+  [PointType.BreakSetPoint]: "Set Point",
   [PointType.MatchPoint]: "Match Point",
+  [PointType.BreakMatchPoint]: "Match Point",
 };
 
 const GameScore = ({ leftPlayer, rightPlayer, matchState }: { leftPlayer: Player; rightPlayer: Player; matchState: MatchState }) => {
