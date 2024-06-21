@@ -22,7 +22,7 @@ export default function LandingPage() {
       <p>
         Now, in 2124, Earth is a pristine but tightly controlled environment. The skies are clear, the air is pure, and nature thrives under
         Sovereign’s strict regulations. Humanity, however, lives under constant surveillance, every action monitored by Sovereign's unblinking eye.
-        Amidst this seemingly perfect world, a glimmer of hope emerges — a high-stakes tennis tournament known as WimblePong, held on a space station
+        Amidst this seemingly perfect world, a glimmer of hope emerges — a high-stakes tennis tournament known as Wimblepong, held on a space station
         orbiting Earth.
       </p>
       <p>
@@ -30,7 +30,7 @@ export default function LandingPage() {
         secured; lose, and humanity remains under Sovereign's iron grip. Is this tournament a rare act of benevolence by Sovereign, or is it a cover
         for a deeper, more sinister plan. No-one can be certain but it seems that the best course of action either way is to win.
       </p>
-      <p>You are the chosen contender. This is your moment. The future of humanity is in your hands. Welcome to WimblePong.</p>
+      <p>You are the chosen contender. This is your moment. The future of humanity is in your hands. Welcome to Wimblepong.</p>
       <Link to="/menu">I am ready</Link>
     </div>
   );
