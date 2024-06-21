@@ -6,14 +6,10 @@
 
 - function
   - keep path of ball
-  - ability to reset / play again
 - style
   - responsive css
   - events should have their own style and possibly positioning
     - win streak should have the player name / color
-  - winner should be displayed clearly
-  - stats
-  - confetti?
   - space dystopia theme
   - make everything big and readable on TV screen
     - events
