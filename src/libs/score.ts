@@ -18,7 +18,7 @@ export const initialState: MatchState = {
     names: { [Player.Player1]: "Player1", [Player.Player2]: "Player2" },
     soundOn: true,
   },
-  events: [{ type: AnnouncementEventType.Ace, speed: "60" }],
+  events: [],
   pointType: PointType.Normal,
 };
 
