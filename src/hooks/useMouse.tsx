@@ -46,7 +46,7 @@ const useMouseInput = () => {
     const { buttonPressed, mouseY } = dataRef.current;
     const rects = canvas.getBoundingClientRect();
     const paddle = state[player];
-    if ((state.positionsReversed && player === Player.Player1) || (state.positionsReversed && player === Player.Player1)) {
+    if ((state.positionsReversed && player === Player.Player1) || (!state.positionsReversed && player === Player.Player2)) {
       return {
         buttonPressed,
         paddleDirection: -boundedValue(paddle.y - mouseY + rects.top + paddle.height, -MAX_MOUSE_PADDLE_SPEED, MAX_MOUSE_PADDLE_SPEED),

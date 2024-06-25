@@ -1,25 +1,32 @@
 import { useCallback } from "react";
 import App from "../game/App";
 import useMouseInput from "../../hooks/useMouse";
-import { getComputerPlayerActionsFunction } from "../../libs/computerPlayer";
+import { botOptions, getComputerPlayerActionsFunction } from "../../libs/computerPlayer";
 import useMachineOpponent from "../../hooks/useMachineOpponent";
 import { getTensorFlowPlayer } from "../../libs/tensorFlowPlayer";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { Player } from "../../types";
 
 export default function MouseControlApp() {
   const location = useLocation();
-  const { opponentType } = useParams<{ opponentType: "ai" | "auto" }>();
   const { getPlayerActions } = useMouseInput();
 
   const getComputerPlayer = useCallback(async () => {
-    if (opponentType === "ai") {
-      return getTensorFlowPlayer();
+    const [opponentType] = Object.values<string>(location.state.matchConfig.inputTypes).filter((type) => type !== "mouse");
+    if (botOptions.includes(opponentType ?? "")) {
+      return getComputerPlayerActionsFunction(opponentType as "bot-easy" | "bot-medium" | "bot-hard");
     } else {
-      return getComputerPlayerActionsFunction();
+      return getTensorFlowPlayer(opponentType);
     }
-  }, [opponentType]);
+  }, [location.state]);
 
   const { getComputerActions } = useMachineOpponent(getComputerPlayer);
 
-  return <App getPlayer1Actions={getPlayerActions} getPlayer2Actions={getComputerActions} matchConfig={location.state.matchConfig} />;
+  return (
+    <App
+      getPlayer1Actions={location.state.matchConfig.inputTypes[Player.Player1] === "mouse" ? getPlayerActions : getComputerActions}
+      getPlayer2Actions={location.state.matchConfig.inputTypes[Player.Player2] === "mouse" ? getPlayerActions : getComputerActions}
+      matchConfig={location.state.matchConfig}
+    />
+  );
 }

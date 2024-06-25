@@ -1,11 +1,20 @@
-import { COURT, MAX_COMPUTER_PADDLE_SPEED } from "../config";
+import { COURT, MAX_COMPUTER_PADDLE_SPEED, PADDLE } from "../config";
 import { GetPlayerActionsFunction, Player } from "../types";
 import { boundedValue } from "./numbers";
 
-export const getComputerPlayerActionsFunction: () => GetPlayerActionsFunction = () => {
+const speeds = {
+  "bot-easy": MAX_COMPUTER_PADDLE_SPEED / 2,
+  "bot-medium": MAX_COMPUTER_PADDLE_SPEED,
+  "bot-hard": MAX_COMPUTER_PADDLE_SPEED * 2,
+};
+
+export const getComputerPlayerActionsFunction: (setting: "bot-easy" | "bot-medium" | "bot-hard") => GetPlayerActionsFunction = (setting) => {
   let serveDelay = 50;
   let serveDelayCounter = 0;
   let direction = 15;
+  const paddleSpeed = speeds[setting] ?? MAX_COMPUTER_PADDLE_SPEED;
+  console.log({ paddleSpeed });
+  const paddleOffset = (Math.random() * PADDLE.height) / 2;
   return (player, state) => {
     if (state.ball.scoreMode) {
       serveDelayCounter = 0;
@@ -29,20 +38,14 @@ export const getComputerPlayerActionsFunction: () => GetPlayerActionsFunction = 
     if (isLeft) {
       return {
         buttonPressed: false,
-        paddleDirection: boundedValue(
-          paddle.y - state.ball.y + paddle.height / 2 + (Math.random() - 0.5) * 2,
-          -MAX_COMPUTER_PADDLE_SPEED,
-          MAX_COMPUTER_PADDLE_SPEED
-        ),
+        paddleDirection: boundedValue(paddle.y + paddleOffset - state.ball.y + paddle.height / 2, -paddleSpeed, paddleSpeed),
       };
     }
     return {
       buttonPressed: false,
-      paddleDirection: -boundedValue(
-        paddle.y - state.ball.y + paddle.height / 2 + (Math.random() - 0.5) * 2,
-        -MAX_COMPUTER_PADDLE_SPEED,
-        MAX_COMPUTER_PADDLE_SPEED
-      ),
+      paddleDirection: -boundedValue(paddle.y + paddleOffset - state.ball.y + paddle.height / 2, -paddleSpeed, paddleSpeed),
     };
   };
 };
+
+export const botOptions = ["bot-easy", "bot-medium", "bot-hard"];

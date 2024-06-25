@@ -1,22 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MatchState, Player } from "../types";
 import { useNavigate } from "react-router-dom";
 import "./Menu.css";
 import { clearState } from "../libs/localStorage";
 
-const playOptions = [
-  { path: "/mouse/ai", title: "Mouse vs Model" },
-  { path: "/mouse/auto", title: "Mouse vs Computer" },
-  // { path: "/dj/dj", title: "DJ vs DJ" },
-  // { path: "/dj/auto", title: "DJ vs Computer" },
-  // { path: "/dj/ai", title: "DJ vs Model" },
-  { path: "/gamepad/gamepad", title: "Gamepad vs Gamepad" },
-  { path: "/gamepad/auto", title: "Gamepad vs Computer" },
-  // { path: "/gamepad/ai", title: "Gamepad vs Computer" },
-];
-
 const MenuComponent: React.FC = () => {
   const navigate = useNavigate();
+  const [models, setModels] = useState<string[]>([]);
   const [matchConfig, setMatchConfig] = useState<MatchState["matchConfig"]>({
     numberOfSets: 3,
     setLength: 6,
@@ -24,44 +14,102 @@ const MenuComponent: React.FC = () => {
       [Player.Player1]: "Player1",
       [Player.Player2]: "Player2",
     },
+    inputTypes: {
+      [Player.Player1]: "mouse",
+      [Player.Player2]: "bot-easy",
+    },
     soundOn: true,
   });
-  const [path, setPath] = useState("/mouse/auto");
 
-  const handleNavigation = (path: string) => {
-    clearState();
-    navigate(path, { state: { matchConfig } });
+  useEffect(() => {
+    const manifest = JSON.parse(localStorage.getItem("model-manifest") || "[]");
+    setModels(manifest);
+  }, []);
+
+  const handleNavigation = () => {
+    const { [Player.Player1]: player1Option, [Player.Player2]: player2Option } = matchConfig.inputTypes;
+    if (player1Option && player2Option) {
+      clearState();
+      const options = { state: { matchConfig } };
+      if ([player1Option, player2Option].includes("mouse")) {
+        navigate(`/mouse`, options);
+      } else if ([player1Option, player2Option].includes("gamepad")) {
+        navigate(`/gamepad`, options);
+      } else {
+        navigate(`/computer`, options);
+      }
+    } else {
+      alert("Please select options for both players.");
+    }
   };
 
-  const handleNameChange = (player: Player) => (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleConfigChange = (key: "names" | "inputTypes", player: Player) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setMatchConfig({
       ...matchConfig,
-      names: {
-        ...matchConfig.names,
-        [player]: event.target.value.slice(0, 8),
+      [key]: {
+        ...matchConfig[key],
+        [player]: key == "names" ? event.target.value.slice(0, 8) : event.target.value,
       },
     });
+  };
+
+  const renderOptions = (otherSelectedOption: string) => {
+    const isMouseSelected = otherSelectedOption === "mouse";
+    const isGamepadSelected = otherSelectedOption === "gamepad";
+    return (
+      <>
+        <optgroup label="Human">
+          <option value="mouse" disabled={isMouseSelected || isGamepadSelected}>
+            Mouse
+          </option>
+          <option value="gamepad" disabled={isMouseSelected}>
+            Gamepad
+          </option>
+        </optgroup>
+        <optgroup label="Bot">
+          <option value="bot-easy">Bot - Easy</option>
+          <option value="bot-medium">Bot - Medium</option>
+          <option value="bot-hard">Bot - Hard</option>
+        </optgroup>
+        <optgroup label="AI">
+          {models.map((model) => (
+            <option key={model} value={`${model}`}>
+              {model}
+            </option>
+          ))}
+        </optgroup>
+      </>
+    );
   };
 
   return (
     <div className="menu">
       <h1>Game Setup</h1>
       <div>
-        {playOptions.map((option) => (
-          <button onClick={() => setPath(option.path)} key={option.path} className={path === option.path ? "selected" : ""}>
-            {option.title}
-          </button>
-        ))}
+        <label>
+          <span>Player 1 Option:</span>
+          <select value={matchConfig.inputTypes[Player.Player1]} onChange={handleConfigChange("inputTypes", Player.Player1)} className="input">
+            {renderOptions(matchConfig.inputTypes[Player.Player2])}
+          </select>
+        </label>
+      </div>
+      <div>
+        <label>
+          <span>Player 2 Option:</span>
+          <select value={matchConfig.inputTypes[Player.Player2]} onChange={handleConfigChange("inputTypes", Player.Player2)} className="input">
+            {renderOptions(matchConfig.inputTypes[Player.Player1])}
+          </select>
+        </label>
       </div>
       <br />
       <label>
         <span>Player 1 Name:</span>
-        <input className="input" type="text" value={matchConfig.names[Player.Player1]} onChange={handleNameChange(Player.Player1)} />
+        <input className="input" type="text" value={matchConfig.names[Player.Player1]} onChange={handleConfigChange("names", Player.Player1)} />
       </label>
       <br />
       <label>
         <span>Player 2 Name:</span>
-        <input className="input" type="text" value={matchConfig.names[Player.Player2]} onChange={handleNameChange(Player.Player2)} />
+        <input className="input" type="text" value={matchConfig.names[Player.Player2]} onChange={handleConfigChange("names", Player.Player2)} />
       </label>
       <br />
       <br />
@@ -109,7 +157,7 @@ const MenuComponent: React.FC = () => {
         />
       </label>
       <br />
-      <button onClick={() => handleNavigation(path)} className="play-button">
+      <button onClick={handleNavigation} className="play-button">
         PLAY
       </button>
     </div>

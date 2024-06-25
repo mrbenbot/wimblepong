@@ -103,6 +103,7 @@ export interface MatchState {
     numberOfSets: number;
     setLength: number;
     names: { [Player.Player1]: string; [Player.Player2]: string };
+    inputTypes: { [Player.Player1]: string; [Player.Player2]: string };
     soundOn: boolean;
   };
   events: AnnouncementEvent[];

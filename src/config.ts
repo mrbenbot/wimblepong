@@ -24,6 +24,8 @@ export const LONG_RALLY_ANNOUNCEMENT_THRESHOLD = 10;
 
 // mouse input
 export const MAX_MOUSE_PADDLE_SPEED = 25;
+
+// bot setting
 export const MAX_COMPUTER_PADDLE_SPEED = 10;
 
 // gamepad api

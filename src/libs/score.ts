@@ -16,6 +16,7 @@ export const initialState: MatchState = {
     numberOfSets: 3,
     setLength: 6,
     names: { [Player.Player1]: "Player1", [Player.Player2]: "Player2" },
+    inputTypes: { [Player.Player1]: "bot-easy", [Player.Player2]: "mouse" },
     soundOn: true,
   },
   events: [],

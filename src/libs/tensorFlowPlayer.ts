@@ -2,7 +2,8 @@ import { COURT } from "../config";
 import { GetPlayerActionsFunction, MutableGameState, Player } from "../types";
 import type { Tensor, Rank } from "@tensorflow/tfjs";
 
-export async function getTensorFlowPlayer(): Promise<GetPlayerActionsFunction> {
+export async function getTensorFlowPlayer(modelName: string): Promise<GetPlayerActionsFunction> {
+  console.log(modelName);
   const tf = await import("@tensorflow/tfjs");
 
   async function loadModel() {
