@@ -61,13 +61,24 @@ function getObservation(player: Player, gameState: MutableGameState) {
   ];
 }
 
+let tfPromise: Promise<typeof import("@tensorflow/tfjs")> | null = null;
+const modelCache: { [key: string]: GraphModel } = {};
+
 export async function getTensorFlowPlayer(modelName: string): Promise<GetPlayerActionsFunction> {
-  const tf = await import("@tensorflow/tfjs");
+  if (!tfPromise) {
+    tfPromise = import("@tensorflow/tfjs");
+  }
+  const tf = await tfPromise;
 
   async function loadModel() {
+    if (modelCache[modelName]) {
+      console.log(`Model - "${modelName}" loaded from cache`);
+      return modelCache[modelName];
+    }
     const model = await tf.loadGraphModel(new LocalStorageIOHandler(modelName));
+    modelCache[modelName] = model;
     console.log(`Model - "${modelName}" loaded successfully`);
-    return { model };
+    return model;
   }
 
   function getPredictionIndex(model: GraphModel) {
@@ -86,7 +97,7 @@ export async function getTensorFlowPlayer(modelName: string): Promise<GetPlayerA
   }
 
   console.log(`loading model - ${modelName}`);
-  const { model } = await loadModel();
+  const model = await loadModel();
   const predictionIndex = getPredictionIndex(model);
 
   return (player, gameState) => {
