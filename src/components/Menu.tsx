@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { MatchState, Player } from "../types";
 import { useNavigate } from "react-router-dom";
 import "./Menu.css";
-import { clearState } from "../libs/localStorage";
+import { clearItem } from "../libs/localStorage";
+import { MATCH_STATE_KEY } from "../config";
 
 const MenuComponent: React.FC = () => {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ const MenuComponent: React.FC = () => {
   const handleNavigation = () => {
     const { [Player.Player1]: player1Option, [Player.Player2]: player2Option } = matchConfig.inputTypes;
     if (player1Option && player2Option) {
-      clearState();
+      clearItem(MATCH_STATE_KEY); // clear match state in local storage in case remaining from previous match
       const options = { state: { matchConfig } };
       if ([player1Option, player2Option].includes("mouse")) {
         navigate(`/mouse`, options);
@@ -157,9 +158,14 @@ const MenuComponent: React.FC = () => {
         />
       </label>
       <br />
-      <button onClick={handleNavigation} className="play-button">
-        PLAY
-      </button>
+      <div style={{ display: "flex", justifyContent: "space-evenly", width: "100%" }}>
+        <button onClick={() => navigate("/upload")} className="upload-button">
+          Manage Local Models
+        </button>
+        <button onClick={handleNavigation} className="play-button">
+          PLAY
+        </button>
+      </div>
     </div>
   );
 };

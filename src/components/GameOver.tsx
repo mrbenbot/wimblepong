@@ -2,7 +2,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "./GameOver.css";
 import { MatchState, Player, PointType } from "../types";
 import { ReactNode } from "react";
-import { clearState } from "../libs/localStorage";
+import { clearItem } from "../libs/localStorage";
+import { MATCH_STATE_KEY } from "../config";
 
 const GameOver = () => {
   const location = useLocation();
@@ -101,7 +102,7 @@ const GameOver = () => {
       <div className="button-container">
         <button
           onClick={() => {
-            clearState();
+            clearItem(MATCH_STATE_KEY);
             navigate(location.state.path, { state: { matchConfig } });
           }}
         >
@@ -109,7 +110,7 @@ const GameOver = () => {
         </button>
         <button
           onClick={() => {
-            clearState();
+            clearItem(MATCH_STATE_KEY);
             navigate("/menu");
           }}
         >

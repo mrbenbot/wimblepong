@@ -6,12 +6,13 @@ import EventAnnouncement from "./EventAnnouncement";
 import { GetPlayerActionsFunction, MatchState, MutableGameState } from "../../types";
 import Scoreboard from "./Scoreboard";
 import useFullscreen from "../../hooks/useFullScreen";
-import { loadState, saveState } from "../../libs/localStorage";
+import { loadItem, saveItem } from "../../libs/localStorage";
 import { initialGameState } from "../../libs/game";
 import "./App.css";
 import useSynthesizer from "../../hooks/useSynthesizer";
 import soundMiddleware from "../../libs/soundMiddleware";
 import { useLocation, useNavigate } from "react-router-dom";
+import { MATCH_STATE_KEY } from "../../config";
 
 interface AppProps {
   connected?: boolean;
@@ -28,12 +29,12 @@ const App = ({ connected = true, getPlayer1Actions, getPlayer2Actions, matchConf
   const [matchState, dispatch] = useReducer(
     soundMiddleware(playNote)(reducer),
     { ...initialState, matchConfig },
-    (initial) => loadState() || initial
+    (initial) => loadItem(MATCH_STATE_KEY) || initial
   );
   const [isFullScreen, toggleFullScreen] = useFullscreen();
 
   useEffect(() => {
-    saveState(matchState);
+    saveItem(MATCH_STATE_KEY, matchState);
     let id = null;
     if (matchState.matchWinner !== undefined) {
       id = setTimeout(() => {

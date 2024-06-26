@@ -1,8 +1,6 @@
-import { MatchState } from "../types";
-
-export const loadState = () => {
+export const loadItem = (key: string) => {
   try {
-    const serializedState = localStorage.getItem("matchState");
+    const serializedState = localStorage.getItem(key);
     if (serializedState === null) {
       return undefined;
     }
@@ -13,18 +11,18 @@ export const loadState = () => {
   }
 };
 
-export const saveState = (state: MatchState) => {
+export const saveItem = <T>(key: string, state: T) => {
   try {
     const serializedState = JSON.stringify(state);
-    localStorage.setItem("matchState", serializedState);
+    localStorage.setItem(key, serializedState);
   } catch (err) {
     console.error("Could not save state", err);
   }
 };
 
-export const clearState = () => {
+export const clearItem = (key: string) => {
   try {
-    localStorage.removeItem("matchState");
+    localStorage.removeItem(key);
   } catch (err) {
     console.error("Could not clear state", err);
   }

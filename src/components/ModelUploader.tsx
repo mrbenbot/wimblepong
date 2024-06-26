@@ -1,17 +1,19 @@
-import React, { useState, ChangeEvent, DragEvent, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent, DragEvent } from "react";
+import { clearItem, loadItem, saveItem } from "../libs/localStorage";
+import { readFileAsArrayBuffer, readFileAsText } from "../libs/fileReader";
+import { useNavigate } from "react-router-dom";
 
 const ModelUploader: React.FC = () => {
+  const navigate = useNavigate();
   const [modelFile, setModelFile] = useState<File | null>(null);
   const [weightsFile, setWeightsFile] = useState<File | null>(null);
   const [modelName, setModelName] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [manifest, setManifest] = useState<string[]>([]);
 
   useEffect(() => {
-    // Clean up FileReader objects if needed
-    return () => {
-      setModelFile(null);
-      setWeightsFile(null);
-    };
+    const storedManifest = loadItem("model-manifest") || [];
+    setManifest(storedManifest);
   }, []);
 
   const handleFileDrop = (event: DragEvent<HTMLDivElement>) => {
@@ -59,24 +61,6 @@ const ModelUploader: React.FC = () => {
     }
   };
 
-  const readFileAsText = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsText(file);
-    });
-  };
-
-  const readFileAsArrayBuffer = (file: File): Promise<ArrayBuffer> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as ArrayBuffer);
-      reader.onerror = reject;
-      reader.readAsArrayBuffer(file);
-    });
-  };
-
   const handleSave = async () => {
     if (!modelFile || !weightsFile || !modelName) {
       setErrorMessage("Please provide a model name and upload both model.json and weights.bin files.");
@@ -84,11 +68,11 @@ const ModelUploader: React.FC = () => {
     }
 
     try {
-      const modelJson = await readFileAsText(modelFile);
+      const modelJson = await readFileAsText(modelFile).then((file) => JSON.parse(file));
       const weightsArrayBuffer = await readFileAsArrayBuffer(weightsFile);
 
-      localStorage.setItem(`${modelName}-model.json`, modelJson);
-      localStorage.setItem(`${modelName}-weights.bin`, JSON.stringify(Array.from(new Uint8Array(weightsArrayBuffer))));
+      saveItem(`${modelName}-model.json`, modelJson);
+      saveItem(`${modelName}-weights.bin`, Array.from(new Uint8Array(weightsArrayBuffer)));
 
       updateManifest(modelName);
 
@@ -100,11 +84,17 @@ const ModelUploader: React.FC = () => {
   };
 
   const updateManifest = (modelName: string) => {
-    const manifest = JSON.parse(localStorage.getItem("model-manifest") || "[]");
-    if (!manifest.includes(modelName)) {
-      manifest.push(modelName);
-      localStorage.setItem("model-manifest", JSON.stringify(manifest));
-    }
+    const updatedManifest = [...manifest, modelName];
+    setManifest(updatedManifest);
+    saveItem("model-manifest", updatedManifest);
+  };
+
+  const handleDelete = (modelName: string) => {
+    const updatedManifest = manifest.filter((name) => name !== modelName);
+    setManifest(updatedManifest);
+    clearItem(`${modelName}-model.json`);
+    clearItem(`${modelName}-weights.bin`);
+    saveItem("model-manifest", updatedManifest);
   };
 
   const preventDefault = (event: DragEvent<HTMLDivElement>) => event.preventDefault();
@@ -140,6 +130,25 @@ const ModelUploader: React.FC = () => {
       </button>
       {modelFile && <p>Selected model file: {modelFile.name}</p>}
       {weightsFile && <p>Selected weights file: {weightsFile.name}</p>}
+      <h2>Saved Models</h2>
+      {manifest.length === 0 ? (
+        <p>No models saved.</p>
+      ) : (
+        <ul style={{ listStyle: "none" }}>
+          {manifest.map((model, index) => (
+            <li
+              key={index}
+              style={{ display: "flex", justifyContent: "space-evenly", alignItems: "center", borderBottom: "2px dashed", paddingBottom: "10px" }}
+            >
+              <span>{model}</span>
+              <button onClick={() => handleDelete(model)} aria-label={`Delete ${model}`} style={{ borderColor: "red " }}>
+                Delete "{model}"
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      <button onClick={() => navigate("/menu")}>Game Setup</button>
     </div>
   );
 };

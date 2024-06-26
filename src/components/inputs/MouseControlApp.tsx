@@ -20,10 +20,11 @@ export default function MouseControlApp() {
     }
   }, [location.state]);
 
-  const { getComputerActions } = useMachineOpponent(getComputerPlayer);
+  const { status, getComputerActions } = useMachineOpponent(getComputerPlayer);
 
   return (
     <App
+      connected={status === "success"}
       getPlayer1Actions={location.state.matchConfig.inputTypes[Player.Player1] === "mouse" ? getPlayerActions : getComputerActions}
       getPlayer2Actions={location.state.matchConfig.inputTypes[Player.Player2] === "mouse" ? getPlayerActions : getComputerActions}
       matchConfig={location.state.matchConfig}

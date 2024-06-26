@@ -30,3 +30,5 @@ export const MAX_COMPUTER_PADDLE_SPEED = 10;
 
 // gamepad api
 export const GAMEPAD_AXIS_MULTIPLIER = 150;
+
+export const MATCH_STATE_KEY = "matchState";

@@ -13,18 +13,19 @@ export default function GamepadApp() {
   const { connected, getPlayerActions } = useGamepad(numberOfControllers);
 
   const getComputerPlayer = useCallback(async () => {
-    const [opponentType] = Object.values<string>(location.state.matchConfig.inputTypes).filter((type) => type !== "gamepad");
-    if (botOptions.includes(opponentType ?? "")) {
-      return getComputerPlayerActionsFunction(opponentType as "bot-easy" | "bot-medium" | "bot-hard");
+    // can assume at least one player will be gamepad or will not be using this component
+    const players = Object.values<string>(location.state.matchConfig.inputTypes).filter((type) => type !== "gamepad");
+    if (players.length == 0 || botOptions.includes(players[0] ?? "")) {
+      return getComputerPlayerActionsFunction((players[0] ?? "bot-easy") as "bot-easy" | "bot-medium" | "bot-hard");
     } else {
-      return getTensorFlowPlayer(opponentType);
+      return getTensorFlowPlayer(players[0]);
     }
   }, [location.state]);
 
-  const { getComputerActions } = useMachineOpponent(getComputerPlayer);
+  const { status, getComputerActions } = useMachineOpponent(getComputerPlayer);
   return (
     <App
-      connected={connected}
+      connected={connected && status === "success"}
       getPlayer1Actions={location.state.matchConfig.inputTypes[Player.Player1] === "gamepad" ? getPlayerActions : getComputerActions}
       getPlayer2Actions={location.state.matchConfig.inputTypes[Player.Player2] === "gamepad" ? getPlayerActions : getComputerActions}
       matchConfig={location.state.matchConfig}
