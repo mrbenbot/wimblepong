@@ -8,7 +8,7 @@
 
 > anything could change before the competition starts on 15th of July
 
-In the meantime. You can find Wimblepong [here](https://wimblepong.netlify.app) and train your models using [this colab notebook](./WimblepongCustomTrainingEnv.ipynb)
+In the meantime. You can find Wimblepong [here](https://wimblepong.netlify.app) (chrome recommended) and train your models using [this colab notebook](./WimblepongCustomTrainingEnv.ipynb)
 
 Any issues found please raise them on this repo.
 
