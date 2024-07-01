@@ -23,7 +23,7 @@ export const PADDLE_SPEED_DEVISOR = 15;
 export const LONG_RALLY_ANNOUNCEMENT_THRESHOLD = 10;
 
 // mouse input
-export const MAX_MOUSE_PADDLE_SPEED = 25;
+export const MAX_MOUSE_PADDLE_SPEED = 30;
 
 // bot setting
 export const MAX_COMPUTER_PADDLE_SPEED = 10;
