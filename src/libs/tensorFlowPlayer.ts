@@ -108,6 +108,10 @@ export async function getTensorFlowPlayer(modelName: string): Promise<GetPlayerA
     const inputTensor = tf.tensor([getObservation(player, gameState)]); // Expand dimensions to match the expected input shape [1, 8]
     const prediction = model.predict(inputTensor) as Tensor<Rank>[];
     const data = prediction[predictionIndex].dataSync();
-    return { buttonPressed: data[0] > 0.5, paddleDirection: data[1] * 60 };
+
+    inputTensor.dispose();
+    prediction.forEach((tensor) => tensor.dispose());
+
+    return { buttonPressed: data[0] > 0.5, paddleDirection: data[1] * 30 };
   };
 }
