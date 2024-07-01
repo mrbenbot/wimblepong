@@ -1,7 +1,6 @@
 import { COURT } from "../config";
 import { GetPlayerActionsFunction, MutableGameState, Player } from "../types";
 import type { Tensor, Rank, io, GraphModel } from "@tensorflow/tfjs";
-import { initialGameState } from "./game";
 
 class LocalStorageIOHandler implements io.IOHandler {
   private modelPath: string;
@@ -81,24 +80,8 @@ export async function getTensorFlowPlayer(modelName: string): Promise<GetPlayerA
     return model;
   }
 
-  function getPredictionIndex(model: GraphModel) {
-    const inputTensor = tf.tensor([getObservation(Player.Player1, initialGameState)]);
-    console.log("Performing test prediction");
-    const prediction = model.predict(inputTensor) as Tensor<Rank>[];
-    for (let i = 0; i < prediction.length; i++) {
-      const data = prediction[i].dataSync();
-      console.log(`prediction index ${i}:`, [...data]);
-      if (data.length === 2) {
-        console.log("prediction length matches action space");
-        return i;
-      }
-    }
-    throw new Error("could not find prediction to match action space length");
-  }
-
   console.log(`loading model - ${modelName}`);
   const model = await loadModel();
-  const predictionIndex = getPredictionIndex(model);
 
   return (player, gameState) => {
     if (!model) {
@@ -106,12 +89,12 @@ export async function getTensorFlowPlayer(modelName: string): Promise<GetPlayerA
       return { paddleDirection: 0, buttonPressed: false };
     }
     const inputTensor = tf.tensor([getObservation(player, gameState)]); // Expand dimensions to match the expected input shape [1, 8]
-    const prediction = model.predict(inputTensor) as Tensor<Rank>[];
-    const data = prediction[predictionIndex].dataSync();
+    const prediction = model.predict(inputTensor) as Tensor<Rank>;
+    const [buttonPressed, paddleDirection] = prediction.dataSync();
 
     inputTensor.dispose();
-    prediction.forEach((tensor) => tensor.dispose());
+    prediction.dispose();
 
-    return { buttonPressed: data[0] > 0.5, paddleDirection: data[1] * 30 };
+    return { buttonPressed: buttonPressed > 0.5, paddleDirection: Math.max(Math.min(paddleDirection, 1), -1) * 30 };
   };
 }
