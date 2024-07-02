@@ -2,12 +2,13 @@ import { describe, it, expect } from "vitest";
 import { Action, addPointState, getDeuceCount, getWinStreak, reducer } from "./score"; // Adjust the import path as needed
 import { AnnouncementEventType, MatchState, Player, PlayerPositions, PointType, Score } from "../types";
 
-const defaultMatchConfig = {
+const defaultMatchConfig: MatchState["matchConfig"] = {
   numberOfSets: 3,
   setLength: 6,
   names: { [Player.Player1]: "Player1", [Player.Player2]: "Player2" },
   inputTypes: { [Player.Player1]: "gamepad", [Player.Player2]: "gamepad" },
   soundOn: true,
+  tieBreakLastSet: false,
 };
 describe("Tennis Match Reducer", () => {
   const initialState: MatchState = {
@@ -607,6 +608,17 @@ describe("addPointState", () => {
   it("should handle tiebreak and set point type to TIEBREAK", () => {
     const state = {
       ...initialState,
+      games: { [Player.Player1]: 6, [Player.Player2]: 6 },
+      tiebreak: { [Player.Player1]: 0, [Player.Player2]: 0 },
+    };
+    const updatedState = addPointState(state);
+    expect(updatedState.pointType).toBe(PointType.Tiebreak);
+  });
+
+  it.only("should handle tiebreak and set point type to TIEBREAK", () => {
+    const state: MatchState = {
+      ...initialState,
+      matchConfig: { ...initialState.matchConfig, numberOfSets: 1, tieBreakLastSet: true },
       games: { [Player.Player1]: 6, [Player.Player2]: 6 },
       tiebreak: { [Player.Player1]: 0, [Player.Player2]: 0 },
     };

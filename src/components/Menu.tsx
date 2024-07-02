@@ -3,9 +3,8 @@ import { MatchState, Player } from "../types";
 import { useNavigate } from "react-router-dom";
 import "./Menu.css";
 import { clearItem, loadItem, saveItem } from "../libs/localStorage";
-import { MATCH_STATE_KEY } from "../config";
+import { MATCH_CONFIG_KEY, MATCH_STATE_KEY } from "../config";
 
-const MATCH_CONFIG_KEY = "MATCH_CONFIG";
 const initialMatchConfig = {
   numberOfSets: 3,
   setLength: 6,
@@ -187,6 +186,16 @@ const MenuComponent: React.FC = () => {
           type="checkbox"
           checked={matchConfig.soundOn}
           onChange={() => setMatchConfig({ ...matchConfig, soundOn: !matchConfig.soundOn })}
+        />
+      </label>
+      <br />
+      <label>
+        <span>Tiebreak in Last Set:</span>
+        <input
+          className="input"
+          type="checkbox"
+          checked={matchConfig.tieBreakLastSet ?? false}
+          onChange={() => setMatchConfig({ ...matchConfig, tieBreakLastSet: !matchConfig.tieBreakLastSet })}
         />
       </label>
       <br />

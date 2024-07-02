@@ -17,8 +17,6 @@ export const DELTA_TIME_DIVISOR = 21;
 export const PADDLE_CONTACT_SPEED_BOOST_DIVISOR = 4;
 export const PADDLE_GAP = 10;
 export const SCORE_PAUSE_TIMEOUT = 75;
-
-// web hid
 export const PADDLE_SPEED_DEVISOR = 15;
 export const LONG_RALLY_ANNOUNCEMENT_THRESHOLD = 10;
 
@@ -32,3 +30,4 @@ export const MAX_COMPUTER_PADDLE_SPEED = 10;
 export const GAMEPAD_AXIS_MULTIPLIER = 150;
 
 export const MATCH_STATE_KEY = "matchState";
+export const MATCH_CONFIG_KEY = "MATCH_CONFIG";

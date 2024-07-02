@@ -1,6 +1,7 @@
 import "./Scoreboard.css";
 import { PLAYER_COLOURS } from "../../config";
 import { MatchState, Player, Score } from "../../types";
+import { isTiebreak } from "../../libs/score";
 
 const scoreMap: {
   [key in Score]?: string;
@@ -11,10 +12,7 @@ const scoreMap: {
 const Scoreboard = ({ matchState }: { matchState: MatchState }) => {
   const { sets, games, tiebreak, servingPlayer, gameState, matchConfig } = matchState;
 
-  const isTieBreak =
-    games[Player.Player1] === matchConfig.setLength &&
-    games[Player.Player2] === matchConfig.setLength &&
-    sets.length + 1 !== matchState.matchConfig.numberOfSets;
+  const inTiebreak = isTiebreak(matchState);
 
   const longestNameLength = Math.max(matchConfig.names[Player.Player1].length, matchConfig.names[Player.Player2].length);
 
@@ -40,7 +38,7 @@ const Scoreboard = ({ matchState }: { matchState: MatchState }) => {
         <div className="cell number-cell">{sets.filter((set) => set[Player.Player1] > set[Player.Player2]).length}</div>
         <div className="cell number-cell">{games[Player.Player1]}</div>
         <div className="cell game-cell">
-          {isTieBreak ? tiebreak[Player.Player1] : scoreMap?.[gameState[Player.Player1]] ?? gameState[Player.Player1]}
+          {inTiebreak ? tiebreak[Player.Player1] : scoreMap?.[gameState[Player.Player1]] ?? gameState[Player.Player1]}
         </div>
       </div>
       <div className="row">
@@ -63,7 +61,7 @@ const Scoreboard = ({ matchState }: { matchState: MatchState }) => {
         <div className="cell number-cell">{sets.filter((set) => set[Player.Player2] > set[Player.Player1]).length}</div>
         <div className="cell number-cell">{games[Player.Player2]}</div>
         <div className="cell game-cell">
-          {isTieBreak ? tiebreak[Player.Player2] : scoreMap?.[gameState[Player.Player2]] ?? gameState[Player.Player2]}
+          {inTiebreak ? tiebreak[Player.Player2] : scoreMap?.[gameState[Player.Player2]] ?? gameState[Player.Player2]}
         </div>
       </div>
     </div>

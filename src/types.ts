@@ -105,6 +105,7 @@ export interface MatchState {
     names: { [Player.Player1]: string; [Player.Player2]: string };
     inputTypes: { [Player.Player1]: string; [Player.Player2]: string };
     soundOn: boolean;
+    tieBreakLastSet: boolean;
   };
   events: AnnouncementEvent[];
   pointType: PointType;

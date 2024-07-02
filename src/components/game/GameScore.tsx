@@ -1,5 +1,6 @@
 import "./GameScore.css";
 import { MatchState, Player, PointType, Score } from "../../types";
+import { isTiebreak } from "../../libs/score";
 
 const scoreMap: {
   [key in Score]?: string;
@@ -21,24 +22,21 @@ const pointMap: {
 };
 
 const GameScore = ({ leftPlayer, rightPlayer, matchState }: { leftPlayer: Player; rightPlayer: Player; matchState: MatchState }) => {
-  const { gameState, matchConfig, games, tiebreak, sets } = matchState;
+  const { gameState, tiebreak } = matchState;
   const leftScore = gameState[leftPlayer];
   const rightScore = gameState[rightPlayer];
-  const isTieBreak =
-    games[Player.Player1] === matchConfig.setLength &&
-    games[Player.Player2] === matchConfig.setLength &&
-    sets.length + 1 !== matchState.matchConfig.numberOfSets;
+  const inTiebreak = isTiebreak(matchState);
 
   return (
     <div className="game-score-container">
       <div key={`left-${leftScore}`} className="score score-left new-score">
-        {isTieBreak ? tiebreak[leftPlayer] : scoreMap?.[leftScore] ?? leftScore}
+        {inTiebreak ? tiebreak[leftPlayer] : scoreMap?.[leftScore] ?? leftScore}
       </div>
       <div key={`middle-${matchState.pointType}`} className="score score-middle new-score">
         {pointMap?.[matchState.pointType] ?? matchState.pointType}
       </div>
       <div key={`right-${rightScore}`} className="score score-right new-score">
-        {isTieBreak ? tiebreak[rightPlayer] : scoreMap?.[rightScore] ?? rightScore}
+        {inTiebreak ? tiebreak[rightPlayer] : scoreMap?.[rightScore] ?? rightScore}
       </div>
     </div>
   );

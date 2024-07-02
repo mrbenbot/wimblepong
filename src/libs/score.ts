@@ -18,6 +18,7 @@ export const initialState: MatchState = {
     names: { [Player.Player1]: "Player1", [Player.Player2]: "Player2" },
     inputTypes: { [Player.Player1]: "bot-easy", [Player.Player2]: "mouse" },
     soundOn: true,
+    tieBreakLastSet: false,
   },
   events: [],
   pointType: PointType.Normal,
@@ -348,11 +349,11 @@ function isGamePoint(scoreOne: Score, scoreTwo: Score): boolean {
   );
 }
 
-function isTiebreak(state: MatchState): boolean {
+export function isTiebreak(state: MatchState): boolean {
   return (
     state.games[Player.Player1] === state.matchConfig.setLength &&
     state.games[Player.Player2] === state.matchConfig.setLength &&
-    state.sets.length + 1 < state.matchConfig.numberOfSets
+    (state.sets.length + 1 < state.matchConfig.numberOfSets || state.matchConfig.tieBreakLastSet)
   );
 }
 
