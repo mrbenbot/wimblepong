@@ -2,30 +2,61 @@ import React, { useState, useEffect } from "react";
 import { MatchState, Player } from "../types";
 import { useNavigate } from "react-router-dom";
 import "./Menu.css";
-import { clearItem } from "../libs/localStorage";
+import { clearItem, loadItem, saveItem } from "../libs/localStorage";
 import { MATCH_STATE_KEY } from "../config";
+
+const MATCH_CONFIG_KEY = "MATCH_CONFIG";
+const initialMatchConfig = {
+  numberOfSets: 3,
+  setLength: 6,
+  names: {
+    [Player.Player1]: "Player1",
+    [Player.Player2]: "Player2",
+  },
+  inputTypes: {
+    [Player.Player1]: "mouse",
+    [Player.Player2]: "bot-easy",
+  },
+  soundOn: true,
+};
+
+const humanInputs = [
+  { value: "mouse", label: "Mouse" },
+  { value: "gamepad", label: "Gamepad" },
+];
+
+const botInputs = [
+  { value: "bot-easy", label: "Bot - Easy" },
+  { value: "bot-medium", label: "Bot - Medium" },
+  { value: "bot-hard", label: "Bot - Hard" },
+];
+
+const staticInputs = [...humanInputs, ...botInputs].map(({ value }) => value);
+
+function checkOptionExists(option: string, models: string[]) {
+  return [...models, ...staticInputs].includes(option) ? option : "bot-easy";
+}
 
 const MenuComponent: React.FC = () => {
   const navigate = useNavigate();
-  const [models, setModels] = useState<string[]>([]);
-  const [matchConfig, setMatchConfig] = useState<MatchState["matchConfig"]>({
-    numberOfSets: 3,
-    setLength: 6,
-    names: {
-      [Player.Player1]: "Player1",
-      [Player.Player2]: "Player2",
-    },
-    inputTypes: {
-      [Player.Player1]: "mouse",
-      [Player.Player2]: "bot-easy",
-    },
-    soundOn: true,
-  });
+  const [models, setModels] = useState<string[]>(() => loadItem("model-manifest") || []);
+  const [matchConfig, setMatchConfig] = useState<MatchState["matchConfig"]>(() => loadItem(MATCH_CONFIG_KEY) ?? initialMatchConfig);
 
   useEffect(() => {
-    const manifest = JSON.parse(localStorage.getItem("model-manifest") || "[]");
+    const manifest = loadItem("model-manifest") || [];
     setModels(manifest);
+    setMatchConfig((config) => ({
+      ...config,
+      inputTypes: {
+        [Player.Player1]: checkOptionExists(config.inputTypes[Player.Player1], manifest),
+        [Player.Player2]: checkOptionExists(config.inputTypes[Player.Player2], manifest),
+      },
+    }));
   }, []);
+
+  useEffect(() => {
+    saveItem(MATCH_CONFIG_KEY, matchConfig);
+  }, [matchConfig]);
 
   const handleNavigation = () => {
     const { [Player.Player1]: player1Option, [Player.Player2]: player2Option } = matchConfig.inputTypes;
@@ -60,17 +91,18 @@ const MenuComponent: React.FC = () => {
     return (
       <>
         <optgroup label="Human">
-          <option value="mouse" disabled={isMouseSelected || isGamepadSelected}>
-            Mouse
-          </option>
-          <option value="gamepad" disabled={isMouseSelected}>
-            Gamepad
-          </option>
+          {humanInputs.map((input) => (
+            <option key={input.value} value={input.value} disabled={input.value === "mouse" ? isMouseSelected || isGamepadSelected : isMouseSelected}>
+              {input.label}
+            </option>
+          ))}
         </optgroup>
         <optgroup label="Bot">
-          <option value="bot-easy">Bot - Easy</option>
-          <option value="bot-medium">Bot - Medium</option>
-          <option value="bot-hard">Bot - Hard</option>
+          {botInputs.map((input) => (
+            <option key={input.value} value={input.value}>
+              {input.label}
+            </option>
+          ))}
         </optgroup>
         <optgroup label="AI">
           {models.map((model) => (
