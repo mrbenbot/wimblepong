@@ -18,3 +18,5 @@ Any issues found please raise them on this repo.
   - for now people can zoom out
 - create serve timeout with auto loose point
   - gameloop / setTimeout?
+- docs / instructions
+- gamepad connection warning

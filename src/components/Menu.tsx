@@ -36,6 +36,19 @@ function checkOptionExists(option: string, models: string[]) {
   return [...models, ...staticInputs].includes(option) ? option : "bot-easy";
 }
 
+function forceLegalOpponent(playerInput: string, opponentInput: string): string {
+  if (playerInput === "mouse") {
+    if (["mouse", "gamepad"].includes(opponentInput)) {
+      return "bot-medium";
+    }
+  } else if (playerInput === "gamepad") {
+    if (opponentInput === "mouse") {
+      return "gamepad";
+    }
+  }
+  return opponentInput;
+}
+
 const MenuComponent: React.FC = () => {
   const navigate = useNavigate();
   const [models, setModels] = useState<string[]>(() => loadItem("model-manifest") || []);
@@ -84,14 +97,25 @@ const MenuComponent: React.FC = () => {
     });
   };
 
-  const renderOptions = (otherSelectedOption: string) => {
-    const isMouseSelected = otherSelectedOption === "mouse";
-    const isGamepadSelected = otherSelectedOption === "gamepad";
+  const handleInputTypeChange = (player: Player) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const playerInput = event.target.value;
+    const opponent = player === Player.Player1 ? Player.Player2 : Player.Player1;
+
+    setMatchConfig({
+      ...matchConfig,
+      inputTypes: {
+        [opponent as Player.Player1]: forceLegalOpponent(playerInput, matchConfig.inputTypes[opponent]),
+        [player as Player.Player2]: playerInput,
+      },
+    });
+  };
+
+  const renderOptions = () => {
     return (
       <>
         <optgroup label="Human">
           {humanInputs.map((input) => (
-            <option key={input.value} value={input.value} disabled={input.value === "mouse" ? isMouseSelected || isGamepadSelected : isMouseSelected}>
+            <option key={input.value} value={input.value}>
               {input.label}
             </option>
           ))}
@@ -118,38 +142,61 @@ const MenuComponent: React.FC = () => {
     <div className="menu">
       <h1>Game Setup</h1>
       <div>
-        <label>
+        <label htmlFor="player1-option">
           <span>Player 1 Option:</span>
-          <select value={matchConfig.inputTypes[Player.Player1]} onChange={handleConfigChange("inputTypes", Player.Player1)} className="input">
-            {renderOptions(matchConfig.inputTypes[Player.Player2])}
+          <select
+            id="player1-option"
+            value={matchConfig.inputTypes[Player.Player1]}
+            onChange={handleInputTypeChange(Player.Player1)}
+            className="input"
+          >
+            {renderOptions()}
           </select>
         </label>
       </div>
       <div>
-        <label>
+        <label htmlFor="player2-option">
           <span>Player 2 Option:</span>
-          <select value={matchConfig.inputTypes[Player.Player2]} onChange={handleConfigChange("inputTypes", Player.Player2)} className="input">
-            {renderOptions(matchConfig.inputTypes[Player.Player1])}
+          <select
+            id="player2-option"
+            value={matchConfig.inputTypes[Player.Player2]}
+            onChange={handleInputTypeChange(Player.Player2)}
+            className="input"
+          >
+            {renderOptions()}
           </select>
         </label>
       </div>
       <br />
-      <label>
+      <label htmlFor="player1-name">
         <span>Player 1 Name:</span>
-        <input className="input" type="text" value={matchConfig.names[Player.Player1]} onChange={handleConfigChange("names", Player.Player1)} />
+        <input
+          id="player1-name"
+          className="input"
+          type="text"
+          value={matchConfig.names[Player.Player1]}
+          onChange={handleConfigChange("names", Player.Player1)}
+        />
       </label>
       <br />
-      <label>
+      <label htmlFor="player2-name">
         <span>Player 2 Name:</span>
-        <input className="input" type="text" value={matchConfig.names[Player.Player2]} onChange={handleConfigChange("names", Player.Player2)} />
+        <input
+          id="player2-name"
+          className="input"
+          type="text"
+          value={matchConfig.names[Player.Player2]}
+          onChange={handleConfigChange("names", Player.Player2)}
+        />
       </label>
       <br />
       <br />
-      <label>
+      <label htmlFor="set-length">
         <span>Set Length:</span>{" "}
         <span>
           First to{" "}
           <select
+            id="set-length"
             className="input"
             onChange={(e) => setMatchConfig({ ...matchConfig, setLength: Number(e.target.value) })}
             value={matchConfig.setLength}
@@ -162,11 +209,12 @@ const MenuComponent: React.FC = () => {
         </span>
       </label>
       <br />
-      <label>
+      <label htmlFor="match-length">
         <span>Match Length:</span>{" "}
         <span>
           Best of{" "}
           <select
+            id="match-length"
             className="input"
             onChange={(e) => setMatchConfig({ ...matchConfig, numberOfSets: Number(e.target.value) })}
             value={matchConfig.numberOfSets}
@@ -179,9 +227,10 @@ const MenuComponent: React.FC = () => {
         </span>
       </label>
       <br />
-      <label>
+      <label htmlFor="sound-on">
         <span>Sound On:</span>
         <input
+          id="sound-on"
           className="input"
           type="checkbox"
           checked={matchConfig.soundOn}
@@ -189,9 +238,10 @@ const MenuComponent: React.FC = () => {
         />
       </label>
       <br />
-      <label>
+      <label htmlFor="tiebreak-last-set">
         <span>Tiebreak in Last Set:</span>
         <input
+          id="tiebreak-last-set"
           className="input"
           type="checkbox"
           checked={matchConfig.tieBreakLastSet ?? false}
