@@ -6,11 +6,12 @@ import { botOptions, getComputerPlayerActionsFunction } from "../../libs/compute
 import { useLocation } from "react-router-dom";
 import { getTensorFlowPlayer } from "../../libs/tensorFlowPlayer";
 import { Player } from "../../types";
+import DisconnectionOverlay from "../game/DisconnectionOverlay";
 
 export default function GamepadApp() {
   const location = useLocation();
   const numberOfControllers = Object.values(location.state.matchConfig.inputTypes).filter((type) => type === "gamepad").length;
-  const { connected, getPlayerActions } = useGamepad(numberOfControllers);
+  const { connected, getPlayerActions, gamepads } = useGamepad(numberOfControllers);
 
   const getComputerPlayer = useCallback(async () => {
     // can assume at least one player will be gamepad or will not be using this component
@@ -24,11 +25,14 @@ export default function GamepadApp() {
 
   const { status, getComputerActions } = useMachineOpponent(getComputerPlayer);
   return (
-    <App
-      connected={connected && status === "success"}
-      getPlayer1Actions={location.state.matchConfig.inputTypes[Player.Player1] === "gamepad" ? getPlayerActions : getComputerActions}
-      getPlayer2Actions={location.state.matchConfig.inputTypes[Player.Player2] === "gamepad" ? getPlayerActions : getComputerActions}
-      matchConfig={location.state.matchConfig}
-    />
+    <>
+      <App
+        connected={connected && status === "success"}
+        getPlayer1Actions={location.state.matchConfig.inputTypes[Player.Player1] === "gamepad" ? getPlayerActions : getComputerActions}
+        getPlayer2Actions={location.state.matchConfig.inputTypes[Player.Player2] === "gamepad" ? getPlayerActions : getComputerActions}
+        matchConfig={location.state.matchConfig}
+      />
+      {!connected && <DisconnectionOverlay devices={gamepads} numberOfControllers={numberOfControllers} />}
+    </>
   );
 }

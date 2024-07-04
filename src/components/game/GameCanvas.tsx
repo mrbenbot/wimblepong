@@ -71,6 +71,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
   }, []);
 
   useLayoutEffect(() => {
+    if (paused) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const { draw } = webGlRef.current ?? {};
@@ -84,8 +85,8 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
     const update = (deltaTime: number) => {
       // getPlayerActions using current state
       const actions = {
-        [Player.Player1]: getPlayer1Actions(Player.Player1, gameState, canvas),
-        [Player.Player2]: getPlayer2Actions(Player.Player2, gameState, canvas),
+        [Player.Player1]: getPlayer1Actions(Player.Player1, gameState, canvas, deltaTimeRef.current),
+        [Player.Player2]: getPlayer2Actions(Player.Player2, gameState, canvas, deltaTimeRef.current),
       };
       // Update game state based on actions
       updateGameState(gameState, actions, deltaTime, handleGameEvent);

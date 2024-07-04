@@ -147,7 +147,8 @@ export interface MutableGameState {
 export type GetPlayerActionsFunction = (
   player: Player,
   state: MutableGameState,
-  canvas: HTMLCanvasElement
+  canvas: HTMLCanvasElement,
+  now: number
 ) => {
   buttonPressed: boolean;
   paddleDirection: number;
