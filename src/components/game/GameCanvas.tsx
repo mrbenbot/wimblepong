@@ -32,7 +32,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
   const webGlRef = useRef<ReturnType<typeof initDrawingContext> | null>(null);
   const deltaTimeRef = useRef(0);
 
-  const { servingPlayer, playerPositions } = matchState;
+  const { servingPlayer, playerPositions, matchWinner } = matchState;
 
   const handleGameEvent = useCallback(
     (event: GameEventType) => {
@@ -71,7 +71,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
   }, []);
 
   useLayoutEffect(() => {
-    if (paused) return;
+    if (paused || matchWinner) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const { draw } = webGlRef.current ?? {};
@@ -113,7 +113,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
         cancelAnimationFrame(loopId);
       }
     };
-  }, [gameStateRef, getPlayer1Actions, getPlayer2Actions, handleGameEvent, paused, playerPositions, servingPlayer]);
+  }, [gameStateRef, getPlayer1Actions, getPlayer2Actions, handleGameEvent, paused, playerPositions, servingPlayer, matchWinner]);
 
   return (
     <div className={`game-canvas-container`}>

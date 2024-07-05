@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import "./Menu.css";
 import { clearItem, loadItem, saveItem } from "../libs/localStorage";
 import { MATCH_CONFIG_KEY, MATCH_STATE_KEY } from "../config";
+import Navigation from "./Navigation";
 
 const initialMatchConfig = {
   numberOfSets: 3,
@@ -140,7 +141,8 @@ const MenuComponent: React.FC = () => {
 
   return (
     <div className="menu">
-      <h1>Game Setup</h1>
+      <Navigation />
+      <h2>Game Setup</h2>
       <div>
         <label htmlFor="player1-option">
           <span>Player 1 Option:</span>
@@ -249,10 +251,7 @@ const MenuComponent: React.FC = () => {
         />
       </label>
       <br />
-      <div style={{ display: "flex", justifyContent: "space-evenly", width: "100%" }}>
-        <button onClick={() => navigate("/upload")} className="upload-button">
-          Manage Local Models
-        </button>
+      <div style={{ display: "flex", justifyContent: "center", width: "min(450px, 100vw)" }}>
         <button onClick={handleNavigation} className="play-button">
           PLAY
         </button>

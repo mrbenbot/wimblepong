@@ -1,10 +1,10 @@
 import React, { useState, useEffect, ChangeEvent, DragEvent } from "react";
 import { clearItem, loadItem, saveItem } from "../libs/localStorage";
 import { readFileAsArrayBuffer, readFileAsText } from "../libs/fileReader";
-import { useNavigate } from "react-router-dom";
+import Navigation from "./Navigation";
+import { GITHUB_COLAB_LINK } from "../config";
 
 const ModelUploader: React.FC = () => {
-  const navigate = useNavigate();
   const [modelFile, setModelFile] = useState<File | null>(null);
   const [weightsFile, setWeightsFile] = useState<File | null>(null);
   const [modelName, setModelName] = useState<string>("");
@@ -100,55 +100,75 @@ const ModelUploader: React.FC = () => {
   const preventDefault = (event: DragEvent<HTMLDivElement>) => event.preventDefault();
 
   return (
-    <div>
-      <h1>Upload Model and Weights</h1>
-      {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
-      <div
-        onDrop={handleFileDrop}
-        onDragOver={preventDefault}
-        onDragEnter={preventDefault}
-        style={{
-          border: "2px dashed #ccc",
-          padding: "20px",
-          borderRadius: "10px",
-          textAlign: "center",
-        }}
-        aria-label="Drag and drop area"
-      >
-        Drag and drop your model.json and weights.bin files here
+    <div style={{ display: "flex", justifyContent: "center", fontSize: "1.5em" }}>
+      <div>
+        <Navigation />
+        <h2>Upload Model and Weights</h2>
+        <div style={{ maxWidth: "800px", textAlign: "justify" }}>
+          <p>
+            Upload your Tensorflow JS models here. You need a .json file for the model description and a .bin file for the model weights. First, train
+            your model and export it in the TFJS saved model format. This <a href={GITHUB_COLAB_LINK}>Google Colab</a> will guide you through the
+            process.
+          </p>
+          <p>Uploaded models are saved to local storage and can be selected as an input type when starting a game.</p>
+        </div>
+        {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+        <div
+          onDrop={handleFileDrop}
+          onDragOver={preventDefault}
+          onDragEnter={preventDefault}
+          style={{
+            border: "2px dashed #ccc",
+            padding: "20px",
+            borderRadius: "10px",
+            textAlign: "center",
+          }}
+          aria-label="Drag and drop area"
+        >
+          Drag and drop your model.json and weights.bin files here
+        </div>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "5px" }}>
+          <input type="file" accept=".json,.bin" multiple onChange={handleFileSelect} aria-label="File input for model and weights" />
+          <input
+            type="text"
+            placeholder="Enter model name"
+            value={modelName}
+            onChange={(e) => setModelName(e.target.value)}
+            aria-label="Model name input"
+            style={{ fontSize: "inherit" }}
+          />
+          <button onClick={handleSave} disabled={!modelFile || !weightsFile || !modelName} aria-label="Save to Local Storage">
+            Save to Local Storage
+          </button>
+        </div>
+        {modelFile && <p>Selected model file: {modelFile.name}</p>}
+        {weightsFile && <p>Selected weights file: {weightsFile.name}</p>}
+        <h2>Saved Models</h2>
+        {manifest.length === 0 ? (
+          <p>No models saved.</p>
+        ) : (
+          <ul style={{ listStyle: "none" }}>
+            {manifest.map((model, index) => (
+              <li
+                key={index}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-evenly",
+                  alignItems: "center",
+                  borderBottom: "2px dashed",
+                  paddingBottom: "10px",
+                  paddingTop: "10px",
+                }}
+              >
+                <span>{model}</span>
+                <button onClick={() => handleDelete(model)} aria-label={`Delete ${model}`} style={{ borderColor: "red " }}>
+                  Delete "{model}"
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
-      <input type="file" accept=".json,.bin" multiple onChange={handleFileSelect} aria-label="File input for model and weights" />
-      <input
-        type="text"
-        placeholder="Enter model name"
-        value={modelName}
-        onChange={(e) => setModelName(e.target.value)}
-        aria-label="Model name input"
-      />
-      <button onClick={handleSave} disabled={!modelFile || !weightsFile || !modelName} aria-label="Save to Local Storage">
-        Save to Local Storage
-      </button>
-      {modelFile && <p>Selected model file: {modelFile.name}</p>}
-      {weightsFile && <p>Selected weights file: {weightsFile.name}</p>}
-      <h2>Saved Models</h2>
-      {manifest.length === 0 ? (
-        <p>No models saved.</p>
-      ) : (
-        <ul style={{ listStyle: "none" }}>
-          {manifest.map((model, index) => (
-            <li
-              key={index}
-              style={{ display: "flex", justifyContent: "space-evenly", alignItems: "center", borderBottom: "2px dashed", paddingBottom: "10px" }}
-            >
-              <span>{model}</span>
-              <button onClick={() => handleDelete(model)} aria-label={`Delete ${model}`} style={{ borderColor: "red " }}>
-                Delete "{model}"
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-      <button onClick={() => navigate("/menu")}>Game Setup</button>
     </div>
   );
 };

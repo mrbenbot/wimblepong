@@ -1,10 +1,10 @@
-# Wimblepong
+# WimblePong
 
 <p align="center">
   <img src="./public/wimblepong.png" alt="Logo" width="200"/>
 </p>
 
-## Wimblepong is in early access
+## WimblePong is in early access
 
 > anything could change before the competition starts on 15th of July
 
