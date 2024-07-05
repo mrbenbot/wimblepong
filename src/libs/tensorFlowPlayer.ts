@@ -1,6 +1,7 @@
 import { COURT } from "../config";
 import { GetPlayerActionsFunction, MutableGameState, Player } from "../types";
 import type { Tensor, Rank, io, GraphModel } from "@tensorflow/tfjs";
+import { initialGameState } from "./game";
 
 class LocalStorageIOHandler implements io.IOHandler {
   private modelPath: string;
@@ -47,14 +48,33 @@ class LocalStorageIOHandler implements io.IOHandler {
   }
 }
 
-function getObservation(player: Player, gameState: MutableGameState) {
+function loadObservationFunction(modelName: string): typeof getObservation {
+  console.log("Checking for custom observation function");
+  const customObservationString = localStorage.getItem(`${modelName}-observations.js`);
+  if (!customObservationString) {
+    console.log("No custom observation function so using default");
+    return getObservation;
+  }
+  const getCustomObservation = new Function(`const getObservation = ${JSON.parse(customObservationString)}; return getObservation;`)();
+
+  try {
+    const observation = getCustomObservation(Player.Player1, initialGameState, COURT);
+    console.log("Test observation succeeded", observation);
+    return getCustomObservation;
+  } catch (err) {
+    console.log("Test observation failed", err);
+    return getObservation;
+  }
+}
+
+function getObservation(player: Player, gameState: MutableGameState, court: typeof COURT) {
   return [
-    gameState.ball.x / COURT.width,
-    gameState.ball.y / COURT.height,
+    gameState.ball.x / court.width,
+    gameState.ball.y / court.height,
     gameState.ball.dx / 40,
     gameState.ball.dy / 40,
-    gameState[player].x > COURT.width / 2 ? 1 : 0,
-    gameState[player].y / COURT.height,
+    gameState[player].x > court.width / 2 ? 1 : 0,
+    gameState[player].y / court.height,
     gameState.ball.serveMode ? 1 : 0,
     gameState.server === player ? 1 : 0,
   ];
@@ -82,13 +102,14 @@ export async function getTensorFlowPlayer(modelName: string): Promise<GetPlayerA
 
   console.log(`loading model - ${modelName}`);
   const model = await loadModel();
+  const getObservation = loadObservationFunction(modelName);
 
   return (player, gameState) => {
     if (!model) {
       console.error(`Model "${modelName}" not loaded yet`);
       return { paddleDirection: 0, buttonPressed: false };
     }
-    const inputTensor = tf.tensor([getObservation(player, gameState)]); // Expand dimensions to match the expected input shape [1, 8]
+    const inputTensor = tf.tensor([getObservation(player, gameState, COURT)]);
     const prediction = model.predict(inputTensor) as Tensor<Rank>;
     const [buttonPressed, paddleDirection] = prediction.dataSync();
 

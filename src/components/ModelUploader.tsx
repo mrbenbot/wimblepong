@@ -7,6 +7,8 @@ import { GITHUB_COLAB_LINK } from "../config";
 const ModelUploader: React.FC = () => {
   const [modelFile, setModelFile] = useState<File | null>(null);
   const [weightsFile, setWeightsFile] = useState<File | null>(null);
+  const [customObservationsFile, setCustomObservationsFile] = useState<File | null>(null);
+
   const [modelName, setModelName] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [manifest, setManifest] = useState<string[]>([]);
@@ -32,6 +34,7 @@ const ModelUploader: React.FC = () => {
   const processFiles = (files: FileList) => {
     let newModelFile: File | null = null;
     let newWeightsFile: File | null = null;
+    let customObservationsFile: File | null = null;
     let error = "";
 
     Array.from(files).forEach((file) => {
@@ -47,6 +50,12 @@ const ModelUploader: React.FC = () => {
         } else {
           newWeightsFile = file;
         }
+      } else if (file.name.endsWith(".js")) {
+        if (customObservationsFile) {
+          error = "Multiple custom observation files detected. Please upload only one weights.bin file.";
+        } else {
+          customObservationsFile = file;
+        }
       } else {
         error = "Unsupported file type detected. Please upload .json and .bin files only.";
       }
@@ -57,6 +66,7 @@ const ModelUploader: React.FC = () => {
     } else {
       setModelFile(newModelFile);
       setWeightsFile(newWeightsFile);
+      setCustomObservationsFile(customObservationsFile);
       setErrorMessage("");
     }
   };
@@ -74,9 +84,14 @@ const ModelUploader: React.FC = () => {
       saveItem(`${modelName}-model.json`, modelJson);
       saveItem(`${modelName}-weights.bin`, Array.from(new Uint8Array(weightsArrayBuffer)));
 
+      if (customObservationsFile) {
+        const observationFunctionString = await readFileAsText(customObservationsFile);
+        saveItem(`${modelName}-observations.js`, observationFunctionString);
+      }
+
       updateManifest(modelName);
 
-      alert("Model and weights saved to local storage.");
+      alert(`Model and weights ${customObservationsFile ? "and observation function " : ""}saved to local storage.`);
     } catch (error) {
       console.error("Error saving model and weights:", error);
       setErrorMessage("Error saving model and weights. Please try again.");
@@ -125,7 +140,7 @@ const ModelUploader: React.FC = () => {
           }}
           aria-label="Drag and drop area"
         >
-          Drag and drop your model.json and weights.bin files here
+          Drag and drop your model.json, weights.bin and (optionally) observations.js files here
         </div>
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "5px" }}>
           <input type="file" accept=".json,.bin" multiple onChange={handleFileSelect} aria-label="File input for model and weights" />
@@ -143,6 +158,7 @@ const ModelUploader: React.FC = () => {
         </div>
         {modelFile && <p>Selected model file: {modelFile.name}</p>}
         {weightsFile && <p>Selected weights file: {weightsFile.name}</p>}
+        {customObservationsFile && <p>Selected observation function file: {customObservationsFile.name}</p>}
         <h2>Saved Models</h2>
         {manifest.length === 0 ? (
           <p>No models saved.</p>
