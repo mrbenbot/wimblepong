@@ -1,0 +1,17 @@
+jupyterlab
+
+gym
+stable-baselines3[extra]
+tensorflowjs
+onnx2tf 
+onnx==1.15.0 
+onnxruntime==1.17.1 
+tensorflow==2.16.1
+onnx_graphsurgeon
+sng4onnx
+onnxsim
+
+
+# other stuff that's magically in a colab :)
+imageio
+moviepy
