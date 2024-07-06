@@ -12,7 +12,7 @@ python -m venv venv
 
 ## 2) Install the requirements
 ``` bash
-pip install -r requirements.txt
+pip install -r train-reqs.txt
 ```
 
 ## 3) fire up Jupyter Lab 
