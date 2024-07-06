@@ -13,6 +13,7 @@ import useSynthesizer from "../../hooks/useSynthesizer";
 import soundMiddleware from "../../libs/soundMiddleware";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MATCH_STATE_KEY } from "../../config";
+import switchEndDelayMiddleWare from "../../libs/switchEndDelayMiddleware";
 
 interface AppProps {
   connected?: boolean;
@@ -21,13 +22,16 @@ interface AppProps {
   matchConfig: MatchState["matchConfig"];
 }
 
+const reducerWithDelayedSwitchEnds = switchEndDelayMiddleWare()(reducer);
+
 const App = ({ connected = true, getPlayer1Actions, getPlayer2Actions, matchConfig }: AppProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const gameStateRef = useRef<MutableGameState>(initialGameState);
   const playNote = useSynthesizer();
+
   const [matchState, dispatch] = useReducer(
-    soundMiddleware(playNote)(reducer),
+    soundMiddleware(playNote)(reducerWithDelayedSwitchEnds),
     { ...initialState, matchConfig },
     (initial) => loadItem(MATCH_STATE_KEY) || initial
   );
