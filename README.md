@@ -1,7 +1,7 @@
 # WimblePong
 
 <p align="center">
-  <img src="./public/wimblepong.png" alt="Logo" width="200"/>
+  <img src="./public/wp2124.png" alt="Logo" width="200"/>
 </p>
 
 ## WimblePong is in early access
