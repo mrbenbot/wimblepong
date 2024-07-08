@@ -1,6 +1,6 @@
 # Guide for training your AI contender with pytorch
 
-This directory contains a [python jupyter notebook](ai_training/WimblepongCustomTrainingEnv.ipynb) which you can use to train a model. You can run this notebook using google colab or you can run in locally - it's up to you.
+This directory contains a [python jupyter notebook](./WimblepongCustomTrainingEnv.ipynb) which you can use to train a model. You can run this notebook using google colab or you can run in locally - it's up to you.
 
 ## To run in colab
 
