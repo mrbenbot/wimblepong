@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useLayoutEffect, useEffect } from "react";
+import React, { useRef, useCallback, useLayoutEffect, useEffect, useState } from "react";
 import { Action } from "../../libs/score";
 import { COURT, DELTA_TIME_DIVISOR } from "../../config";
 import "./GameCanvas.css";
@@ -31,17 +31,29 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const webGlRef = useRef<ReturnType<typeof initDrawingContext> | null>(null);
   const deltaTimeRef = useRef(0);
+  const matchStateRef = useRef(matchState);
+  const [endsAndServer, setEndsAndServer] = useState({ playerPositions: matchState.playerPositions, servingPlayer: matchState.servingPlayer });
 
-  const { servingPlayer, playerPositions, matchWinner } = matchState;
+  const { matchWinner } = matchState;
+  const { playerPositions, servingPlayer } = endsAndServer;
+
+  useEffect(() => {
+    matchStateRef.current = matchState;
+  }, [matchState]);
+
+  const updateEndsAndServer = useCallback(() => {
+    console.log(matchStateRef.current);
+    setEndsAndServer({ playerPositions: matchStateRef.current.playerPositions, servingPlayer: matchStateRef.current.servingPlayer });
+  }, []);
 
   const handleGameEvent = useCallback(
     (event: GameEventType) => {
       switch (event) {
         case GameEventType.ScorePointLeft:
-          dispatch({ type: "POINT_SCORED", player: rightPlayer, stats: { ...gameStateRef.current.stats } });
+          dispatch({ type: "POINT_SCORED", side: "rightPlayer", stats: { ...gameStateRef.current.stats } });
           break;
         case GameEventType.ScorePointRight:
-          dispatch({ type: "POINT_SCORED", player: leftPlayer, stats: { ...gameStateRef.current.stats } });
+          dispatch({ type: "POINT_SCORED", side: "leftPlayer", stats: { ...gameStateRef.current.stats } });
           break;
         case GameEventType.HitPaddle:
           dispatch({ type: "HIT_PADDLE" });
@@ -53,13 +65,14 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
           dispatch({ type: "SERVE" });
           break;
         case GameEventType.ResetBall:
+          updateEndsAndServer();
           dispatch({ type: "RESET_BALL" });
           break;
         default:
           return;
       }
     },
-    [dispatch, gameStateRef, leftPlayer, rightPlayer]
+    [dispatch, gameStateRef, updateEndsAndServer]
   );
 
   useEffect(() => {

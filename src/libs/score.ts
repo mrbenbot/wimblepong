@@ -25,7 +25,7 @@ export const initialState: MatchState = {
 };
 
 export type Action =
-  | { type: "POINT_SCORED"; player: Player; stats: { rallyLength: number; serveSpeed: number; server: Player } }
+  | { type: "POINT_SCORED"; side: "leftPlayer" | "rightPlayer"; stats: { rallyLength: number; serveSpeed: number; server: Player } }
   | { type: "CLEAR_EVENTS" }
   | { type: "HIT_PADDLE" }
   | { type: "WALL_CONTACT" }
@@ -39,7 +39,8 @@ export function reducer(state: MatchState, action: Action): MatchState {
 
   switch (action.type) {
     case "POINT_SCORED": {
-      const { player, stats } = action;
+      const { stats } = action;
+      const { [action.side]: player } = getLeftRightPlayer(state.playerPositions);
       const opponent = player === Player.Player1 ? Player.Player2 : Player.Player1;
       if (isTiebreak(state)) {
         if (isTiebreakSetPoint(state, player, opponent)) {

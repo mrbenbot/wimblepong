@@ -5,7 +5,6 @@ import MouseControlApp from "./components/inputs/MouseControlApp";
 import GamepadApp from "./components/inputs/GamepadApp";
 import GameOver from "./components/GameOver";
 import ModelUploader from "./components/ModelUploader";
-import ModelSelector from "./components/ModelSelector";
 import ComputerApp from "./components/inputs/ComputerApp";
 import BackStory from "./components/BackStory";
 import Instructions from "./components/Instructions";
@@ -32,5 +31,4 @@ export const router = createBrowserRouter([
   { path: "/computer", element: <ComputerApp />, errorElement: <Navigate to="/play" replace={true} /> },
   { path: "/gameover", element: <GameOver /> },
   { path: "/upload", element: <ModelUploader /> },
-  { path: "/select", element: <ModelSelector /> },
 ]);

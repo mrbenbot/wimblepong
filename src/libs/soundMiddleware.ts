@@ -1,6 +1,6 @@
 import { Melody, NoteType, longRally, noteFrequencies, switchEnds, winGame, winMatch, winSet, winStreak } from "../hooks/useSynthesizer";
 import { AnnouncementEvent, AnnouncementEventType, MatchState } from "../types";
-import { Action } from "./score";
+import { Action, getLeftRightPlayer } from "./score";
 
 type MatchStateReducer = (state: MatchState, action: Action) => MatchState;
 
@@ -23,9 +23,11 @@ const soundMiddleware = (
           playNote(buildSoundsFromEvents(newState.events));
         } else {
           switch (action.type) {
-            case "POINT_SCORED":
-              playNote(state.servingPlayer === action.player ? NoteType.WinPointServer : NoteType.WinPointReceiver);
+            case "POINT_SCORED": {
+              const { [action.side]: player } = getLeftRightPlayer(state.playerPositions);
+              playNote(state.servingPlayer === player ? NoteType.WinPointServer : NoteType.WinPointReceiver);
               break;
+            }
             case "HIT_PADDLE":
               playNote(NoteType.Paddle);
               break;

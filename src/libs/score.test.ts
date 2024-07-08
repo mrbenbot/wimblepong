@@ -29,7 +29,7 @@ describe("Tennis Match Reducer", () => {
 
   describe("should update the number of games won and sets won correctly", () => {
     it("should update number of games correctly", () => {
-      const action: Action = { type: "POINT_SCORED", player: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } };
+      const action: Action = { type: "POINT_SCORED", side: "leftPlayer", stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } };
       const state = { ...initialState, gameState: { [Player.Player1]: Score.Forty, [Player.Player2]: Score.Thirty } };
       const updatedState = reducer(state, action); // Player1 wins the game
       expect(updatedState.games[Player.Player1]).toBe(1);
@@ -42,7 +42,7 @@ describe("Tennis Match Reducer", () => {
         gameState: { [Player.Player1]: Score.Forty, [Player.Player2]: Score.Thirty },
         games: { [Player.Player1]: 5, [Player.Player2]: 0 },
       };
-      const action: Action = { type: "POINT_SCORED", player: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } };
+      const action: Action = { type: "POINT_SCORED", side: "leftPlayer", stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } };
       const updatedState = reducer(state, action); // Player1 wins the set
       expect(updatedState.games[Player.Player1]).toBe(0);
       expect(updatedState.games[Player.Player2]).toBe(0);
@@ -57,7 +57,7 @@ describe("Tennis Match Reducer", () => {
         gameState: { [Player.Player1]: Score.Forty, [Player.Player2]: Score.Thirty },
         games: { [Player.Player1]: 5, [Player.Player2]: 6 },
       };
-      const action: Action = { type: "POINT_SCORED", player: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } };
+      const action: Action = { type: "POINT_SCORED", side: "leftPlayer", stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } };
       const updatedState = reducer(state, action); // Should be tie break
       expect(updatedState.games[Player.Player1]).toBe(6);
       expect(updatedState.games[Player.Player2]).toBe(6);
@@ -97,7 +97,7 @@ describe("Tennis Match Reducer", () => {
         matchConfig: { ...defaultMatchConfig, ...matchConfig },
         games: { [Player.Player1]: matchConfig.setLength, [Player.Player2]: matchConfig.setLength },
       };
-      const action: Action = { type: "POINT_SCORED", player: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } };
+      const action: Action = { type: "POINT_SCORED", side: "leftPlayer", stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } };
       const updatedState = reducer(state, action); // Should be tie break
       expect(updatedState.games[Player.Player1]).toBe(matchConfig.setLength);
       expect(updatedState.games[Player.Player2]).toBe(matchConfig.setLength);
@@ -116,77 +116,77 @@ describe("Tennis Match Reducer", () => {
       };
 
       // Point 1: Player1 scores
-      state = reducer(state, { type: "POINT_SCORED", player: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
+      state = reducer(state, { type: "POINT_SCORED", side: "leftPlayer", stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
       expect(state.tiebreak[Player.Player1]).toBe(1);
       expect(state.tiebreak[Player.Player2]).toBe(0);
       expect(state.servingPlayer).toBe(Player.Player2); // Serve changes after the first point
       expect(state.playerPositions).toBe(PlayerPositions.Initial); // End stays the same
 
       // Point 2: Player2 scores
-      state = reducer(state, { type: "POINT_SCORED", player: Player.Player2, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
+      state = reducer(state, { type: "POINT_SCORED", side: "rightPlayer", stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
       expect(state.tiebreak[Player.Player1]).toBe(1);
       expect(state.tiebreak[Player.Player2]).toBe(1);
       expect(state.servingPlayer).toBe(Player.Player2); // Serve stays the same after two points
       expect(state.playerPositions).toBe(PlayerPositions.Initial); // End stays the same
 
       // Point 3: Player2 scores
-      state = reducer(state, { type: "POINT_SCORED", player: Player.Player2, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
+      state = reducer(state, { type: "POINT_SCORED", side: "rightPlayer", stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
       expect(state.tiebreak[Player.Player1]).toBe(1);
       expect(state.tiebreak[Player.Player2]).toBe(2);
       expect(state.servingPlayer).toBe(Player.Player1); // Serve changes after two more points
       expect(state.playerPositions).toBe(PlayerPositions.Initial); // End stays the same
 
       // Point 4: Player1 scores
-      state = reducer(state, { type: "POINT_SCORED", player: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
+      state = reducer(state, { type: "POINT_SCORED", side: "leftPlayer", stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
       expect(state.tiebreak[Player.Player1]).toBe(2);
       expect(state.tiebreak[Player.Player2]).toBe(2);
       expect(state.servingPlayer).toBe(Player.Player1); // Serve stays the same after one point
       expect(state.playerPositions).toBe(PlayerPositions.Initial); // End stays the same
 
       // Point 5: Player1 scores
-      state = reducer(state, { type: "POINT_SCORED", player: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
+      state = reducer(state, { type: "POINT_SCORED", side: "leftPlayer", stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
       expect(state.tiebreak[Player.Player1]).toBe(3);
       expect(state.tiebreak[Player.Player2]).toBe(2);
       expect(state.servingPlayer).toBe(Player.Player2); // Serve changes after two more points
       expect(state.playerPositions).toBe(PlayerPositions.Initial); // End stays the same
 
       // Point 6: Player2 scores
-      state = reducer(state, { type: "POINT_SCORED", player: Player.Player2, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
+      state = reducer(state, { type: "POINT_SCORED", side: "rightPlayer", stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
       expect(state.tiebreak[Player.Player1]).toBe(3);
       expect(state.tiebreak[Player.Player2]).toBe(3);
       expect(state.servingPlayer).toBe(Player.Player2); // Serve stays the same after one point
       expect(state.playerPositions).toBe(PlayerPositions.Reversed); // Ends change after 6 points
 
       // Point 7: Player2 scores
-      state = reducer(state, { type: "POINT_SCORED", player: Player.Player2, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
+      state = reducer(state, { type: "POINT_SCORED", side: "leftPlayer", stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
       expect(state.tiebreak[Player.Player1]).toBe(3);
       expect(state.tiebreak[Player.Player2]).toBe(4);
       expect(state.servingPlayer).toBe(Player.Player1); // Serve changes after two more points
       expect(state.playerPositions).toBe(PlayerPositions.Reversed); // End stays the same
 
       // Point 8: Player1 scores
-      state = reducer(state, { type: "POINT_SCORED", player: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
+      state = reducer(state, { type: "POINT_SCORED", side: "rightPlayer", stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
       expect(state.tiebreak[Player.Player1]).toBe(4);
       expect(state.tiebreak[Player.Player2]).toBe(4);
       expect(state.servingPlayer).toBe(Player.Player1); // Serve stays the same after one point
       expect(state.playerPositions).toBe(PlayerPositions.Reversed); // End stays the same
 
       // Point 9: Player1 scores
-      state = reducer(state, { type: "POINT_SCORED", player: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
+      state = reducer(state, { type: "POINT_SCORED", side: "rightPlayer", stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
       expect(state.tiebreak[Player.Player1]).toBe(5);
       expect(state.tiebreak[Player.Player2]).toBe(4);
       expect(state.servingPlayer).toBe(Player.Player2); // Serve changes after two more points
       expect(state.playerPositions).toBe(PlayerPositions.Reversed); // End stays the same
 
       // Point 10: Player2 scores
-      state = reducer(state, { type: "POINT_SCORED", player: Player.Player2, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
+      state = reducer(state, { type: "POINT_SCORED", side: "leftPlayer", stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
       expect(state.tiebreak[Player.Player1]).toBe(5);
       expect(state.tiebreak[Player.Player2]).toBe(5);
       expect(state.servingPlayer).toBe(Player.Player2); // Serve stays the same after one point
       expect(state.playerPositions).toBe(PlayerPositions.Reversed); // End stays the same
 
       // Point 11: Player2 scores
-      state = reducer(state, { type: "POINT_SCORED", player: Player.Player2, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
+      state = reducer(state, { type: "POINT_SCORED", side: "leftPlayer", stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
       expect(state.tiebreak[Player.Player1]).toBe(5);
       expect(state.tiebreak[Player.Player2]).toBe(6);
       expect(state.pointType).toBe(PointType.BreakSetPoint);
@@ -194,14 +194,14 @@ describe("Tennis Match Reducer", () => {
       expect(state.playerPositions).toBe(PlayerPositions.Reversed); // End stays the same
 
       // Point 12: Player1 scores
-      state = reducer(state, { type: "POINT_SCORED", player: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
+      state = reducer(state, { type: "POINT_SCORED", side: "rightPlayer", stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
       expect(state.tiebreak[Player.Player1]).toBe(6);
       expect(state.tiebreak[Player.Player2]).toBe(6);
       expect(state.servingPlayer).toBe(Player.Player1); // Serve stays the same after one point
       expect(state.playerPositions).toBe(PlayerPositions.Initial); // Ends change after 6 points
 
       // Point 13: Player1 scores
-      state = reducer(state, { type: "POINT_SCORED", player: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
+      state = reducer(state, { type: "POINT_SCORED", side: "leftPlayer", stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
       expect(state.tiebreak[Player.Player1]).toBe(7);
       expect(state.tiebreak[Player.Player2]).toBe(6);
       expect(state.pointType).toBe(PointType.BreakSetPoint);
@@ -209,7 +209,7 @@ describe("Tennis Match Reducer", () => {
       expect(state.playerPositions).toBe(PlayerPositions.Initial); // End stays the same
 
       // Point 13: Player1 scores
-      state = reducer(state, { type: "POINT_SCORED", player: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
+      state = reducer(state, { type: "POINT_SCORED", side: "leftPlayer", stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } });
       expect(state.tiebreak[Player.Player1]).toBe(0);
       expect(state.tiebreak[Player.Player2]).toBe(0);
       expect(state.servingPlayer).toBe(Player.Player2); // 13 games played so player two serves in the 14th
@@ -229,7 +229,7 @@ describe("Tennis Match Reducer", () => {
 
       const nextState = reducer(state, {
         type: "POINT_SCORED",
-        player: Player.Player1,
+        side: "leftPlayer",
         stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 },
       });
       expect(nextState.tiebreak[Player.Player1]).toBe(0);
@@ -240,7 +240,7 @@ describe("Tennis Match Reducer", () => {
     });
 
     it("should change ends after the first game and every two games thereafter", () => {
-      const action: Action = { type: "POINT_SCORED", player: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } };
+      const action: Action = { type: "POINT_SCORED", side: "leftPlayer", stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } };
       let state: MatchState = {
         ...initialState,
         playerPositions: PlayerPositions.Initial,
@@ -254,22 +254,22 @@ describe("Tennis Match Reducer", () => {
       expect(state.events).toEqual(expect.arrayContaining([{ type: AnnouncementEventType.SwitchEnds }]));
 
       state = { ...state, gameState: { [Player.Player1]: Score.Forty, [Player.Player2]: Score.Thirty } };
-      state = reducer(state, action); // Player1 wins the second game
+      state = reducer(state, { ...action, side: "rightPlayer" }); // Player1 wins the second game
       expect(state.playerPositions).toBe(PlayerPositions.Reversed); // No change after the second game
       expect(state.events).not.toEqual(expect.arrayContaining([{ type: AnnouncementEventType.SwitchEnds }]));
 
       state = { ...state, gameState: { [Player.Player1]: Score.Forty, [Player.Player2]: Score.Thirty } };
-      state = reducer(state, action); // Player1 wins the third game
+      state = reducer(state, { ...action, side: "rightPlayer" }); // Player1 wins the third game
       expect(state.playerPositions).toBe(PlayerPositions.Initial); // Change after the third game
       expect(state.events).toEqual(expect.arrayContaining([{ type: AnnouncementEventType.SwitchEnds }]));
 
       state = { ...state, gameState: { [Player.Player1]: Score.Forty, [Player.Player2]: Score.Thirty } };
-      state = reducer(state, action); // Player1 wins the fourth game
+      state = reducer(state, { ...action, side: "leftPlayer" }); // Player1 wins the fourth game
       expect(state.playerPositions).toBe(PlayerPositions.Initial); // No change after the fourth game
       expect(state.events).not.toEqual(expect.arrayContaining([{ type: AnnouncementEventType.SwitchEnds }]));
 
       state = { ...state, gameState: { [Player.Player1]: Score.Forty, [Player.Player2]: Score.Thirty } };
-      state = reducer(state, action); // Player1 wins the fifth game
+      state = reducer(state, { ...action, side: "leftPlayer" }); // Player1 wins the fifth game
       expect(state.playerPositions).toBe(PlayerPositions.Reversed); // Change after the fifth game
       expect(state.events).toEqual(expect.arrayContaining([{ type: AnnouncementEventType.SwitchEnds }]));
     });
@@ -283,7 +283,7 @@ describe("Tennis Match Reducer", () => {
           gameState: { [Player.Player1]: Score.Forty, [Player.Player2]: Score.Thirty },
           matchConfig: { ...defaultMatchConfig, numberOfSets: 3, setLength: 6 },
         },
-        actionSettings: { player: Player.Player1 },
+        actionSettings: { side: "leftPlayer" },
         winner: Player.Player1,
       },
       // player 2 winning in straight sets (3 set match)
@@ -294,7 +294,7 @@ describe("Tennis Match Reducer", () => {
           gameState: { [Player.Player1]: Score.Forty, [Player.Player2]: Score.Advantage },
           matchConfig: { ...defaultMatchConfig, numberOfSets: 3, setLength: 6 },
         },
-        actionSettings: { player: Player.Player2 },
+        actionSettings: { side: "rightPlayer" },
         winner: Player.Player2,
       },
       // player 1 winning in straight sets (5 set match)
@@ -308,7 +308,7 @@ describe("Tennis Match Reducer", () => {
           gameState: { [Player.Player1]: Score.Forty, [Player.Player2]: Score.Thirty },
           matchConfig: { ...defaultMatchConfig, numberOfSets: 5, setLength: 6 },
         },
-        actionSettings: { player: Player.Player1 },
+        actionSettings: { side: "leftPlayer" },
         winner: Player.Player1,
       },
       // player 2 winning in straight sets (5 set match)
@@ -322,7 +322,7 @@ describe("Tennis Match Reducer", () => {
           gameState: { [Player.Player1]: Score.Forty, [Player.Player2]: Score.Advantage },
           matchConfig: { ...defaultMatchConfig, numberOfSets: 5, setLength: 6 },
         },
-        actionSettings: { player: Player.Player2 },
+        actionSettings: { side: "rightPlayer" },
         winner: Player.Player2,
       },
       // player 1 winning in 3rd set (3 set match)
@@ -336,7 +336,7 @@ describe("Tennis Match Reducer", () => {
           gameState: { [Player.Player1]: Score.Advantage, [Player.Player2]: Score.Forty },
           matchConfig: { ...defaultMatchConfig, numberOfSets: 3, setLength: 6 },
         },
-        actionSettings: { player: Player.Player1 },
+        actionSettings: { side: "leftPlayer" },
         winner: Player.Player1,
       },
       // player 2 winning in 3rd set (3 set match)
@@ -350,7 +350,7 @@ describe("Tennis Match Reducer", () => {
           gameState: { [Player.Player1]: Score.Forty, [Player.Player2]: Score.Advantage },
           matchConfig: { ...defaultMatchConfig, numberOfSets: 3, setLength: 6 },
         },
-        actionSettings: { player: Player.Player2 },
+        actionSettings: { side: "rightPlayer" },
         winner: Player.Player2,
       },
       // player 2 winning in 3rd set (3 set match)
@@ -364,7 +364,7 @@ describe("Tennis Match Reducer", () => {
           gameState: { [Player.Player1]: Score.Forty, [Player.Player2]: Score.Advantage },
           matchConfig: { ...defaultMatchConfig, numberOfSets: 3, setLength: 4 },
         },
-        actionSettings: { player: Player.Player2 },
+        actionSettings: { side: "rightPlayer" },
         winner: Player.Player2,
       },
     ])(
@@ -373,10 +373,11 @@ describe("Tennis Match Reducer", () => {
         const action: Action = {
           type: "POINT_SCORED",
           stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 },
-          ...actionSettings,
+          ...(actionSettings as { side: "leftPlayer" | "rightPlayer" }),
         };
         const state: MatchState = {
           ...initialState,
+          playerPositions: PlayerPositions.Initial,
           ...stateSettings,
         };
         const newState = reducer(state, action);
@@ -388,7 +389,7 @@ describe("Tennis Match Reducer", () => {
     );
 
     it("should work going from deuce to advantage", () => {
-      const action: Action = { type: "POINT_SCORED", player: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } };
+      const action: Action = { type: "POINT_SCORED", side: "leftPlayer", stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } };
       const state: MatchState = {
         ...initialState,
         playerPositions: PlayerPositions.Initial,
@@ -400,7 +401,7 @@ describe("Tennis Match Reducer", () => {
     });
 
     it("should work going from advantage to next game", () => {
-      const action: Action = { type: "POINT_SCORED", player: Player.Player1, stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } };
+      const action: Action = { type: "POINT_SCORED", side: "leftPlayer", stats: { rallyLength: 5, serveSpeed: 5, server: Player.Player1 } };
       const state: MatchState = {
         ...initialState,
         games: { [Player.Player1]: 0, [Player.Player2]: 0 },
@@ -615,7 +616,7 @@ describe("addPointState", () => {
     expect(updatedState.pointType).toBe(PointType.Tiebreak);
   });
 
-  it.only("should handle tiebreak and set point type to TIEBREAK", () => {
+  it("should handle tiebreak and set point type to TIEBREAK", () => {
     const state: MatchState = {
       ...initialState,
       matchConfig: { ...initialState.matchConfig, numberOfSets: 1, tieBreakLastSet: true },
