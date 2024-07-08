@@ -4,7 +4,7 @@ This directory contains a [python jupyter notebook](./WimblepongCustomTrainingEn
 
 ## To run in colab
 
-Go to the [notebook](ai_training/WimblepongCustomTrainingEnv.ipynb) and click open in colab.
+Go to the [notebook](./WimblepongCustomTrainingEnv.ipynb) and click open in colab.
 
 ## To run locally
 
