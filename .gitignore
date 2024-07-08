@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Nonsense added by the Python dev work 
+.ipynb_checkpoints/
+venv/
+*.mp4
+data/
+
