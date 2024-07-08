@@ -29,7 +29,8 @@ export type Action =
   | { type: "CLEAR_EVENTS" }
   | { type: "HIT_PADDLE" }
   | { type: "WALL_CONTACT" }
-  | { type: "SERVE" };
+  | { type: "SERVE" }
+  | { type: "RESET_BALL" };
 
 export function reducer(state: MatchState, action: Action): MatchState {
   if (state.matchWinner) {

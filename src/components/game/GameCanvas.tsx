@@ -52,6 +52,9 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
         case GameEventType.Serve:
           dispatch({ type: "SERVE" });
           break;
+        case GameEventType.ResetBall:
+          dispatch({ type: "RESET_BALL" });
+          break;
         default:
           return;
       }
