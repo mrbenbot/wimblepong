@@ -96,23 +96,29 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
     };
 
     let loopId: null | number = null;
+    let done = false;
+
     const gameLoop = (timestamp: number) => {
       const deltaTime = (timestamp - deltaTimeRef.current) / DELTA_TIME_DIVISOR;
       deltaTimeRef.current = timestamp;
       update(deltaTime);
       draw(gameState);
-      loopId = requestAnimationFrame(gameLoop);
+      if (!done) {
+        loopId = requestAnimationFrame(gameLoop);
+      }
     };
 
     // set deltaTimeRef so that initial delta time is not crazy big
     deltaTimeRef.current = performance.now();
     console.log("starting game loop");
+
     loopId = requestAnimationFrame(gameLoop);
 
     return () => {
       // Cleanup on unmount
       if (loopId !== null) {
         console.log("stopping game loop");
+        done = true;
         cancelAnimationFrame(loopId);
       }
     };
