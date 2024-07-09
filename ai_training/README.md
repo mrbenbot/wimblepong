@@ -8,6 +8,8 @@ Go to the [notebook](./WimblepongCustomTrainingEnv.ipynb) and click open in cola
 
 ## To run locally
 
+Note: Python 3.10 recommended (to match colab envs)
+
 ### 1) Create a virtual environment
 
 I prefer venv, bash, and Linux, you can try Conda, Windows, Powershell if you'd like life to be unnecessarily complicated..

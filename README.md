@@ -8,7 +8,7 @@
 
 > anything could change before the competition starts on 15th of July
 
-In the meantime. You can find Wimblepong [here](https://wimblepong.netlify.app) (chrome recommended) and train your models using [this colab notebook](./WimblepongCustomTrainingEnv.ipynb)
+In the meantime. You can find Wimblepong [here](https://wimblepong.netlify.app) (chrome recommended) and train your models using [this notebook](./ai_training/README.md)
 
 Any issues found please raise them on this repo.
 
@@ -19,4 +19,4 @@ Any issues found please raise them on this repo.
 - create serve timeout with auto loose point
   - gameloop / setTimeout?
 - docs / instructions
-- gamepad connection warning
+- make it visually more clear when paddles swap sides
