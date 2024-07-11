@@ -32,4 +32,4 @@ export const GAMEPAD_AXIS_MULTIPLIER = 150;
 export const MATCH_STATE_KEY = "MATCH_STATE";
 export const MATCH_CONFIG_KEY = "MATCH_CONFIG";
 
-export const GITHUB_COLAB_LINK = "https://github.com/mrbenbot/wimblepong/blob/main/WimblepongCustomTrainingEnv.ipynb";
+export const GITHUB_COLAB_LINK = "https://github.com/mrbenbot/wimblepong/blob/main/ai_training/WimblepongCustomTrainingEnv.ipynb";
