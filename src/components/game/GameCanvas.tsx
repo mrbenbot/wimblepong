@@ -42,7 +42,6 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
   }, [matchState]);
 
   const updateEndsAndServer = useCallback(() => {
-    console.log(matchStateRef.current);
     setEndsAndServer({ playerPositions: matchStateRef.current.playerPositions, servingPlayer: matchStateRef.current.servingPlayer });
   }, []);
 
@@ -87,7 +86,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
   }, []);
 
   useLayoutEffect(() => {
-    if (paused || matchWinner) return;
+    if (paused || matchWinner !== undefined) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const { draw } = webGlRef.current ?? {};

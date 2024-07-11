@@ -13,7 +13,6 @@ export const getComputerPlayerActionsFunction: (setting: "bot-easy" | "bot-mediu
   let serveDelayCounter = 0;
   let direction = 15;
   const paddleSpeed = speeds[setting] ?? MAX_COMPUTER_PADDLE_SPEED;
-  console.log({ paddleSpeed });
   const paddleOffset = (Math.random() * PADDLE.height) / 2;
   return (player, state) => {
     if (state.ball.scoreMode) {

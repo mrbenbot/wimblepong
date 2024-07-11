@@ -19,7 +19,7 @@ const soundMiddleware = (
       const newState = reducer(state, action);
 
       if (newState.matchConfig.soundOn && !state.matchWinner) {
-        if (newState.events.length > 0) {
+        if (newState.events.length > 0 && action.type!=="RESET_BALL") {
           playNote(buildSoundsFromEvents(newState.events));
         } else {
           switch (action.type) {
