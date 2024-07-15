@@ -8,7 +8,8 @@ import { MATCH_STATE_KEY } from "../config";
 const GameOver = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { sets, rallies, matchWinner, matchConfig } = location.state.matchState as MatchState;
+  const { matchState }: { matchState: MatchState } = location.state;
+  const { sets, rallies, matchWinner, matchConfig } = matchState;
 
   const getOpponent = (player: Player) => (player === Player.Player1 ? Player.Player2 : Player.Player1);
 
@@ -100,6 +101,14 @@ const GameOver = () => {
           <span>Average rally length:</span> {averageRallyLength().toFixed(2)}
           <span>Longest rally:</span> {longestRally()}
         </p>
+        <div style={{display:"flex", justifyContent:"space-evenly", alignItems:"center", fontSize:'0.5em'}}>
+          <p>Sets:</p>
+          {sets.map((set, i) => (
+            <div className="cell number-cell" key={i}>
+              {set[Player.Player1]}/{set[Player.Player2]}
+            </div>
+          ))}
+        </div>
         <div className="button-container">
           <button
             onClick={() => {
