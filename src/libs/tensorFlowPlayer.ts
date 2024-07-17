@@ -56,7 +56,7 @@ function loadObservationFunction(modelName: string): typeof getObservation {
     return getObservation;
   }
   const getCustomObservation = new Function(`const getObservation = ${JSON.parse(customObservationString)}; return getObservation;`)();
-
+  console.log("Using custom observation function")
   try {
     const observation = getCustomObservation(Player.Player1, initialGameState, COURT);
     console.log("Test observation succeeded", observation);
