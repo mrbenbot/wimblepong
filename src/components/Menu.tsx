@@ -3,7 +3,7 @@ import { MatchState, Player } from "../types";
 import { useNavigate } from "react-router-dom";
 import "./Menu.css";
 import { clearItem, loadItem, saveItem } from "../libs/localStorage";
-import { MATCH_CONFIG_KEY, MATCH_STATE_KEY } from "../config";
+import { MATCH_CONFIG_KEY, MATCH_STATE_KEY, PLAYER_COLOURS } from "../config";
 import Navigation from "./Navigation";
 
 const initialMatchConfig = {
@@ -17,6 +17,7 @@ const initialMatchConfig = {
     [Player.Player1]: "mouse",
     [Player.Player2]: "bot-easy",
   },
+  colors: PLAYER_COLOURS,
   soundOn: true,
 };
 
@@ -88,15 +89,16 @@ const MenuComponent: React.FC = () => {
     }
   };
 
-  const handleConfigChange = (key: "names" | "inputTypes", player: Player) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setMatchConfig({
-      ...matchConfig,
-      [key]: {
-        ...matchConfig[key],
-        [player]: key == "names" ? event.target.value.slice(0, 8) : event.target.value,
-      },
-    });
-  };
+  const handleConfigChange =
+    (key: "names" | "inputTypes" | "colors", player: Player) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      setMatchConfig({
+        ...matchConfig,
+        [key]: {
+          ...matchConfig[key],
+          [player]: key == "names" ? event.target.value.slice(0, 8) : event.target.value,
+        },
+      });
+    };
 
   const handleInputTypeChange = (player: Player) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const playerInput = event.target.value;
@@ -155,8 +157,6 @@ const MenuComponent: React.FC = () => {
             {renderOptions()}
           </select>
         </label>
-      </div>
-      <div>
         <label htmlFor="player2-option">
           <span>Player 2 Option:</span>
           <select
@@ -169,66 +169,86 @@ const MenuComponent: React.FC = () => {
           </select>
         </label>
       </div>
-      <br />
-      <label htmlFor="player1-name">
-        <span>Player 1 Name:</span>
-        <input
-          id="player1-name"
-          className="input"
-          type="text"
-          value={matchConfig.names[Player.Player1]}
-          onChange={handleConfigChange("names", Player.Player1)}
-        />
-      </label>
-      <br />
-      <label htmlFor="player2-name">
-        <span>Player 2 Name:</span>
-        <input
-          id="player2-name"
-          className="input"
-          type="text"
-          value={matchConfig.names[Player.Player2]}
-          onChange={handleConfigChange("names", Player.Player2)}
-        />
-      </label>
-      <br />
-      <br />
-      <label htmlFor="set-length">
-        <span>Set Length:</span>{" "}
-        <span>
-          First to{" "}
-          <select
-            id="set-length"
+      <div>
+        <label htmlFor="player1-name">
+          <span>Player 1 Name:</span>
+          <input
+            id="player1-name"
             className="input"
-            onChange={(e) => setMatchConfig({ ...matchConfig, setLength: Number(e.target.value) })}
-            value={matchConfig.setLength}
-          >
-            {[1, 2, 3, 4, 5, 6].map((length) => (
-              <option key={length}>{length}</option>
-            ))}
-          </select>{" "}
-          Games
-        </span>
-      </label>
-      <br />
-      <label htmlFor="match-length">
-        <span>Match Length:</span>{" "}
-        <span>
-          Best of{" "}
-          <select
-            id="match-length"
+            type="text"
+            value={matchConfig.names[Player.Player1]}
+            onChange={handleConfigChange("names", Player.Player1)}
+          />
+        </label>
+        <label htmlFor="player2-name">
+          <span>Player 2 Name:</span>
+          <input
+            id="player2-name"
             className="input"
-            onChange={(e) => setMatchConfig({ ...matchConfig, numberOfSets: Number(e.target.value) })}
-            value={matchConfig.numberOfSets}
-          >
-            {[1, 3, 5].map((length) => (
-              <option key={length}>{length}</option>
-            ))}
-          </select>{" "}
-          Sets
-        </span>
-      </label>
-      <br />
+            type="text"
+            value={matchConfig.names[Player.Player2]}
+            onChange={handleConfigChange("names", Player.Player2)}
+          />
+        </label>
+      </div>
+      <div>
+        <label htmlFor="player1-color">
+          <span>Player 1 Colour:</span>
+          <input
+            id="player1-color"
+            className="input"
+            type="color"
+            value={matchConfig.colors[Player.Player1]}
+            onChange={handleConfigChange("colors", Player.Player1)}
+          />
+        </label>
+        <label htmlFor="player2-color">
+          <span>Player 2 Colour:</span>
+          <input
+            id="player2-color"
+            className="input"
+            type="color"
+            value={matchConfig.colors[Player.Player2]}
+            onChange={handleConfigChange("colors", Player.Player2)}
+          />
+        </label>
+      </div>
+      <div>
+        <label htmlFor="set-length">
+          <span>Set Length:</span>{" "}
+          <span>
+            First to{" "}
+            <select
+              id="set-length"
+              className="input"
+              onChange={(e) => setMatchConfig({ ...matchConfig, setLength: Number(e.target.value) })}
+              value={matchConfig.setLength}
+            >
+              {[1, 2, 3, 4, 5, 6].map((length) => (
+                <option key={length}>{length}</option>
+              ))}
+            </select>{" "}
+            Games
+          </span>
+        </label>
+        <label htmlFor="match-length">
+          <span>Match Length:</span>{" "}
+          <span>
+            Best of{" "}
+            <select
+              id="match-length"
+              className="input"
+              onChange={(e) => setMatchConfig({ ...matchConfig, numberOfSets: Number(e.target.value) })}
+              value={matchConfig.numberOfSets}
+            >
+              {[1, 3, 5].map((length) => (
+                <option key={length}>{length}</option>
+              ))}
+            </select>{" "}
+            Sets
+          </span>
+        </label>
+      </div>
       <label htmlFor="sound-on">
         <span>Sound On:</span>
         <input
@@ -239,18 +259,18 @@ const MenuComponent: React.FC = () => {
           onChange={() => setMatchConfig({ ...matchConfig, soundOn: !matchConfig.soundOn })}
         />
       </label>
-      <br />
-      <label htmlFor="tiebreak-last-set">
-        <span>Tiebreak in Last Set:</span>
-        <input
-          id="tiebreak-last-set"
-          className="input"
-          type="checkbox"
-          checked={matchConfig.tieBreakLastSet ?? false}
-          onChange={() => setMatchConfig({ ...matchConfig, tieBreakLastSet: !matchConfig.tieBreakLastSet })}
-        />
-      </label>
-      <br />
+      <div>
+        <label htmlFor="tiebreak-last-set">
+          <span>Tiebreak in Last Set:</span>
+          <input
+            id="tiebreak-last-set"
+            className="input"
+            type="checkbox"
+            checked={matchConfig.tieBreakLastSet ?? false}
+            onChange={() => setMatchConfig({ ...matchConfig, tieBreakLastSet: !matchConfig.tieBreakLastSet })}
+          />
+        </label>
+      </div>
       <div style={{ display: "flex", justifyContent: "center", width: "min(450px, 100vw)" }}>
         <button onClick={handleNavigation} className="play-button">
           PLAY

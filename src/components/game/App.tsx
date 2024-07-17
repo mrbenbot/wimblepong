@@ -3,7 +3,7 @@ import GameCanvas from "./GameCanvas";
 import { getLeftRightPlayer, initialState, reducer } from "../../libs/score";
 import PlayerScore from "./PlayerScore";
 import EventAnnouncement from "./EventAnnouncement";
-import { GetPlayerActionsFunction, MatchState, MutableGameState } from "../../types";
+import { GetPlayerActionsFunction, MatchState, MutableGameState, Player } from "../../types";
 import Scoreboard from "./Scoreboard";
 import useFullscreen from "../../hooks/useFullScreen";
 import { loadItem, saveItem } from "../../libs/localStorage";
@@ -13,6 +13,7 @@ import useSynthesizer from "../../hooks/useSynthesizer";
 import soundMiddleware from "../../libs/soundMiddleware";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MATCH_STATE_KEY } from "../../config";
+import { hexToRgb } from "../../libs/numbers";
 
 interface AppProps {
   connected?: boolean;
@@ -21,10 +22,18 @@ interface AppProps {
   matchConfig: MatchState["matchConfig"];
 }
 
+function getInitialGameState(matchConfig: MatchState["matchConfig"]):MutableGameState {
+  return {
+    ...initialGameState,
+    [Player.Player1]: { ...initialGameState[Player.Player1], colour: hexToRgb(matchConfig.colors[Player.Player1]) },
+    [Player.Player2]: { ...initialGameState[Player.Player2], colour: hexToRgb(matchConfig.colors[Player.Player2]) },
+  };
+}
+
 const App = ({ connected = true, getPlayer1Actions, getPlayer2Actions, matchConfig }: AppProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const gameStateRef = useRef<MutableGameState>(initialGameState);
+  const gameStateRef = useRef<MutableGameState>(getInitialGameState(matchConfig));
   const playNote = useSynthesizer();
   const reducerWithMiddleware = useMemo(() => soundMiddleware(playNote)(reducer), [playNote]);
 

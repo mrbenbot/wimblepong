@@ -13,6 +13,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 20px
 }
 
 .input {
@@ -21,9 +22,13 @@
 .input[type="checkbox"] {
   width: 1.5rem;
 }
+.input[type="text"] {
+  width: 200px;
+}
 
 label {
-  width: min(450px, 100vw);
+  width: min(500px, 100vw);
   display: flex;
   justify-content: space-between;
+  text-align: left;
 }

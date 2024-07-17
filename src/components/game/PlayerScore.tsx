@@ -1,5 +1,4 @@
 import "./PlayerScore.css";
-import { PLAYER_COLOURS } from "../../config";
 import { MatchState, Player } from "../../types";
 
 const PlayerScore = ({ matchState, player }: { matchState: MatchState; player: Player }) => {
@@ -9,7 +8,7 @@ const PlayerScore = ({ matchState, player }: { matchState: MatchState; player: P
 
   return (
     <div className="player-score">
-      <h2 className="player display-item" style={{ color: PLAYER_COLOURS[player] }}>
+      <h2 className="player display-item" style={{ color: matchConfig.colors[player] }}>
         {matchConfig.names[player]}
       </h2>
       <p className="serving display-item">{servingPlayer === player ? "(serving)" : ""}</p>

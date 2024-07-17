@@ -1,5 +1,4 @@
 import "./Scoreboard.css";
-import { PLAYER_COLOURS } from "../../config";
 import { MatchState, Player, Score } from "../../types";
 import { isTiebreak } from "../../libs/score";
 
@@ -27,7 +26,7 @@ const Scoreboard = ({ matchState }: { matchState: MatchState }) => {
         <div
           className="cell player-cell"
           style={{
-            color: PLAYER_COLOURS[Player.Player1],
+            color: matchConfig.colors[Player.Player1],
             textDecoration: servingPlayer === Player.Player1 ? "underline" : " ",
             width: `calc(0.6em * ${longestNameLength})`,
             textAlign: "left",
@@ -50,7 +49,7 @@ const Scoreboard = ({ matchState }: { matchState: MatchState }) => {
         <div
           className="cell player-cell"
           style={{
-            color: PLAYER_COLOURS[Player.Player2],
+            color: matchConfig.colors[Player.Player2],
             textDecoration: servingPlayer === Player.Player2 ? "underline" : " ",
             textAlign: "left",
             width: `calc(0.6em * ${longestNameLength})`,

@@ -104,6 +104,7 @@ export interface MatchState {
     setLength: number;
     names: { [Player.Player1]: string; [Player.Player2]: string };
     inputTypes: { [Player.Player1]: string; [Player.Player2]: string };
+    colors: { [Player.Player1]: string; [Player.Player2]: string };
     soundOn: boolean;
     tieBreakLastSet: boolean;
   };
