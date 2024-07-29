@@ -7,18 +7,19 @@ import { MATCH_CONFIG_KEY, MATCH_STATE_KEY, PLAYER_COLOURS } from "../config";
 import Navigation from "./Navigation";
 
 const initialMatchConfig = {
-  numberOfSets: 3,
+  numberOfSets: 1,
   setLength: 6,
   names: {
     [Player.Player1]: "Player1",
     [Player.Player2]: "Player2",
   },
   inputTypes: {
-    [Player.Player1]: "mouse",
-    [Player.Player2]: "bot-easy",
+    [Player.Player1]: "gamepad",
+    [Player.Player2]: "gamepad",
   },
   colors: PLAYER_COLOURS,
   soundOn: true,
+  tieBreakLastSet: true,
 };
 
 const humanInputs = [
