@@ -7,6 +7,7 @@ const defaultMatchConfig: MatchState["matchConfig"] = {
   setLength: 6,
   names: { [Player.Player1]: "Player1", [Player.Player2]: "Player2" },
   inputTypes: { [Player.Player1]: "gamepad", [Player.Player2]: "gamepad" },
+  colors: { [Player.Player1]: "#ffffff", [Player.Player2]: "#ffffff" },
   soundOn: true,
   tieBreakLastSet: false,
 };

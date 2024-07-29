@@ -17,6 +17,7 @@ export const initialState: MatchState = {
     setLength: 6,
     names: { [Player.Player1]: "Player1", [Player.Player2]: "Player2" },
     inputTypes: { [Player.Player1]: "bot-easy", [Player.Player2]: "mouse" },
+    colors: { [Player.Player1]: "#ffffff", [Player.Player2]: "#ffffff" },
     soundOn: true,
     tieBreakLastSet: false,
   },

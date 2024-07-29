@@ -47,14 +47,14 @@ describe("MenuComponent", () => {
     const soundOn = screen.getByLabelText("Sound On:");
     const tiebreak = screen.getByLabelText("Tiebreak in Last Set:");
 
-    expect(player1Option).toHaveValue("mouse");
-    expect(player2Option).toHaveValue("bot-easy");
+    expect(player1Option).toHaveValue("gamepad");
+    expect(player2Option).toHaveValue("gamepad");
     expect(player1Name).toHaveValue("Player1");
     expect(player2Name).toHaveValue("Player2");
     expect(setLength).toHaveValue("6");
-    expect(matchLength).toHaveValue("3");
+    expect(matchLength).toHaveValue("1");
     expect(soundOn).toBeChecked();
-    expect(tiebreak).not.toBeChecked();
+    expect(tiebreak).toBeChecked();
   });
 
   it("changes player names", () => {
@@ -82,17 +82,16 @@ describe("MenuComponent", () => {
     const playButton = screen.getByText("PLAY");
 
     fireEvent.click(playButton);
-    expect(mockNavigate).toHaveBeenCalledWith("/mouse", expect.anything());
-
+    expect(mockNavigate).toHaveBeenCalledWith("/gamepad", expect.anything());
+    
     fireEvent.change(screen.getByLabelText("Player 1 Option:"), { target: { value: "bot-hard" } });
     fireEvent.change(screen.getByLabelText("Player 2 Option:"), { target: { value: "bot-medium" } });
     fireEvent.click(playButton);
     expect(mockNavigate).toHaveBeenCalledWith("/computer", expect.anything());
-
-    fireEvent.change(screen.getByLabelText("Player 1 Option:"), { target: { value: "gamepad" } });
-    fireEvent.change(screen.getByLabelText("Player 2 Option:"), { target: { value: "gamepad" } });
+    
+    fireEvent.change(screen.getByLabelText("Player 1 Option:"), { target: { value: "mouse" } });
     fireEvent.click(playButton);
-    expect(mockNavigate).toHaveBeenCalledWith("/gamepad", expect.anything());
+    expect(mockNavigate).toHaveBeenCalledWith("/mouse", expect.anything());
   });
 
   it("toggles checkboxes", () => {
@@ -108,9 +107,9 @@ describe("MenuComponent", () => {
     fireEvent.click(soundOn);
     expect(soundOn).not.toBeChecked();
 
-    expect(tiebreak).not.toBeChecked();
-    fireEvent.click(tiebreak);
     expect(tiebreak).toBeChecked();
+    fireEvent.click(tiebreak);
+    expect(tiebreak).not.toBeChecked();
   });
 
   it("changes match and set length", () => {
