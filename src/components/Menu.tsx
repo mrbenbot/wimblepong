@@ -7,8 +7,8 @@ import { MATCH_CONFIG_KEY, MATCH_STATE_KEY, PLAYER_COLOURS } from "../config";
 import Navigation from "./Navigation";
 
 const initialMatchConfig = {
-  numberOfSets: 1,
-  setLength: 6,
+  numberOfSets: 3,
+  setLength: 3,
   names: {
     [Player.Player1]: "Player1",
     [Player.Player2]: "Player2",

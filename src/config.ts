@@ -30,6 +30,6 @@ export const MAX_COMPUTER_PADDLE_SPEED = 10;
 export const GAMEPAD_AXIS_MULTIPLIER = 150;
 
 export const MATCH_STATE_KEY = "MATCH_STATE";
-export const MATCH_CONFIG_KEY = "MATCH_CONFIG_1";
+export const MATCH_CONFIG_KEY = "MATCH_CONFIG_2";
 
 export const GITHUB_COLAB_LINK = "https://github.com/mrbenbot/wimblepong/blob/main/ai_training/WimblepongCustomTrainingEnv.ipynb";
